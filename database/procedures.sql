@@ -479,6 +479,8 @@ END$$
 -- billing_invoice model functions
 -- CREATE PROCEDURE to insert a new billing invoice
 
+DELIMITER $$
+
 CREATE PROCEDURE create_billing_invoice(
     IN p_appointment_id INT,
     IN p_additional_fee DECIMAL(10,2),
@@ -488,11 +490,24 @@ CREATE PROCEDURE create_billing_invoice(
     IN p_remaining_payment_amount DECIMAL(10,2)
 )
 BEGIN
-    INSERT INTO `billing_invoice` 
-    (appointment_id, additional_fee, total_fee, claim_id, net_amount, remaining_payment_amount, time_stamp)
+    -- Error handler: rollback if something fails
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+    END;
+
+    START TRANSACTION;
+
+    INSERT INTO billing_invoice 
+        (appointment_id, additional_fee, total_fee, claim_id, net_amount, remaining_payment_amount, time_stamp)
     VALUES
-    (p_appointment_id, p_additional_fee, p_total_fee, p_claim_id, p_net_amount, p_remaining_payment_amount, NOW());
+        (p_appointment_id, p_additional_fee, p_total_fee, p_claim_id, p_net_amount, p_remaining_payment_amount, NOW());
+
+    COMMIT;
 END$$
+
+DELIMITER ;
+
 
 
 -- CREATE PROCEDURE to update an existing billing invoice
@@ -505,13 +520,24 @@ CREATE PROCEDURE update_billing_invoice(
     IN p_remaining_payment_amount DECIMAL(10,2)
 )
 BEGIN
-    UPDATE `billing_invoice`
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+    END;
+
+    START TRANSACTION;
+
+    UPDATE billing_invoice
     SET additional_fee = p_additional_fee,
         total_fee = p_total_fee,
         net_amount = p_net_amount,
         remaining_payment_amount = p_remaining_payment_amount,
         time_stamp = NOW()
     WHERE id = p_invoice_id;
+
+    COMMIT;
+
+    SELECT * FROM billing_invoice WHERE id = p_invoice_id;
 END$$
 
 
@@ -525,9 +551,18 @@ END$$
 
 -- CREATE PROCEDURE to get a billing invoice by ID
 
-CREATE PROCEDURE get_billing_invoice_by_id(IN p_invoice_id INT)
+CREATE PROCEDURE delete_billing_invoice(IN p_invoice_id INT)
 BEGIN
-    SELECT * FROM `billing_invoice` WHERE id = p_invoice_id;
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+    END;
+
+    START TRANSACTION;
+
+    DELETE FROM billing_invoice WHERE id = p_invoice_id;
+
+    COMMIT;
 END$$
 
 -- CREATE PROCEDURE to get all billing invoices
@@ -549,10 +584,21 @@ CREATE PROCEDURE create_billing_payment(
     IN p_cashier_id INT
 )
 BEGIN
-    INSERT INTO `billing_payment`
-    (payment_id, invoice_id, branch_id, paid_amount, cashier_id, time_stamp)
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+    END;
+
+    START TRANSACTION;
+
+    INSERT INTO billing_payment
+        (payment_id, invoice_id, branch_id, paid_amount, cashier_id, time_stamp)
     VALUES
-    (p_payment_id, p_invoice_id, p_branch_id, p_paid_amount, p_cashier_id, NOW());
+        (p_payment_id, p_invoice_id, p_branch_id, p_paid_amount, p_cashier_id, NOW());
+
+    COMMIT;
+
+    SELECT * FROM billing_payment WHERE payment_id = p_payment_id;
 END$$
 
 -- CREATE PROCEDURE to update an existing billing payment
@@ -561,10 +607,21 @@ CREATE PROCEDURE update_billing_payment(
     IN p_paid_amount NUMERIC(8,2)
 )
 BEGIN
-    UPDATE `billing_payment`
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+    END;
+
+    START TRANSACTION;
+
+    UPDATE billing_payment
     SET paid_amount = p_paid_amount,
         time_stamp = NOW()
     WHERE payment_id = p_payment_id;
+
+    COMMIT;
+
+    SELECT * FROM billing_payment WHERE payment_id = p_payment_id;
 END$$
 
 
@@ -572,7 +629,16 @@ END$$
 
 CREATE PROCEDURE delete_billing_payment(IN p_payment_id INT)
 BEGIN
-    DELETE FROM `billing_payment` WHERE payment_id = p_payment_id;
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+    END;
+
+    START TRANSACTION;
+
+    DELETE FROM billing_payment WHERE payment_id = p_payment_id;
+
+    COMMIT;
 END$$
 
 
