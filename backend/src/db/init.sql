@@ -66,7 +66,8 @@ INSERT INTO `doctor` (doctor_id, name, fee_per_patient, basic_monthly_salary, ge
 (1, 'Dr. John Doe', 1000.00, 50000.00, 'Male'),
 (2, 'Dr. Jane Smith', 1200.00, 55000.00, 'Female'),
 (3, 'Dr. Mike Johnson', 900.00, 48000.00, 'Male'),
-(4, 'Dr. Emily Davis', 1100.00, 52000.00, 'Female');
+(4, 'Dr. Emily Davis', 1100.00, 52000.00, 'Female'),
+(5, 'Dr. Hasaranga Dinujaya', 1100.00, 52000.00, 'Male');
 
 -- ===========================
 -- 9. Doctor_Speciality

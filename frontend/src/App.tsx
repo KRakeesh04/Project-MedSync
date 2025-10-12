@@ -1,3 +1,4 @@
+// Updated App.tsx
 import './App.css'
 import { useEffect, useState } from "react";
 import { Route, Routes, useLocation } from 'react-router-dom';
@@ -13,7 +14,10 @@ import PatientSignUp from './pages/Authentication/patient-sign-up';
 import DashboardRedirect from './pages/DashboardRedirect';
 import Loader from './components/Loader';
 import LoginLayout from './layouts/LoginLayout';
-
+import AllAppointments from './pages/appointments/AllAppointments';
+import AddAppointments from './pages/appointments/AddAppointment';
+import DoctorTimeSlots from './pages/appointments/DoctorTimeSlots';
+import AddAppointment from './pages/appointments/AddAppointment';
 
 function App() {
   const [loading, setLoading] = useState<boolean>(false);
@@ -97,6 +101,37 @@ function App() {
                 <>
                   <PageTitle title="Deleted Users | MedSync" />
                   <InactiveUsers />
+                </>
+              }
+            />
+
+            {/* Appointment Routes */}
+            <Route
+              path="/appointments"
+              element={
+                <>
+                  <PageTitle title="All Appointments | MedSync" />
+                  <AllAppointments />
+                </>
+              }
+            />
+
+            <Route
+              path="/appointments/time-slots"
+              element={
+                <>
+                  <PageTitle title="Doctors' Time Slots | MedSync" />
+                  <DoctorTimeSlots />
+                </>
+              }
+            />
+
+            <Route
+              path="/appointments/add"
+              element={
+                <>
+                  <PageTitle title="Add Appointment | MedSync" />
+                  <AddAppointment />
                 </>
               }
             />

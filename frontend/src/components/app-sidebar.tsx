@@ -294,15 +294,15 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
       {
         type: "child",
         title: "All Appointments",
-        url: "",
+        url: "/appointments",
         icon: ClipboardList,
         // hideIf: (role) => typeof role !== "string" ||
         //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
       },
       {
         type: "child",
-        title: "Doctors' avilable time",
-        url: "",
+        title: "Doctors' available time",
+        url: "/appointments/time-slots",
         icon: ClockPlus,
         // hideIf: (role) => typeof role !== "string" ||
         //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
@@ -310,7 +310,7 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
       {
         type: "child",
         title: "Add Appointment",
-        url: "",
+        url: "/appointments/add",
         icon: ClipboardPlus,
         // hideIf: (role) => typeof role !== "string" ||
         //   ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),

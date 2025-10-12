@@ -5,6 +5,7 @@ import { patientSignup, staffSignup, userLogin, validateUser } from "../handlers
 import { getBranches } from "../handlers/branch.handler.ts";
 
 
+
 export const HttpMethod = {
 	GET    : "GET",
 	POST   : "POST",
