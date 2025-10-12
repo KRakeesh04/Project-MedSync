@@ -29,7 +29,7 @@ const AllAppointments: React.FC = () => {
   const fetchAppointments = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:3001/api/appointments');
+      const response = await fetch('http://localhost:8000/api/appointments');
       const data = await response.json();
       setAppointments(data);
     } catch (error) {
@@ -117,7 +117,7 @@ const AllAppointments: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/appointments/${id}`, {
+      const response = await fetch(`http://localhost:8000/api/appointments/${id}`, {
         method: 'DELETE',
       });
       

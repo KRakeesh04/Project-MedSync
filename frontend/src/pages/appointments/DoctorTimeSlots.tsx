@@ -30,7 +30,7 @@ const DoctorTimeSlots: React.FC = () => {
   // Fetch doctors from backend
   const fetchDoctors = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/doctors');
+      const response = await fetch('http://localhost:8000/api/doctors');
       const data = await response.json();
       setDoctors(data);
       if (data.length > 0) {
@@ -49,7 +49,7 @@ const DoctorTimeSlots: React.FC = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:3001/api/available-slots?doctor_id=${selectedDoctor}&date=${selectedDate}`
+        `http://localhost:8000/api/available-slots?doctor_id=${selectedDoctor}&date=${selectedDate}`
       );
       const data = await response.json();
       setAvailableSlots(data);

@@ -25,7 +25,7 @@ const AddAppointment: React.FC = () => {
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const doctorsRes = await fetch('http://localhost:3001/api/doctors');
+        const doctorsRes = await fetch('http://localhost:8000/api/doctors');
         const doctorsData = await doctorsRes.json();
         setDoctors(doctorsData);
       } catch (error) {
@@ -62,7 +62,7 @@ const AddAppointment: React.FC = () => {
         time_stamp: new Date().toISOString()
       };
 
-      const response = await fetch('http://localhost:3001/api/appointments', {
+      const response = await fetch('http://localhost:8000/api/appointments', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
