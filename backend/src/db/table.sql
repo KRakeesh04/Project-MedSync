@@ -1,4 +1,4 @@
-USE `Project-MedSync`;
+-- USE `Project-MedSync`;
 
 -- child → parent drop order
 DROP TABLE IF EXISTS `billing_payment`;
@@ -38,7 +38,7 @@ CREATE TABLE `branch` (
 CREATE TABLE `user` (
     `user_id` INT AUTO_INCREMENT,
     `username` VARCHAR(20) NOT NULL UNIQUE,
-    `password_hash` VARCHAR(50) NOT  NULL,
+    `password_hash` VARCHAR(255) NOT  NULL,
     `role` ENUM(
         'Super_Admin', 
         'Branch_Manager', 
@@ -53,6 +53,7 @@ CREATE TABLE `user` (
     `branch_id` INT NULL,
     `is_approved` BOOLEAN DEFAULT FALSE,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `is_deleted` BOOLEAN DEFAULT False,
     PRIMARY KEY (`user_id`),
     FOREIGN KEY (`branch_id`) 
       REFERENCES `branch`(`branch_id`)
@@ -70,6 +71,7 @@ CREATE Table `patient` (
     `address` VARCHAR(100) NULL,
     `date_of_birth` DATE,
     `blood_type` VARCHAR(5) NULL,    -- A+, A-, AB-, O+,....
+    `is_ex_patient` BOOLEAN DEFAULT false,
     PRIMARY KEY(`patient_id`),
     Foreign Key (`patient_id`) 
       REFERENCES `user`(`user_id`)
@@ -124,7 +126,7 @@ CREATE TABLE `user_contact` (
 );
 
 CREATE TABLE `speciality` (
-  `speciality_id` int,
+  `speciality_id` int AUTO_INCREMENT,
   `speciality_name` varchar(20),
   `description` varchar(255),
   PRIMARY KEY (`speciality_id`)
@@ -141,10 +143,10 @@ CREATE TABLE `doctor` (
 
 CREATE TABLE `doctor_speciality` (
   `doctor_id` int,
-  `specialiy_id` int,
+  `speciality_id` int,
   `added_at` timestamp,
-  PRIMARY KEY (`doctor_id`, `specialiy_id`),
-  FOREIGN KEY (`specialiy_id`) 
+  PRIMARY KEY (`doctor_id`, `speciality_id`),
+  FOREIGN KEY (`speciality_id`) 
       REFERENCES `speciality`(`speciality_id`),
   FOREIGN KEY (`doctor_id`)
       REFERENCES `doctor`(`doctor_id`)
@@ -284,7 +286,7 @@ CREATE TABLE `log` (
   `action_id` int,
   `table_name` varchar(255),
   `record_id` int,
-  `time_Stamp` timestamp,
+  `time_stamp` timestamp DEFAULT CURRENT_TIMESTAMP,
   `details` varchar(255),
   PRIMARY KEY (`log_id`),
   FOREIGN KEY (`action_id`)

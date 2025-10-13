@@ -22,5 +22,5 @@
 
   <!-- Heartbeat line -->
   <path d="M20 64 L40 64 L50 48 L60 80 L74 36 L86 64 L108 64"
-        stroke="#0f172a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        stroke="#119c95ff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>
