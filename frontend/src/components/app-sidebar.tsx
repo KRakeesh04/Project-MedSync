@@ -26,7 +26,10 @@ import {
   ClipboardPenLine,
   ChevronRight,
   LogOut,
-  PanelRightOpen
+  PanelRightOpen,
+  UsersRound,
+  UserRoundX,
+  UserRoundCheck
 } from "lucide-react"
 // billing and paments - Receipt
 // patient - Users
@@ -68,19 +71,33 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 
-export const ROLE_SUPER_ADMIN = "SUPER_ADMIN";
-export const ROLE_BRANCH_MANAGER = "BRANCH_MANAGER";
-export const ROLE_DOCTOR = "DOCTOR";
-export const ROLE_ADMIN_STAFF = "ADMIN_STAFF";
-export const ROLE_NURSE = "NURSE";
-export const ROLE_RECEPTIONIST = "RECEPTIONIST";
-export const ROLE_BILLING_STAFF = "BILLING_STAFF";
-export const ROLE_INSURANCE_AGENT = "INSURANCE_AGENT";
-export const ROLE_PATIENT = "PATIENT";
-export const ROLE_USER = "USER";
-
 import { NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { Role } from "@/utils";
+import { LOCAL_STORAGE__ROLE, LOCAL_STORAGE__TOKEN, LOCAL_STORAGE__USER, LOCAL_STORAGE__USER_ID, LOCAL_STORAGE__USERNAME } from "@/services/authServices";
+import { formatRole } from "@/services/utils";
+
+
+const ROLE_SUPER_ADMIN = Role.SUPER_ADMIN;
+const ROLE_BRANCH_MANAGER = Role.BRANCH_MANAGER;
+const ROLE_DOCTOR = Role.DOCTOR;
+const ROLE_ADMIN_STAFF = Role.ADMIN_STAFF;
+const ROLE_NURSE = Role.NURSE;
+const ROLE_RECEPTIONIST = Role.RECEPTIONIST;
+const ROLE_BILLING_STAFF = Role.BILLING_STAFF;
+const ROLE_INSURANCE_AGENT = Role.INSURANCE_AGENT;
+const ROLE_PATIENT = Role.PATIENT;
+const ROLE_USER = "User";
+
+
+export interface LocalStorage_User {
+  user_id: number;
+  username: string;
+  role: string;
+  name: string;
+  approved: boolean;
+  created_at: string;
+}
 
 interface SidebarItemLink {
   type: "child";
@@ -104,102 +121,168 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
     title: "Dashboard",
     url: "/",
     icon: Hospital,
-    hideIf: (role) => typeof role !== "string" || role == ROLE_PATIENT,
+    // hideIf: (role) => typeof role !== "string" ||
+    //   ![ROLE_RECEPTIONIST, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
   },
   {
     type: "parent",
-    title: "Patient Dashboard",
-    icon: HeartPulse,
-    hideIf: (role) => typeof role !== "string" || role != ROLE_PATIENT,
+    title: "Users",
+    icon: UsersRound,
     children: [
+      {
+        type: "child",
+        title: "Active Users",
+        url: "/users/active",
+        icon: UserRoundCheck,
+      },
+      {
+        type: "child",
+        title: "Deleted Users",
+        url: "/users/inactive",
+        icon: UserRoundX,
+      },
+    ],
+  },
+  {
+    type: "parent",
+    title: "Patients",
+    icon: HeartPulse,
+    // hideIf: (role) => typeof role !== "string" || role != ROLE_PATIENT,
+    children: [
+      {
+        type: "child",
+        title: "In-Patients",
+        url: "",
+        icon: HeartPulse,
+        // hideIf: (role) => typeof role !== "string" ||
+        //   [ROLE_PATIENT, ROLE_INSURANCE_AGENT].includes(role),
+      },
+      {
+        type: "child",
+        title: "Ex-Patients",
+        url: "",
+        icon: HeartPulse,
+        // hideIf: (role) => typeof role !== "string" ||
+        //   [ROLE_PATIENT, ROLE_INSURANCE_AGENT].includes(role),
+      },
       {
         type: "child",
         title: "Medical History",
         url: "",
         icon: BookOpen,
-        hideIf: (role) => typeof role !== "string" ||
-          ![ROLE_PATIENT, ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+        // hideIf: (role) => typeof role !== "string" ||
+        //   [ROLE_PATIENT, ROLE_INSURANCE_AGENT, ROLE_RECEPTIONIST, ROLE_BILLING_STAFF].includes(role),
       },
       {
         type: "child",
-        title: "Outstanding bills",
-        url: "",
-        icon: FileStack,
-        hideIf: (role) => typeof role !== "string" ||
-          ![ROLE_PATIENT, ROLE_BILLING_STAFF, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
-      },
-      {
-        type: "child",
-        title: "Insurances info",
-        url: "",
-        icon: IdCardLanyard,
-        hideIf: (role) => typeof role !== "string" ||
-          ![ROLE_PATIENT, ROLE_INSURANCE_AGENT, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
-      },
-      {
-        type: "child",
-        title: "Payment history",
+        title: "Treatments details",
         url: "",
         icon: FileClock,
-        hideIf: (role) => typeof role !== "string" ||
-          ![ROLE_PATIENT, ROLE_BILLING_STAFF, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+        // hideIf: (role) => typeof role !== "string" ||
+        //   [ROLE_PATIENT, ROLE_INSURANCE_AGENT, ROLE_RECEPTIONIST, ROLE_BILLING_STAFF].includes(role),
+      },
+      {
+        type: "child",
+        title: "Medication details",
+        url: "",
+        icon: FileClock,
+        // hideIf: (role) => typeof role !== "string" ||
+        //   [ROLE_PATIENT, ROLE_INSURANCE_AGENT, ROLE_RECEPTIONIST, ROLE_BILLING_STAFF].includes(role),
       }
     ],
   },
+  // {
+  //   type: "parent",
+  //   title: "Patients",
+  //   icon: HeartPulse,
+  //   hideIf: (role) => typeof role !== "string" || role != ROLE_PATIENT,
+  //   children: [
+  //     {
+  //       type: "child",
+  //       title: "Medical History",
+  //       url: "",
+  //       icon: BookOpen,
+  //       hideIf: (role) => typeof role !== "string" ||
+  //         ![ROLE_PATIENT, ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+  //     },
+  //     {
+  //       type: "child",
+  //       title: "Outstanding bills",
+  //       url: "",
+  //       icon: FileStack,
+  //       hideIf: (role) => typeof role !== "string" ||
+  //         ![ROLE_PATIENT, ROLE_BILLING_STAFF, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+  //     },
+  //     {
+  //       type: "child",
+  //       title: "Insurances info",
+  //       url: "",
+  //       icon: IdCardLanyard,
+  //       hideIf: (role) => typeof role !== "string" ||
+  //         ![ROLE_PATIENT, ROLE_INSURANCE_AGENT, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+  //     },
+  //     {
+  //       type: "child",
+  //       title: "Payment history",
+  //       url: "",
+  //       icon: FileClock,
+  //       hideIf: (role) => typeof role !== "string" ||
+  //         ![ROLE_PATIENT, ROLE_BILLING_STAFF, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+  //     }
+  //   ],
+  // },
   {
     type: "parent",
-    title: "Doctors' Dashboard",
+    title: "Doctors",
     icon: Stethoscope,
-    //hideIf:(role) => typeof role !== "string" || ![ROLE_DOCTOR].includes(role),
+    hideIf: (role) => typeof role !== "string",
     children: [
       {
         type: "child",
-        title: "Doctors' details",
+        title: "All Doctors",
         url: "",
         icon: HeartPulse,
-        hideIf: (role) => typeof role !== "string" ||
-          ![ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+        // hideIf: (role) => typeof role !== "string" ||
+        //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
       },
       {
         type: "child",
-        title: "Appointment details",
+        title: "Doctors' Specialities",
         url: "",
         icon: FileUser,
-        hideIf: (role) => typeof role !== "string" ||
-          ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+        hideIf: (role) => typeof role !== "string",
       },
       {
         type: "child",
-        title: "Patients history",
+        title: "All Specialities",
         url: "",
         icon: BookUser,
-        hideIf: (role) => typeof role !== "string" ||
-          ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+        // hideIf: (role) => typeof role !== "string" ||
+        //   [ROLE_PATIENT, ROLE_INSURANCE_AGENT].includes(role),
       },
     ],
   },
   {
     type: "parent",
-    title: "Staff Dashboard",
+    title: "Staff",
     icon: Users,
-    // hideIf:(role) => typeof role !== "string" || ![ROLE_DOCTOR].includes(role),
     children: [
       {
         type: "child",
-        title: "Staffs details",
+        title: "All Staffs",
         url: "",
         icon: UserSearch,
-        hideIf: (role) => typeof role !== "string" ||
-          ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+        // hideIf: (role) => typeof role !== "string" ||
+        //   ![ROLE_ADMIN_STAFF, ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
       },
-      {
-        type: "child",
-        title: "Reports",
-        url: "",
-        icon: ClipboardPenLine,
-        hideIf: (role) => typeof role !== "string" ||
-          ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
-      },
+      // {
+      //   type: "child",
+      //   title: "Reports",
+      //   url: "",
+      //   icon: ClipboardPenLine,
+      //   hideIf: (role) => typeof role !== "string" ||
+      //     ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+      // },
     ],
   },
   {
@@ -213,41 +296,41 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
         title: "All Appointments",
         url: "",
         icon: ClipboardList,
-        hideIf: (role) => typeof role !== "string" ||
-          ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+        // hideIf: (role) => typeof role !== "string" ||
+        //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
       },
       {
         type: "child",
         title: "Doctors' avilable time",
         url: "",
         icon: ClockPlus,
-        hideIf: (role) => typeof role !== "string" ||
-          ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+        // hideIf: (role) => typeof role !== "string" ||
+        //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
       },
       {
         type: "child",
         title: "Add Appointment",
         url: "",
         icon: ClipboardPlus,
-        hideIf: (role) => typeof role !== "string" ||
-          ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+        // hideIf: (role) => typeof role !== "string" ||
+        //   ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
       },
-      {
-        type: "child",
-        title: "Schedule/Reschedule",
-        url: "",
-        icon: CalendarSync,
-        hideIf: (role) => typeof role !== "string" ||
-          ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
-      },
-      {
-        type: "child",
-        title: "Cancelled",
-        url: "",
-        icon: CalendarX2,
-        hideIf: (role) => typeof role !== "string" ||
-          ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
-      },
+      // {
+      //   type: "child",
+      //   title: "Schedule/Reschedule",
+      //   url: "",
+      //   icon: CalendarSync,
+      //   hideIf: (role) => typeof role !== "string" ||
+      //     ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+      // },
+      // {
+      //   type: "child",
+      //   title: "Cancelled",
+      //   url: "",
+      //   icon: CalendarX2,
+      //   hideIf: (role) => typeof role !== "string" ||
+      //     ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+      // },
     ],
   },
   {
@@ -261,24 +344,24 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
         title: "Invoice details",
         url: "",
         icon: ReceiptText,
-        hideIf: (role) => typeof role !== "string" ||
-          ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+        // hideIf: (role) => typeof role !== "string" ||
+        //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
       },
       {
         type: "child",
         title: "Outstanding balances",
         url: "",
         icon: BanknoteX,
-        hideIf: (role) => typeof role !== "string" ||
-          ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+        // hideIf: (role) => typeof role !== "string" ||
+        //   ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
       },
       {
         type: "child",
         title: "Make payment",
         url: "",
         icon: CreditCard,
-        hideIf: (role) => typeof role !== "string" ||
-          ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+        // hideIf: (role) => typeof role !== "string" ||
+        //   ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
       },
     ],
   },
@@ -286,23 +369,40 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
     type: "parent",
     title: "Insurance info",
     icon: HandCoins,
-    // hideIf:(role) => typeof role !== "string" || ![ROLE_DOCTOR].includes(role),
+    // hideIf: (role) => typeof role !== "string" ||
+    //   ![ROLE_BILLING_STAFF, ROLE_INSURANCE_AGENT, ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
     children: [
       {
         type: "child",
-        title: "",
+        title: "Claimed History",
         url: "",
         icon: HandCoins,
-        hideIf: (role) => typeof role !== "string" ||
-          ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+        // hideIf: (role) => typeof role !== "string" ||
+        //   ![ROLE_BILLING_STAFF, ROLE_INSURANCE_AGENT, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
       },
       {
         type: "child",
-        title: "",
+        title: "Requests",
         url: "",
         icon: HandCoins,
-        hideIf: (role) => typeof role !== "string" ||
-          ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+        // hideIf: (role) => typeof role !== "string" ||
+        //   ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+      },
+      {
+        type: "child",
+        title: "Insurance Types",
+        url: "",
+        icon: HandCoins,
+        // hideIf: (role) => typeof role !== "string" ||
+        //   ![ROLE_BILLING_STAFF, ROLE_INSURANCE_AGENT, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+      },
+      {
+        type: "child",
+        title: "Available Patient",
+        url: "",
+        icon: HandCoins,
+        // hideIf: (role) => typeof role !== "string" ||
+        //   ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
       },
     ],
   },
@@ -312,12 +412,17 @@ export function AppSidebar() {
   const [loading, setLoading] = useState<boolean>(false);
   const { toggleSidebar, open } = useSidebar();
   const navigate = useNavigate();
-  const user = {
-    role: "User",
-    username: "K Rakeshan",
-  };
-  const role = "";
+  const userStringified = localStorage.getItem(LOCAL_STORAGE__USER);
+  const user: LocalStorage_User | null = userStringified
+    ? JSON.parse(userStringified)
+    : null;
+  const role = localStorage.getItem(LOCAL_STORAGE__ROLE) || "";
   const logout = () => {
+    localStorage.removeItem(LOCAL_STORAGE__USER);
+    localStorage.removeItem(LOCAL_STORAGE__ROLE);
+    localStorage.removeItem(LOCAL_STORAGE__USER_ID);
+    localStorage.removeItem(LOCAL_STORAGE__USERNAME);
+    localStorage.removeItem(LOCAL_STORAGE__TOKEN);
     navigate("/sign-in");
   };
 
@@ -384,23 +489,25 @@ export function AppSidebar() {
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                       <SidebarMenuSub>
-                        {item.children.map((child) => (
-                          <SidebarMenuSubItem key={child.title}>
-                            <SidebarMenuSubButton asChild>
-                              <NavLink to={child.url}>
-                                <child.icon size={25} className="size-40" />
-                                <span>{child.title}</span>
-                              </NavLink>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                        ))}
+                        {item.children.map((child) =>
+                          item.hideIf?.(role) ? null : (
+                            <SidebarMenuSubItem key={child.title}>
+                              <SidebarMenuSubButton asChild>
+                                <NavLink to={child.url}>
+                                  <child.icon size={25} className="size-40" />
+                                  <span>{child.title}</span>
+                                </NavLink>
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          ),
+                        )}
                       </SidebarMenuSub>
                     </CollapsibleContent>
                   </SidebarMenuItem>
                 </Collapsible>
               </SidebarMenu>
             </SidebarGroup>
-          )
+          ),
         )}
       </SidebarContent>
       <SidebarFooter>
@@ -415,7 +522,7 @@ export function AppSidebar() {
                       <div className="flex flex-col pl-1">
                         <span className="font-medium">{user.username}</span>
                         <span className="text-xs">
-                          {user.role}
+                          {formatRole(user.role)}
                         </span>
                       </div>
                     </>
@@ -430,8 +537,8 @@ export function AppSidebar() {
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>Billing</DropdownMenuItem>
-                <DropdownMenuItem>Team</DropdownMenuItem>
+                <DropdownMenuItem>Settings</DropdownMenuItem>
+                {/* <DropdownMenuItem>Team</DropdownMenuItem> */}
                 <DropdownMenuItem
                   className="text-destructive hover:text-destructive"
                   onClick={logout}>

@@ -38,7 +38,7 @@ CREATE TABLE `branch` (
 CREATE TABLE `user` (
     `user_id` INT AUTO_INCREMENT,
     `username` VARCHAR(20) NOT NULL UNIQUE,
-    `password_hash` VARCHAR(50) NOT  NULL,
+    `password_hash` VARCHAR(255) NOT  NULL,
     `role` ENUM(
         'Super_Admin', 
         'Branch_Manager', 
@@ -53,6 +53,7 @@ CREATE TABLE `user` (
     `branch_id` INT NULL,
     `is_approved` BOOLEAN DEFAULT FALSE,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `is_deleted` BOOLEAN DEFAULT False,
     PRIMARY KEY (`user_id`),
     FOREIGN KEY (`branch_id`) 
       REFERENCES `branch`(`branch_id`)

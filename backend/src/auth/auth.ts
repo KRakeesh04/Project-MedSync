@@ -1,4 +1,5 @@
 import type { Request, Response, NextFunction } from 'express';
+import { Role } from '../router/router.ts';
 
 export interface AuthRequest extends Request {
 	user?: {
@@ -8,7 +9,7 @@ export interface AuthRequest extends Request {
 
 function authorizeRoles(allowedRoles: string[]) {
   return (req: AuthRequest, res: Response, next: NextFunction) => {
-    if (allowedRoles.includes("PUBLIC")) {
+    if (allowedRoles.includes(Role.PUBLIC)) {
       return next();
     }
     if (!req.user) {

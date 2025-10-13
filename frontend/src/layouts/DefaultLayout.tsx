@@ -1,9 +1,21 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { Toaster } from "react-hot-toast";
+import { useEffect } from "react";
+import toast, { Toaster, useToasterStore } from "react-hot-toast";
 import { Outlet } from "react-router-dom";
 
+const TOAST_LIMIT = 3;
+
+
 export default function DefaultLayout() {
+	  const { toasts } = useToasterStore();
+
+  useEffect(() => {
+    toasts
+      .filter((t) => t.visible)
+      .filter((_, i) => i >= TOAST_LIMIT)
+      .forEach((t) => toast.dismiss(t.id));
+  }, [toasts]);
 	return (
 		<SidebarProvider>
 			<Toaster position="top-right" />
