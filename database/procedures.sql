@@ -53,11 +53,11 @@ DROP PROCEDURE IF EXISTS get_all_specialities;
 
 -- billing_invoice model functions
 DROP PROCEDURE IF EXISTS create_billing_invoice;
-DROP PROCEDURE IF EXISTS update_billing_invoice;
+DROP PROCEDURE IF EXISTS update_billing_invoice_bypayment;
 DROP PROCEDURE IF EXISTS delete_billing_invoice;
 DROP PROCEDURE IF EXISTS get_billing_invoice_by_id;
 DROP PROCEDURE IF EXISTS get_all_billing_invoices;
-
+DROP PROCEDURE IF EXISTS get_all_outstanding_bills;
 
 -- billing_payment model functions
 DROP PROCEDURE IF EXISTS create_billing_payment;
@@ -512,12 +512,10 @@ DELIMITER ;
 
 -- CREATE PROCEDURE to update an existing billing invoice
 
-CREATE PROCEDURE update_billing_invoice(
+CREATE PROCEDURE update_billing_invoice_bypayment(
     IN p_invoice_id INT,
-    IN p_additional_fee DECIMAL(10,2),
-    IN p_total_fee DECIMAL(10,2),
-    IN p_net_amount DECIMAL(10,2),
-    IN p_remaining_payment_amount DECIMAL(10,2)
+    IN p_payment DECIMAL(10,2),
+   
 )
 BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
@@ -528,10 +526,8 @@ BEGIN
     START TRANSACTION;
 
     UPDATE billing_invoice
-    SET additional_fee = p_additional_fee,
-        total_fee = p_total_fee,
-        net_amount = p_net_amount,
-        remaining_payment_amount = p_remaining_payment_amount,
+    SET 
+        remaining_payment_amount = remaining_payment_amount-p_payment,
         time_stamp = NOW()
     WHERE id = p_invoice_id;
 
@@ -572,6 +568,12 @@ BEGIN
     SELECT * FROM `billing_invoice`;
 END$$
 
+CREATE PROCEDURE get_all_outstanding_bills()
+BEGIN
+    SELECT * FROM `billing_invoice`
+    WHERE remaining_payment_amount > 0
+    ORDER BY remaining_payment_amount DESC;
+END$$
 -- billing_payment model functions
 
 -- CREATE PROCEDURE to insert a new billing payment

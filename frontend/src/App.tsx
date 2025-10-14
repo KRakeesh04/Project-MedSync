@@ -35,6 +35,9 @@ import {
   validateToken
 } from "./services/authServices";
 import DashboardSkeleton from './components/dashboard-skeleton';
+import MakePayment from './pages/billing/make_payment';
+import AllInvoices from './pages/billing/invoice_details';
+import OutstandingInvoices from './pages/billing/outstanding_balances';
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -276,6 +279,34 @@ function App() {
               />
 
           </Route>
+          <Route
+            path="/make-payment"
+            element={
+              <>
+                <PageTitle title="Make Payment | MedSync" />
+                <MakePayment />
+              </>
+            }
+          />
+          <Route
+            path="/invoice_details"
+            element={
+              <>
+                <PageTitle title="Invoice Details | MedSync" />
+                <AllInvoices />
+              </>
+            }
+          />
+          <Route 
+            path="/outstanding-balances"
+            element={
+              <>
+                <PageTitle title="Outstanding Balances | MedSync" />
+                <OutstandingInvoices />
+              </>
+            }
+          />
+
         </Routes>
       </>
     </ThemeProvider>

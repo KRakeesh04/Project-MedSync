@@ -7,7 +7,7 @@ export interface BillingInvoice {
   claim_id: number;
   net_amount: number;
   remaining_payment_amount: number;
-  time_stamp: string; // or Date
+  time_stamp: string; 
 }
 
 export const createBillingInvoice = async (
@@ -74,6 +74,16 @@ export const deleteBillingInvoice = async (invoice_id: number): Promise<void> =>
 export const getAllBillingInvoices = async (): Promise<BillingInvoice[]> => {
   try {
     const [rows] = await sql.query("CALL get_all_billing_invoices()");
+    return (rows as any)[0] as BillingInvoice[];
+  } catch (error) {
+    console.error("Error fetching all billing invoices:", error);
+    throw error;
+  }
+};
+
+export const getAllOutstandingBills = async (): Promise<BillingInvoice[]> => {
+  try {
+    const [rows] = await sql.query("CALL get_all_outstanding_bills ()");
     return (rows as any)[0] as BillingInvoice[];
   } catch (error) {
     console.error("Error fetching all billing invoices:", error);

@@ -403,7 +403,7 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
       {
         type: "child",
         title: "Make payment",
-        url: "",
+        url: "/make-payment",
         icon: CreditCard,
         // hideIf: (role) => typeof role !== "string" ||
         //   ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),

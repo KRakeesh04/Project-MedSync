@@ -4,6 +4,7 @@ import {
   updateBillingInvoiceBypayment,
   deleteBillingInvoice,
   getAllBillingInvoices,
+  getAllOutstandingBills,
   type BillingInvoice
 } from "../models/billing_invoice.model.ts";
 
@@ -64,3 +65,15 @@ export const getAllBillingInvoicesHandler = async (_req: Request, res: Response)
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+// Get all outstanding billing invoices
+export const getAllOutstandingBillsHandler = async (_req: Request, res: Response) => {
+  try {
+    const invoices = await getAllOutstandingBills();
+    res.status(200).json(invoices);
+  } catch (error) {
+    console.error("Error in getAllOutstandingBillsHandler:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+

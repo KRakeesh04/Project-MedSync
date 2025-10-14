@@ -57,7 +57,7 @@ DROP PROCEDURE IF EXISTS update_billing_invoice_bypayment;
 DROP PROCEDURE IF EXISTS delete_billing_invoice;
 DROP PROCEDURE IF EXISTS get_billing_invoice_by_id;
 DROP PROCEDURE IF EXISTS get_all_billing_invoices;
-
+DROP PROCEDURE IF EXISTS get_all_outstanding_bills;
 
 -- billing_payment model functions
 DROP PROCEDURE IF EXISTS create_billing_payment;
@@ -568,6 +568,12 @@ BEGIN
     SELECT * FROM `billing_invoice`;
 END$$
 
+CREATE PROCEDURE get_all_outstanding_bills()
+BEGIN
+    SELECT * FROM `billing_invoice`
+    WHERE remaining_payment_amount > 0
+    ORDER BY remaining_payment_amount DESC;
+END$$
 -- billing_payment model functions
 
 -- CREATE PROCEDURE to insert a new billing payment

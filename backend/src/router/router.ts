@@ -29,7 +29,8 @@ import {
   createNewBillingInvoice,
   updateCurrentBillingInvoiceByPayment,
   deleteBillingInvoiceById,
-  getAllBillingInvoicesHandler
+  getAllBillingInvoicesHandler,
+	getAllOutstandingBillsHandler
 } from "../handlers/billing_invoice.handler.ts";
 
 
@@ -135,8 +136,10 @@ var routes: Route[] = [
   // Delete billing invoice
   { path: "/billing-invoice/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.DELETE, handler: deleteBillingInvoiceById },
 
-  // Get all billing invoices
-  { path: "/billing-invoices", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllBillingInvoicesHandler }
+  // Get all outstanding billing invoices
+  { path: "/outstanding-bills", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllOutstandingBillsHandler },
+
+	{path: "/billing-invoices", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllBillingInvoicesHandler },
 
 
 ];
