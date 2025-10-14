@@ -39,33 +39,18 @@ export const createBillingInvoice = async (
   }
 };
 
-export interface BillingInvoice {
-  id: number;
-  appointment_id: number;
-  additional_fee: number;
-  total_fee: number;
-  claim_id: number;
-  net_amount: number;
-  remaining_payment_amount: number;
-  time_stamp: string;
-}
 
-export const updateBillingInvoice = async (
+export const updateBillingInvoiceBypayment = async (
   invoice_id: number,
-  additional_fee: number,
-  total_fee: number,
-  net_amount: number,
-  remaining_payment_amount: number
+  payment: number,
+  
 ): Promise<BillingInvoice> => {
   try {
     const [rows] = await sql.query(
       "CALL update_billing_invoice(?, ?, ?, ?, ?)",
       [
         invoice_id,
-        additional_fee,
-        total_fee,
-        net_amount,
-        remaining_payment_amount
+        payment
       ]
     );
     const invoice = (rows as any)[0][0] as BillingInvoice;

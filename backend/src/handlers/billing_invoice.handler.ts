@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import {
   createBillingInvoice,
-  updateBillingInvoice,
+  updateBillingInvoiceBypayment,
   deleteBillingInvoice,
   getAllBillingInvoices,
   type BillingInvoice
@@ -27,15 +27,13 @@ export const createNewBillingInvoice = async (req: Request, res: Response) => {
 };
 
 // Update billing invoice
-export const updateCurrentBillingInvoice = async (req: Request, res: Response) => {
+export const updateCurrentBillingInvoiceByPayment = async (req: Request, res: Response) => {
   const { invoice_id, additional_fee, total_fee, net_amount, remaining_payment_amount } = req.body;
   try {
-    const invoice = await updateBillingInvoice(
+    const invoice = await updateBillingInvoiceBypayment (
       invoice_id,
       additional_fee,
-      total_fee,
-      net_amount,
-      remaining_payment_amount
+      
     );
     res.status(200).json({ message: "Billing invoice updated successfully", invoice });
   } catch (error) {

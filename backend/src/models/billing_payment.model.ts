@@ -31,14 +31,6 @@ export const createBillingPayment = async (
 
 
 
-export interface BillingPayment {
-  payment_id: number;
-  invoice_id: number;
-  branch_id: number;
-  paid_amount: number;
-  time_stamp: string;
-  cashier_id: number;
-}
 
 export const updateBillingPayment = async (
   payment_id: number,
