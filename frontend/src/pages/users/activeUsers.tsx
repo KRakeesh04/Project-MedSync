@@ -109,7 +109,7 @@ const Users: React.FC = () => {
         }
         if (userRole === Role.SUPER_ADMIN) {
           return (
-            <div className="grid grid-cols-2 ">
+            <div className="grid grid-cols-2 place-items-center">
 
               <Button
                 size="icon"

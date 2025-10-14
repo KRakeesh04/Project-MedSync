@@ -133,6 +133,8 @@ export const staffSignup = async (req: Request, res: Response) => {
             // } else {
             //     res.status(400).json({ error: "Undefined staff role" })
         }
+        res.status(201).json({ message: "Staff account created successfully", user: usr });
+        return;
 
     } catch (error) {
         console.error("Error in staff create handler:", error);
@@ -165,6 +167,8 @@ export const patientSignup = async (req: Request, res: Response) => {
             data.DOB,
             data.bloodType
         );
+        res.status(201).json({ message: "Patient account created successfully", user: usr });
+        return;
     } catch (error) {
         res.status(500).json({ error: "Internal Server Error" });
     }

@@ -119,7 +119,7 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
   {
     type: "child",
     title: "Dashboard",
-    url: "/",
+    url: "/dashboard",
     icon: Hospital,
     // hideIf: (role) => typeof role !== "string" ||
     //   ![ROLE_RECEPTIONIST, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),

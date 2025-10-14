@@ -16,11 +16,12 @@ export default function DefaultLayout() {
 
 	const breadcrumbs = [
 		{ name: "Dashboard", path: "/" },
-		...pathSegments.map((segment, index) => ({
+	].concat(
+		location.pathname === "/dashboard" ? [] :																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																					
+		pathSegments.map((segment, index) => ({
 			name: segment.charAt(0).toUpperCase() + segment.slice(1),
 			path: `/${pathSegments.slice(0, index + 1).join("/")}`,
-		})),
-	];
+		})));
 
 	useEffect(() => {
 		toasts

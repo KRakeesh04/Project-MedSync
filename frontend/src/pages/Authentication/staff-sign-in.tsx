@@ -29,7 +29,7 @@ const StaffSignIn: React.FC = () => {
     if (username !== "" && password !== "") {
       await signin(username, password)
         .then(() => {
-          navigate("/");
+          navigate("/dashboard");
         })
         .catch((error) => {
           toast.error(error);
@@ -43,7 +43,7 @@ const StaffSignIn: React.FC = () => {
 
   useEffect(() => {
     if (token) {
-      navigate("/");
+      navigate("/dashboard");
     }
   }, [token, navigate]);
 

@@ -26,10 +26,12 @@ export const getBranches = async (req: Request, res: Response) => {
   try {
     if (!count || !offset) {
       res.status(400).json({ error: "Params count & offset undefined" });
+      return;
     }
     const branches: Branch[] = await getBranchesForPagination(Number(count), Number(offset));
     if (branches.length < 1) {
       res.status(404).json({ error: "Branches not found" });
+      return;
     }
     const branch_count: Number = await getBranchCount();
     if (branch_count == undefined) {

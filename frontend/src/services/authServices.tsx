@@ -94,11 +94,6 @@ export const patientSignup = async (data: PatientData) => {
 }
 
 export const validateToken = async () => {
-  const token = localStorage.getItem("token")
-  const response = await axiosInstance.get("/auth/validate", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-  return response.data.success
+  const response = await axiosInstance.get("/auth/validate")
+  return response.data.message
 }

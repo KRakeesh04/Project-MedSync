@@ -19,26 +19,59 @@ import InactiveUsers from './pages/users/deletedUsers';
 import PatientSignIn from './pages/Authentication/patient-sign-in';
 import PatientSignUp from './pages/Authentication/patient-sign-up';
 import DashboardRedirect from './pages/DashboardRedirect';
-import Loader from './components/Loader';
 import LoginLayout from './layouts/LoginLayout';
 import StaffPage from './pages/staff/staff';
 import CurrentPatients from './pages/patients/currentPatients';
 import ExPatients from './pages/patients/exPatients';
 import Branches from './pages/branches/branches';
 import Home from './pages/Home';
-
+import { useNavigate } from "react-router-dom";
+import {
+  LOCAL_STORAGE__ROLE,
+  LOCAL_STORAGE__TOKEN,
+  LOCAL_STORAGE__USER,
+  LOCAL_STORAGE__USER_ID,
+  LOCAL_STORAGE__USERNAME,
+  validateToken
+} from "./services/authServices";
+import DashboardSkeleton from './components/dashboard-skeleton';
 
 function App() {
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const { pathname } = useLocation();
+  const token = localStorage.getItem(LOCAL_STORAGE__TOKEN);
+  const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
 
+  useEffect(() => {
+    const path = window.location.pathname;
+    const isAuthPath =
+      path == "/staff/sign-in" || path == "/staff/sign-up" || path == "/sign-in" || path === "/sign-up";
+    if (!token && !isAuthPath) {
+      navigate("/sign-in");
+      return;
+    }
+    validateToken().then(() => {
+      setLoading(false)
+    }).catch(() => {
+      localStorage.removeItem(LOCAL_STORAGE__TOKEN);
+      localStorage.removeItem(LOCAL_STORAGE__USER);
+      localStorage.removeItem(LOCAL_STORAGE__USERNAME);
+      localStorage.removeItem(LOCAL_STORAGE__ROLE);
+      localStorage.removeItem(LOCAL_STORAGE__USER_ID);
+
+      if (!isAuthPath) {
+        navigate("/sign-in");
+      }
+    });
+  }, []);
+
   return loading ? (
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-      <Loader />
+      <DashboardSkeleton />
     </ThemeProvider>
   ) : (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
@@ -46,7 +79,7 @@ function App() {
         <Routes>
 
           <Route
-            path="/home"
+            index
             element={
               <>
                 <PageTitle title="Home | MedSync" />
@@ -101,8 +134,13 @@ function App() {
           <Route element={<DefaultLayout />}>
 
             <Route
-              index
-              element={<DashboardRedirect />}
+              path="/dashboard"
+              element={
+                <>
+                  <PageTitle title="Dashboard | MedSync" />
+                  <DashboardRedirect />
+                </>
+              }
             />
 
             <Route
