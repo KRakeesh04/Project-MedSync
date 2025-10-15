@@ -9,6 +9,11 @@ export interface Branch {
   created_at: string;
 }
 
+export interface BranchName {
+  branch_id: number;
+  name: string;
+}
+
 export const getBranchesForPagination = async () => {
   try {
     const branches_db = await axiosInstance.get<{
@@ -32,7 +37,7 @@ export const getAllBranches = async () => {
   try {
     const branches_db = await axiosInstance.get<{
       branch_count: number;
-      branches: Array<Branch>;
+      branches: Array<BranchName>;
     }>(`/all-branches`);
     return branches_db.data;
   } catch (error: unknown) {
