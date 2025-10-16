@@ -1,4 +1,4 @@
--- Active: 1760580896901@@127.0.0.1@3306
+-- Active: 1760580896901@@127.0.0.1@3306@project-medsync
 -- use `Project-MedSync`;
 -- User model functions
 DROP PROCEDURE IF EXISTS create_user;
@@ -86,6 +86,19 @@ DROP PROCEDURE IF EXISTS get_all_branch;
 DROP PROCEDURE IF EXISTS get_branch_for_pagination;
 
 DROP PROCEDURE IF EXISTS get_all_branch_count;
+
+-- Insurance model functions
+DROP PROCEDURE IF EXISTS create_insurance_types;
+
+DROP PROCEDURE IF EXISTS update_insurance_types;
+
+DROP PROCEDURE IF EXISTS get_insurance_type_by_id;
+
+DROP PROCEDURE IF EXISTS get_all_insurance_types;
+
+DROP PROCEDURE IF EXISTS get_insurance_type_count;
+
+DROP PROCEDURE IF EXISTS get_insurance_types_for_pagination;
 
 -- User_Contact model functions
 DROP PROCEDURE IF EXISTS create_user_contact;
@@ -596,6 +609,66 @@ END$$
 CREATE PROCEDURE delete_branch(IN p_id INT)
 BEGIN
     DELETE FROM `branch` WHERE branch_id = p_id;
+END$$
+
+-- insurance type model functions
+CREATE PROCEDURE create_insurance_types(
+    IN p_insurance_type VARCHAR(50),
+    IN p_insurance_period INT,
+    IN p_claim_percentage DECIMAL(5,2)
+)
+BEGIN
+    INSERT INTO `insurance` (insurance_type, insurance_period, claim_percentage)
+    VALUES (p_insurance_type, p_insurance_period, p_claim_percentage);
+END$$
+
+CREATE PROCEDURE update_insurance_types(
+    IN p_insurance_type_id INT,
+    IN p_insurance_type VARCHAR(50),
+    IN p_insurance_period INT,
+    IN p_claim_percentage DECIMAL(5,2)
+)
+BEGIN
+    UPDATE `insurance`
+    SET insurance_type = p.insurance_type,
+        insurance_period = p.insurance_period,
+        claim_percentage = p_claim_percentage
+    WHERE insurance_id = p_insurance_type_id;
+END$$
+
+CREATE PROCEDURE get_insurance_type_by_id(
+    IN p_insurance_type_id INT,
+    OUT p_insurance_type VARCHAR(50),
+    OUT p_insurance_period INT,
+    OUT p_claim_percentage DECIMAL(5,2)
+)
+BEGIN
+    SELECT insurance_type, insurance_period, claim_percentage
+    FROM `insurance`
+    WHERE insurance_id = p_insurance_type_id;
+END$$
+
+CREATE PROCEDURE get_all_insurance_types()
+BEGIN
+    SELECT insurance_id,insurance_type, insurance_period, claim_percentage,created_at
+    FROM `insurance`
+    ORDER BY insurance_id;
+END$$
+
+CREATE PROCEDURE get_insurance_type_count()
+BEGIN
+    SELECT COUNT(insurance_id) AS insurance_count
+    FROM `insurance`;
+END$$
+
+CREATE PROCEDURE get_insurance_types_for_pagination(
+    IN insurance_count INT,
+     IN count_start INT)
+BEGIN
+    SELECT insurance_id,insurance_type, insurance_period, claim_percentage,created_at
+    FROM `insurance`
+    ORDER BY insurance_id
+    LIMIT insurance_count OFFSET count_start;
 END$$
 
 -- user contact model functions

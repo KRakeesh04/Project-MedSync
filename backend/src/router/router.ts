@@ -12,6 +12,7 @@ import { addNewSpecialty, getAllSpecialties } from "../handlers/speciality.handl
 import { checkServiceCodeHandler, createTreatmentHandler, getAllTreatmentsHandler } from "../handlers/treatment.handler.ts";
 import { getMedicalHistoryHandler } from "../handlers/medicalhistory.handler.ts";
 import { getAllMedicationsHandler, getMedicationsByPatientHandler } from "../handlers/medication.handlers.ts";
+import { createNewInsuranceType, getAllInsuranceTypeNames, getInsuranceTypes, updateInsuranceTypeByID } from "../handlers/insurance.handler.ts";
 
 export const HttpMethod = {
 	GET: "GET",
@@ -96,7 +97,13 @@ var routes: Route[] = [
 	
 	//medication router
 	{ path: "/medications", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllMedicationsHandler },
-	{ path: "/medications/:patientId", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getMedicationsByPatientHandler }
+	{ path: "/medications/:patientId", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getMedicationsByPatientHandler },
+
+	//insurance router
+	{ path: "/all-insurance-types", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllInsuranceTypeNames },
+	{ path: "/insurance-types", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getInsuranceTypes },
+	{ path: "/insurance-types/add", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: createNewInsuranceType },
+	{ path: "/insurance-types/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: updateInsuranceTypeByID }
 
 ];
 
