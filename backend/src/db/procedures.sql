@@ -1,4 +1,4 @@
--- Active: 1755111596628@@127.0.0.1@3306@Project-MedSync
+-- Active: 1760580896901@@127.0.0.1@3306
 -- use `Project-MedSync`;
 -- User model functions
 DROP PROCEDURE IF EXISTS create_user;
