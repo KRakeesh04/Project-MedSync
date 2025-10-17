@@ -1,3 +1,4 @@
+-- Active: 1760508928142@@127.0.0.1@3306@project-medsync
 -- USE `Project-MedSync`;
 
 -- child → parent drop order
@@ -220,21 +221,19 @@ CREATE TABLE `billing_invoice` (
     REFERENCES `appointment`(`appointment_id`)
 );
 
-CREATE TABLE `billing_payment` (
-  `payment_id` int,
-  `invoice_id` int,
-  `branch_id` int,
-  `paid_amount` numeric(8,2),
-  `time_stamp` timestamp,
-  `cashier_id` int,
-  PRIMARY KEY (`payment_id`),
-  FOREIGN KEY (`branch_id`)
-      REFERENCES `branch`(`branch_id`),
-  FOREIGN KEY (`invoice_id`)
-      REFERENCES `billing_invoice`(`appointment_id`),
-  FOREIGN KEY (`cashier_id`)
-      REFERENCES `staff`(`staff_id`)
-);
+CREATE TABLE billing_payment (
+  payment_id INT AUTO_INCREMENT,
+  invoice_id INT,
+  branch_id INT,
+  paid_amount NUMERIC(8,2),
+  time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  cashier_id INT,
+  PRIMARY KEY (payment_id),
+  FOREIGN KEY (branch_id) REFERENCES branch(branch_id),
+  FOREIGN KEY (invoice_id) REFERENCES billing_invoice(appointment_id),
+  FOREIGN KEY (cashier_id) REFERENCES staff(staff_id)
+) AUTO_INCREMENT = 1;
+
 
 CREATE TABLE `prescription` (
   `appointment_id` int,

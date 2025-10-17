@@ -12,18 +12,13 @@ import { updateBillingInvoiceBypayment } from "../models/billing_invoice.model.t
 
 // Create a new billing payment
 export const createNewBillingPayment = async (req: Request, res: Response) => {
-  const { payment_id, invoice_id, branch_id, paid_amount, cashier_id } = req.body;
+  const { invoice_id, branch_id, paid_amount, cashier_id } = req.body;
   try {
     const payment = await createBillingPayment(
-      payment_id,
       invoice_id,
       branch_id,
       paid_amount,
       cashier_id
-    );
-    const invoice = await updateBillingInvoiceBypayment (
-      invoice_id,
-      paid_amount
     );
     res.status(200).json({ message: "Billing payment created successfully", payment });
   } catch (error) {

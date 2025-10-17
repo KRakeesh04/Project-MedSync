@@ -18,7 +18,10 @@ export const createBillingPayment = async (data: {
   cashier_id: number;
 }): Promise<{ message: string; payment?: BillingPayment }> => {
   try {
+    
     const response = await axiosInstance.post(`/billing-payment`, data);
+   
+    
     return response.data;
   } catch (error) {
     console.error("Error creating billing payment:", error);

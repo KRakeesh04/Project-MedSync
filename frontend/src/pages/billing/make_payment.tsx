@@ -41,7 +41,7 @@ const MakePayment: React.FC = () => {
         cashier_id: Number(cashierId),
       });
       toast.success("Payment successful!");
-      navigate("/payments"); // redirect after success (change path as needed)
+      //navigate("/payments"); // redirect after success (change path as needed)
     } catch (error: any) {
       toast.error(error?.message || "Payment failed. Please try again.");
     } finally {
@@ -62,7 +62,7 @@ const MakePayment: React.FC = () => {
               type="button"
               variant="outline"
               className="w-full"
-              onClick={() => navigate("/invoices")} // example navigation
+              onClick={() => navigate("/invoice_details")} // example navigation
             >
               View Invoices
             </Button>

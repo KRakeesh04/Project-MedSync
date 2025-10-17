@@ -9,20 +9,19 @@ export interface BillingPayment {
 }
 
 export const createBillingPayment = async (
-  payment_id: number,
   invoice_id: number,
   branch_id: number,
   paid_amount: number,
   cashier_id: number
-): Promise<BillingPayment> => {
+): Promise<void> => {
   try {
+    
     const [rows] = await sql.query(
-      "CALL create_billing_payment(?, ?, ?, ?, ?)",
-      [payment_id, invoice_id, branch_id, paid_amount, cashier_id]
+      "CALL create_billing_payment(?, ?, ?, ?)",
+      [invoice_id, branch_id, paid_amount, cashier_id]
     );
-    const payment = (rows as any)[0][0] as BillingPayment;
-    if (!payment) throw new Error("Billing payment not created");
-    return payment;
+    
+    
   } catch (error) {
     console.error("Error creating billing payment:", error);
     throw error;

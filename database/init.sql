@@ -1,3 +1,5 @@
+-- Active: 1760508928142@@127.0.0.1@3306@project-medsync
+-- Active: 1760508928142@@127.0.0.1@3306@project-medsync1760504316590@@root@null
 -- BRANCHES
 INSERT INTO `branch` (branch_id, name, location, landline_no, created_at) VALUES
 (1, 'Colombo', 'Colombo 07', '0112567890', NOW()),
@@ -398,14 +400,14 @@ INSERT INTO `billing_invoice` (appointment_id, additional_fee, total_fee, claim_
 
 
 -- BILLING_PAYMENT (cashier_id references staff.staff_id)
-INSERT INTO `billing_payment` (payment_id, invoice_id, branch_id, paid_amount, time_stamp, cashier_id) VALUES
-(1, 1, 1, 1700.00, NOW() - INTERVAL 57 DAY, 8),
-(2, 2, 2, 3500.00, NOW() - INTERVAL 51 DAY, 54),
-(3, 3, 3, 240.00, NOW() - INTERVAL 47 DAY, 8),
-(4, 4, 4, 90.00, NOW() - INTERVAL 43 DAY, 54),
-(5, 5, 5, 4000.00, NOW() - INTERVAL 37 DAY, 54),
-(6, 11, 1, 200.00, NOW() - INTERVAL 5 DAY, 8),
-(7, 16, 2, 640.00, NOW() - INTERVAL 1 DAY, 54);
+INSERT INTO `billing_payment` (invoice_id, branch_id, paid_amount, time_stamp, cashier_id) VALUES
+( 1, 1, 1700.00, NOW() - INTERVAL 57 DAY, 8),
+( 2, 2, 3500.00, NOW() - INTERVAL 51 DAY, 54),
+( 3, 3, 240.00, NOW() - INTERVAL 47 DAY, 8),
+( 4, 4, 90.00, NOW() - INTERVAL 43 DAY, 54),
+( 5, 5, 4000.00, NOW() - INTERVAL 37 DAY, 54),
+( 11, 1, 200.00, NOW() - INTERVAL 5 DAY, 8),
+( 16, 2, 640.00, NOW() - INTERVAL 1 DAY, 54);
 
 
 -- ACTION

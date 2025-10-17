@@ -138,7 +138,7 @@ var routes: Route[] = [
   { path: "/billing-invoice", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: createNewBillingInvoice },
 
   // Update billing invoice
-  { path: "/billing-invoice", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: updateCurrentBillingInvoiceByPayment },
+  { path: "/billing-invoice/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: updateCurrentBillingInvoiceByPayment },
 
   // Delete billing invoice
   { path: "/billing-invoice/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.DELETE, handler: deleteBillingInvoiceById },

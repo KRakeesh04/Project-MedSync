@@ -2,13 +2,9 @@
 -- use `Project-MedSync`;
 -- User model functions
 DROP PROCEDURE IF EXISTS create_user;
-
 DROP PROCEDURE IF EXISTS update_user;
-
 DROP PROCEDURE IF EXISTS delete_user;
-
 DROP PROCEDURE IF EXISTS get_user_by_id;
-
 DROP PROCEDURE IF EXISTS get_user_by_username;
 
 DROP PROCEDURE IF EXISTS get_all_users;
@@ -901,12 +897,12 @@ BEGIN
   ORDER BY p.prescribed_at DESC;
 END$$
 
-DELIMITER;
+
 
 -- billing_invoice model functions
 -- CREATE PROCEDURE to insert a new billing invoice
 
-DELIMITER $$
+
 
 CREATE PROCEDURE create_billing_invoice(
     IN p_appointment_id INT,
@@ -933,7 +929,7 @@ BEGIN
     COMMIT;
 END$$
 
-DELIMITER ;
+
 
 
 
@@ -941,7 +937,7 @@ DELIMITER ;
 
 CREATE PROCEDURE update_billing_invoice_bypayment(
     IN p_invoice_id INT,
-    IN p_payment DECIMAL(10,2),
+    IN p_payment DECIMAL(10,2)
    
 )
 BEGIN
@@ -966,10 +962,6 @@ END$$
 
 -- CREATE PROCEDURE to delete a billing invoice
 
-CREATE PROCEDURE delete_billing_invoice(IN p_invoice_id INT)
-BEGIN
-    DELETE FROM `billing_invoice` WHERE id = p_invoice_id;
-END$$
 
 
 -- CREATE PROCEDURE to get a billing invoice by ID
@@ -1006,28 +998,27 @@ END$$
 -- CREATE PROCEDURE to insert a new billing payment
 
 CREATE PROCEDURE create_billing_payment(
-    IN p_payment_id INT,
-    IN p_invoice_id INT,
-    IN p_branch_id INT,
-    IN p_paid_amount NUMERIC(8,2),
-    IN p_cashier_id INT
+  IN p_invoice_id INT,
+  IN p_branch_id INT,
+  IN p_paid_amount NUMERIC(8,2),
+  IN p_cashier_id INT
 )
 BEGIN
-    DECLARE EXIT HANDLER FOR SQLEXCEPTION
-    BEGIN
-        ROLLBACK;
-    END;
+  DECLARE EXIT HANDLER FOR SQLEXCEPTION
+  BEGIN
+    ROLLBACK;
+  END;
 
-    START TRANSACTION;
+  START TRANSACTION;
 
-    INSERT INTO billing_payment
-        (payment_id, invoice_id, branch_id, paid_amount, cashier_id, time_stamp)
-    VALUES
-        (p_payment_id, p_invoice_id, p_branch_id, p_paid_amount, p_cashier_id, NOW());
+  INSERT INTO billing_payment (invoice_id, branch_id, paid_amount, cashier_id, time_stamp)
+  VALUES (p_invoice_id, p_branch_id, p_paid_amount, p_cashier_id, NOW());
 
-    COMMIT;
+  SET @new_id = LAST_INSERT_ID();
 
-    SELECT * FROM billing_payment WHERE payment_id = p_payment_id;
+  COMMIT;
+
+  SELECT * FROM billing_payment WHERE payment_id = @new_id;
 END$$
 
 -- CREATE PROCEDURE to update an existing billing payment
