@@ -424,7 +424,7 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
       {
         type: "child",
         title: "Claimed History",
-        url: "",
+        url: "/insurance-history",
         icon: HandCoins,
         // hideIf: (role) => typeof role !== "string" ||
         //   ![ROLE_BILLING_STAFF, ROLE_INSURANCE_AGENT, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),

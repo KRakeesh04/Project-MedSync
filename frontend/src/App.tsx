@@ -40,6 +40,7 @@ import DashboardSkeleton from './components/dashboard-skeleton';
 import LogsTable from './pages/logs/logs';
 import BranchManagerPage from './pages/managers/manager';
 import InsuranceTypesPage from './pages/insurance/insurancetypes';
+import InsuranceHistory from './pages/insurance/insuranceHistory';
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -335,6 +336,16 @@ function App() {
                 <>
                   <PageTitle title="Insurance Types | MedSync" />
                   <InsuranceTypesPage />
+                </>
+              }
+            />
+
+             <Route
+              path="/insurance-history"
+              element={
+                <>
+                  <PageTitle title="Insurance Claim History | MedSync" />
+                  <InsuranceHistory />
                 </>
               }
             />

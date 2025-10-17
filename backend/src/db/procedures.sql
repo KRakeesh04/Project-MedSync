@@ -100,6 +100,10 @@ DROP PROCEDURE IF EXISTS get_insurance_type_count;
 
 DROP PROCEDURE IF EXISTS get_insurance_types_for_pagination;
 
+-- Insurance history model functions
+
+DROP PROCEDURE IF EXISTS get_all_insurance_histories;
+
 -- User_Contact model functions
 DROP PROCEDURE IF EXISTS create_user_contact;
 
@@ -670,6 +674,14 @@ BEGIN
     ORDER BY insurance_id
     LIMIT insurance_count OFFSET count_start;
 END$$
+
+-- insurance history modelfunction
+
+CREATE PROCEDURE get_all_insurance_histories()
+BEGIN
+    SELECT * FROM `insurance_claim`;
+END$$
+
 
 -- user contact model functions
 CREATE PROCEDURE create_user_contact(
