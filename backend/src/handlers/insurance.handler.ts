@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { createInsuranceType, getAllInsuranceTypes, getInsuranceTypeCount, updateInsuranceType } from "../models/insurancetype.model.ts";
+import { createInsuranceType, getAllInsuranceTypes, getInsuranceTypeCount, getInsuranceTypesForPagination, updateInsuranceType } from "../models/insurancetype.model.ts";
 
 
 interface insuranceTypeNames {
@@ -25,14 +25,13 @@ export const createNewInsuranceType = async (req: Request, res: Response) => {
 
 
 export const getInsuranceTypes = async (req: Request, res: Response) => {
-  // const { count, offset } = req.query;
+  const { count, offset } = req.query;
   try {
-    // if (!count || !offset) {
-    //   res.status(400).json({ error: "Params count & offset undefined" });
-    //   return;
-    // }
-    // const branches: Branch[] = await getBranchesForPagination(Number(count), Number(offset));
-    const insuranceTypes: insuranceTypeNames[] = await getAllInsuranceTypes();
+    if (!count || !offset) {
+      res.status(400).json({ error: "Params count & offset undefined" });
+      return;
+    }
+    const insuranceTypes = await getInsuranceTypesForPagination(Number(count), Number(offset));
     if (insuranceTypes.length < 1) {
       res.status(404).json({ error: "Insurance types not found" });
       return;
@@ -40,11 +39,6 @@ export const getInsuranceTypes = async (req: Request, res: Response) => {
     const insurance_count: Number = await getInsuranceTypeCount();
     if (insurance_count == undefined) {
       console.log("error in finding the insurance count, count = " + insurance_count);
-      res.status(500).json({ error: "Internal Server Error" });
-      return;
-    }
-    if (insurance_count != insuranceTypes.length) {
-      console.log("insurance count and length mismatch, count = " + insurance_count + " length = " + insuranceTypes.length);
       res.status(500).json({ error: "Internal Server Error" });
       return;
     }

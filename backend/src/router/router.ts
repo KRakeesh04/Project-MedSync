@@ -102,8 +102,8 @@ var routes: Route[] = [
 	//insurance router
 	{ path: "/all-insurance-types", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllInsuranceTypeNames },
 	{ path: "/insurance-types", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getInsuranceTypes },
-	{ path: "/insurance-types/add", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: createNewInsuranceType },
-	{ path: "/insurance-types/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: updateInsuranceTypeByID }
+	{ path: "/insurance-types/add", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: createNewInsuranceType },
+	{ path: "/insurance-types/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: updateInsuranceTypeByID }
 
 ];
 
