@@ -1,10 +1,13 @@
--- Active: 1760508928142@@127.0.0.1@3306@project-medsync
 -- use `Project-MedSync`;
 -- User model functions
 DROP PROCEDURE IF EXISTS create_user;
+
 DROP PROCEDURE IF EXISTS update_user;
+
 DROP PROCEDURE IF EXISTS delete_user;
+
 DROP PROCEDURE IF EXISTS get_user_by_id;
+
 DROP PROCEDURE IF EXISTS get_user_by_username;
 
 DROP PROCEDURE IF EXISTS get_all_users;
@@ -144,25 +147,39 @@ DROP PROCEDURE IF EXISTS check_service_code_exists;
 -- medical history model functions
 DROP PROCEDURE IF EXISTS get_all_medical_histories;
 
+DROP PROCEDURE IF EXISTS get_medical_histories_by_patient_id;
+
 -- medication model functions
 DROP PROCEDURE IF EXISTS get_all_medications;
 
 DROP PROCEDURE IF EXISTS get_medications_by_patient_id;
+-- Appointment model functions
+DROP PROCEDURE IF EXISTS get_appointments_by_patient_id;
 
 -- billing_invoice model functions
 DROP PROCEDURE IF EXISTS create_billing_invoice;
+
 DROP PROCEDURE IF EXISTS update_billing_invoice_bypayment;
+
 DROP PROCEDURE IF EXISTS delete_billing_invoice;
+
 DROP PROCEDURE IF EXISTS get_billing_invoice_by_id;
+
 DROP PROCEDURE IF EXISTS get_all_billing_invoices;
+
 DROP PROCEDURE IF EXISTS get_all_outstanding_bills;
 
 -- billing_payment model functions
 DROP PROCEDURE IF EXISTS create_billing_payment;
+
 DROP PROCEDURE IF EXISTS update_billing_payment;
+
 DROP PROCEDURE IF EXISTS delete_billing_payment;
+
 DROP PROCEDURE IF EXISTS get_billing_payment_by_id;
+
 DROP PROCEDURE IF EXISTS get_billing_payments_by_invoice_id;
+
 DROP PROCEDURE IF EXISTS get_all_billing_payments;
 
 DELIMITER $$
@@ -878,6 +895,16 @@ BEGIN
     SELECT * FROM `medical_history`;
 END$$
 
+CREATE PROCEDURE get_medical_histories_by_patient_id(IN p_patient_id INT)
+BEGIN
+  SELECT pat.patient_id, mh.appointment_id, visit_date, diagnosis, symptoms, allergies, notes, follow_up_date, created_at, updated_at
+  FROM medical_history AS mh
+  JOIN appointment as a ON mh.appointment_id = a.appointment_id
+  JOIN patient      AS pat ON a.patient_id     = pat.patient_id
+  WHERE a.patient_id = p_patient_id
+  ORDER BY mh.created_at DESC;
+END$$
+
 -- medication model functions
 CREATE PROCEDURE get_all_medications()
 BEGIN
@@ -897,13 +924,111 @@ BEGIN
   ORDER BY p.prescribed_at DESC;
 END$$
 
+-- Appointment model functions
+-- CREATE PROCEDURE get_appointments_by_patient_id(IN p_patient_id INT)
+-- BEGIN
+-- 	select ap.appointment_id , ap.doctor_id, ap.date, ap.time_slot, ap.status, d.name
+-- 	from appointment as ap join doctor as d
+-- 	on ap.doctor_id= d.doctor_id
+-- 	where ap.patient_id = p_patient_id
+-- 	ORDER BY ap.date DESC;
+-- END$$
 
+-- -- billing_invoice model functions
+-- CREATE PROCEDURE create_billing_invoice(
+--     IN p_appointment_id INT,
+--     IN p_additional_fee DECIMAL(10,2),
+--     IN p_total_fee DECIMAL(10,2),
+--     IN p_claim_id INT,
+--     IN p_net_amount DECIMAL(10,2),
+--     IN p_remaining_payment_amount DECIMAL(10,2)
+-- )
+-- BEGIN
+--     INSERT INTO `billing_invoice`
+--     (appointment_id, additional_fee, total_fee, claim_id, net_amount, remaining_payment_amount, time_stamp)
+--     VALUES
+--     (p_appointment_id, p_additional_fee, p_total_fee, p_claim_id, p_net_amount, p_remaining_payment_amount, NOW());
+-- END$$
+
+-- CREATE PROCEDURE update_billing_invoice(
+--     IN p_invoice_id INT,
+--     IN p_additional_fee DECIMAL(10,2),
+--     IN p_total_fee DECIMAL(10,2),
+--     IN p_net_amount DECIMAL(10,2),
+--     IN p_remaining_payment_amount DECIMAL(10,2)
+-- )
+-- BEGIN
+--     UPDATE `billing_invoice`
+--     SET additional_fee = p_additional_fee,
+--         total_fee = p_total_fee,
+--         net_amount = p_net_amount,
+--         remaining_payment_amount = p_remaining_payment_amount,
+--         time_stamp = NOW()
+--     WHERE id = p_invoice_id;
+-- END$$
+
+-- CREATE PROCEDURE delete_billing_invoice(IN p_invoice_id INT)
+-- BEGIN
+--     DELETE FROM `billing_invoice` WHERE id = p_invoice_id;
+-- END$$
+
+-- CREATE PROCEDURE get_billing_invoice_by_id(IN p_invoice_id INT)
+-- BEGIN
+--     SELECT * FROM `billing_invoice` WHERE id = p_invoice_id;
+-- END$$
+
+-- CREATE PROCEDURE get_all_billing_invoices()
+-- BEGIN
+--     SELECT * FROM `billing_invoice`;
+-- END$$
+
+-- -- billing_payment model functions
+-- CREATE PROCEDURE create_billing_payment(
+--     IN p_payment_id INT,
+--     IN p_invoice_id INT,
+--     IN p_branch_id INT,
+--     IN p_paid_amount NUMERIC(8,2),
+--     IN p_cashier_id INT
+-- )
+-- BEGIN
+--     INSERT INTO `billing_payment`
+--     (payment_id, invoice_id, branch_id, paid_amount, cashier_id, time_stamp)
+--     VALUES
+--     (p_payment_id, p_invoice_id, p_branch_id, p_paid_amount, p_cashier_id, NOW());
+-- END$$
+
+-- CREATE PROCEDURE update_billing_payment(
+--     IN p_payment_id INT,
+--     IN p_paid_amount NUMERIC(8,2)
+-- )
+-- BEGIN
+--     UPDATE `billing_payment`
+--     SET paid_amount = p_paid_amount,
+--         time_stamp = NOW()
+--     WHERE payment_id = p_payment_id;
+-- END$$
+
+-- CREATE PROCEDURE delete_billing_payment(IN p_payment_id INT)
+-- BEGIN
+--     DELETE FROM `billing_payment` WHERE payment_id = p_payment_id;
+-- END$$
+
+-- CREATE PROCEDURE get_billing_payment_by_id(IN p_payment_id INT)
+-- BEGIN
+--     SELECT * FROM `billing_payment` WHERE payment_id = p_payment_id;
+-- END$$
+
+-- CREATE PROCEDURE get_billing_payments_by_invoice_id(IN p_invoice_id INT)
+-- BEGIN
+--     SELECT * FROM `billing_payment` WHERE invoice_id = p_invoice_id;
+-- END$$
+
+-- CREATE PROCEDURE get_all_billing_payments()
+-- BEGIN
+--     SELECT * FROM `billing_payment`;
+-- END$$
 
 -- billing_invoice model functions
--- CREATE PROCEDURE to insert a new billing invoice
-
-
-
 CREATE PROCEDURE create_billing_invoice(
     IN p_appointment_id INT,
     IN p_additional_fee DECIMAL(10,2),
@@ -929,16 +1054,9 @@ BEGIN
     COMMIT;
 END$$
 
-
-
-
-
--- CREATE PROCEDURE to update an existing billing invoice
-
 CREATE PROCEDURE update_billing_invoice_bypayment(
     IN p_invoice_id INT,
-    IN p_payment DECIMAL(10,2)
-   
+    IN p_payment DECIMAL(10,2)  
 )
 BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
@@ -954,17 +1072,8 @@ BEGIN
         time_stamp = NOW()
     WHERE appointment_id = p_invoice_id;
 
-    COMMIT;
-
-    
+    COMMIT;    
 END$$
-
-
--- CREATE PROCEDURE to delete a billing invoice
-
-
-
--- CREATE PROCEDURE to get a billing invoice by ID
 
 CREATE PROCEDURE delete_billing_invoice(IN p_invoice_id INT)
 BEGIN
@@ -980,8 +1089,6 @@ BEGIN
     COMMIT;
 END$$
 
--- CREATE PROCEDURE to get all billing invoices
-
 CREATE PROCEDURE get_all_billing_invoices()
 BEGIN
     SELECT * FROM `billing_invoice`;
@@ -993,10 +1100,8 @@ BEGIN
     WHERE remaining_payment_amount > 0
     ORDER BY remaining_payment_amount DESC;
 END$$
+
 -- billing_payment model functions
-
--- CREATE PROCEDURE to insert a new billing payment
-
 CREATE PROCEDURE create_billing_payment(
   IN p_invoice_id INT,
   IN p_branch_id INT,
@@ -1017,13 +1122,8 @@ BEGIN
   SET @new_id = LAST_INSERT_ID();
 
   COMMIT;
-
-  
 END$$
 
-
-
--- CREATE PROCEDURE to update an existing billing payment
 CREATE PROCEDURE update_billing_payment(
     IN p_payment_id INT,
     IN p_paid_amount NUMERIC(8,2)
@@ -1046,9 +1146,6 @@ BEGIN
     SELECT * FROM billing_payment WHERE payment_id = p_payment_id;
 END$$
 
-
--- CREATE PROCEDURE to delete a billing payment
-
 CREATE PROCEDURE delete_billing_payment(IN p_payment_id INT)
 BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
@@ -1063,26 +1160,19 @@ BEGIN
     COMMIT;
 END$$
 
-
--- CREATE PROCEDURE to get a billing payment by payment_id
-
 CREATE PROCEDURE get_billing_payment_by_id(IN p_payment_id INT)
 BEGIN
     SELECT * FROM `billing_payment` WHERE payment_id = p_payment_id;
 END$$
-
-
--- CREATE PROCEDURE to get payments by invoice_id
 
 CREATE PROCEDURE get_billing_payments_by_invoice_id(IN p_invoice_id INT)
 BEGIN
     SELECT * FROM `billing_payment` WHERE invoice_id = p_invoice_id;
 END$$
 
-
--- CREATE PROCEDURE to get all billing payments
 CREATE PROCEDURE get_all_billing_payments()
 BEGIN
     SELECT * FROM `billing_payment`;
 END$$
-DELIMITER ;
+
+DELIMITER;

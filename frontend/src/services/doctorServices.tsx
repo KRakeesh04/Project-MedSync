@@ -11,13 +11,24 @@ export interface Doctor {
   basic_monthly_salary: number;
 }
 
-export interface DoctorSpeciality {
-  doctor_id: number;
-  speciality_id: number;
+// export interface DoctorSpeciality {
+//   doctor_id: number;
+//   speciality_id: number;
+//   name: string;
+//   speciality_name: string;
+//   added_at: string;
+// }
+export type DoctorSpeciality = {
+  id: number;
   name: string;
-  speciality_name: string;
-  added_at: string;
-}
+};
+
+export type DoctorDataWithSpeciality = {
+  doctor_id: number;
+  name: string;
+  specialties: string[]; // array of specialty names
+  added_at: string; // ISO date string
+};
 
 export interface DoctorAppointment {
   appointment_id: number;
@@ -102,15 +113,45 @@ export const addDoctor = async (doctorData: {
 };
 
 
-export const getAllDoctorSpecialities = async () => {
+// export const getAllDoctorSpecialities = async () => {
+//   try {
+//     const response = await axiosInstance.get<{
+//       doctor_speciality_count: number;
+//       doctor_specialities: Array<DoctorSpeciality>;
+//     }>(`/doctors/specialities`);
+//     return response.data;
+//   } catch (error: unknown) {
+//     console.error("Error getting all doctors' speciality data:", error);
+//     if (error instanceof AxiosError) {
+//       if (error.response?.data?.error) {
+//         throw error.response.data.error;
+//       }
+//       throw error.message;
+//     }
+//     throw "Unknown error occurred";
+//   }
+// };
+export const getAllDoctorSpecialities = async (): Promise<DoctorDataWithSpeciality[]> => {
   try {
-    const response = await axiosInstance.get
-      // <{
-      //   doctor_speciality_count: number;
-      //   doctor_specialities: Array<DoctorSpeciality>;
-      // }>
-      (`/doctors/specialities`);
-    return response.data;
+    const response = await axiosInstance.get<{
+      doctor_speciality_count: number;
+      doctor_specialities: Array<{
+        doctor_id: number;
+        doctor_name: string;
+        specialties: DoctorSpeciality[];
+        added_at: string;
+      }>;
+    }>(`/doctors/specialities`);
+
+    // Map API response to our Doctor type
+    const doctors: DoctorDataWithSpeciality[] = response.data.doctor_specialities.map((d) => ({
+      doctor_id: d.doctor_id,
+      name: d.doctor_name,
+      specialties: d.specialties.map((s) => s.name), // extract names
+      added_at: d.added_at,
+    }));
+
+    return doctors;
   } catch (error: unknown) {
     console.error("Error getting all doctors' speciality data:", error);
     if (error instanceof AxiosError) {

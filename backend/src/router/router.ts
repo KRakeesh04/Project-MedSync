@@ -5,12 +5,12 @@ import { deleteUser, getDeletedUsers, getUsers, restoreUser, updateUser } from "
 import { patientSignup, staffSignup, userLogin, validateUser } from "../handlers/auth.handler.ts";
 import { createNewBranch, getAllBranchNames, getBranches, updateBranchByID } from "../handlers/branch.handler.ts";
 import { getLogsForPagination } from "../handlers/log.handler.ts";
-import { dischargePatientByID, getPatients, updateCurrentPatientDetails } from "../handlers/patient.handler.ts";
+import { dischargePatientByID, getPatientDetailsByID, getPatients, updateCurrentPatientDetails } from "../handlers/patient.handler.ts";
 import { getAllStaff, updateStaffByID } from "../handlers/staff.handler.ts";
 import { addNewSpecialty, getAllSpecialties } from "../handlers/speciality.handler.ts";
 
 import { checkServiceCodeHandler, createTreatmentHandler, getAllTreatmentsHandler } from "../handlers/treatment.handler.ts";
-import { getMedicalHistoryHandler } from "../handlers/medicalhistory.handler.ts";
+import { getMedicalHistoriesByPatientHandler, getMedicalHistoryHandler } from "../handlers/medicalhistory.handler.ts";
 import { getAllMedicationsHandler, getMedicationsByPatientHandler } from "../handlers/medication.handlers.ts";
 
 import {
@@ -96,6 +96,7 @@ var routes: Route[] = [
 	{ path: "/patients", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getPatients },
 	{ path: "/patient/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: updateCurrentPatientDetails },
 	{ path: "/patient/discharge/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: dischargePatientByID },
+	{ path: "/patient/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getPatientDetailsByID },
 
 	// staff router
 	{ path: "/staff", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllStaff },
@@ -111,7 +112,7 @@ var routes: Route[] = [
 
 	//medical history router
 	{path: "/medical-histories", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler:getMedicalHistoryHandler },
-	
+	{path: "/medical-histories/:patientId", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler:getMedicalHistoriesByPatientHandler },
 	//medication router
 	{ path: "/medications", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllMedicationsHandler },
 	{ path: "/medications/:patientId", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getMedicationsByPatientHandler },
@@ -150,6 +151,8 @@ var routes: Route[] = [
 
 
 
+	//appointment router
+	{ path: "/patient/appointments/:patientId", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAppointmentsbyPatientIdHandler }
 ];
 
 

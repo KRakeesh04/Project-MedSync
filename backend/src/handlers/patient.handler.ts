@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import { createPatient, dischargePatient, getAllPatients, getPatientByID, getPatientsCount, UpdatePatientByID, type Patient } from "../models/patient.model.ts";
+import e from "express";
 
 
 // export const createNewPatient = async (req: Request, res: Response) => {
@@ -93,4 +94,19 @@ export const getPatients = async (req: Request, res: Response) => {
     console.log("Error in getPatients handler: ", error)
     res.status(500).json({ error: "Internal Server Error" });
   };
+};
+
+export const getPatientDetailsByID = async (req: Request, res: Response) => {
+  let { id } = req.params;
+  try {
+    const patient = await getPatientByID(Number(id));
+    if (!patient) {
+      res.status(404).json({ error: "Patient not found" });
+      return;
+    }
+    res.status(200).json({ patient });
+  } catch (error) {
+    console.error("Error in getPatientDetailsByID handler:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 };
