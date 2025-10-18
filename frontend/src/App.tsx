@@ -27,6 +27,11 @@ import TreatmentAdd from './pages/patients/treatment/treatment_add';
 import Treatments from './pages/patients/treatment/treatment';
 import Medications from './pages/patients/medication/medication';
 
+// Import appointment pages
+import AllAppointments from './pages/appointments/AllAppointments';
+import AddAppointment from './pages/appointments/AddAppointment';
+import DoctorTimeSlots from './pages/appointments/DoctorTimeSlots';
+
 import { useNavigate } from "react-router-dom";
 import {
   LOCAL_STORAGE__ROLE,
@@ -228,6 +233,37 @@ function App() {
               }
             />
 
+            {/* Appointment Routes */}
+            <Route
+              path="/appointments"
+              element={
+                <>
+                  <PageTitle title="Appointments | MedSync" />
+                  <AllAppointments />
+                </>
+              }
+            />
+
+            <Route
+              path="/appointments/add"
+              element={
+                <>
+                  <PageTitle title="Add Appointment | MedSync" />
+                  <AddAppointment />
+                </>
+              }
+            />
+
+            <Route
+              path="/appointments/slots"
+              element={
+                <>
+                  <PageTitle title="Available Slots | MedSync" />
+                  <DoctorTimeSlots />
+                </>
+              }
+            />
+
             {/* <Route
               path="/doctors-appointments"
               element={
@@ -247,8 +283,6 @@ function App() {
                 </>
               }
             /> */}
-
-
 
             <Route
               path="/doctors/specialities"
@@ -317,7 +351,6 @@ function App() {
               }
             />
 
-
             <Route
               path="/patients/medication"
               element={
@@ -327,7 +360,6 @@ function App() {
                 </>
               }
             />
-
 
           </Route>
         </Routes>

@@ -153,6 +153,21 @@ DROP PROCEDURE IF EXISTS get_all_medications;
 
 DROP PROCEDURE IF EXISTS get_medications_by_patient_id;
 
+-- Appointment model functions
+DROP PROCEDURE IF EXISTS create_appointment;
+
+DROP PROCEDURE IF EXISTS update_appointment;
+
+DROP PROCEDURE IF EXISTS delete_appointment;
+
+DROP PROCEDURE IF EXISTS get_appointment_by_id;
+
+DROP PROCEDURE IF EXISTS get_all_appointments;
+
+DROP PROCEDURE IF EXISTS get_available_slots;
+
+DROP PROCEDURE IF EXISTS get_all_doctors_for_appointments;
+
 DELIMITER $$
 
 -- User model functions
@@ -885,4 +900,301 @@ BEGIN
   ORDER BY p.prescribed_at DESC;
 END$$
 
-DELIMITER;
+-- Create new appointment
+CREATE PROCEDURE create_appointment(
+    IN p_patient_name VARCHAR(50),
+    IN p_patient_contact VARCHAR(10),
+    IN p_patient_age INT,
+    IN p_doctor_id INT,
+    IN p_date DATE,
+    IN p_time_slot VARCHAR(13),
+    IN p_patient_note VARCHAR(255)
+)
+BEGIN
+    DECLARE v_patient_id INT;
+    DECLARE v_user_id INT;
+    DECLARE v_appointment_id INT;
+    DECLARE v_overlap_count INT;
+    
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+    
+    START TRANSACTION;
+    
+    -- NORMALIZE time slot format (remove spaces around hyphen)
+    SET @normalized_time_slot = REPLACE(p_time_slot, ' - ', '-');
+    SET @normalized_time_slot = REPLACE(@normalized_time_slot, ' -', '-');
+    SET @normalized_time_slot = REPLACE(@normalized_time_slot, '- ', '-');
+    
+    -- Check if patient exists with same name and contact
+    SELECT patient_id INTO v_patient_id
+    FROM patient 
+    WHERE name = p_patient_name AND emergency_contact_no = p_patient_contact
+    LIMIT 1;
+    
+    -- If patient doesn't exist, create new patient
+    IF v_patient_id IS NULL THEN
+        -- Create user first
+        INSERT INTO user (username, password_hash, role, is_approved)
+        VALUES (CONCAT('patient_', UNIX_TIMESTAMP()), 'temp_password', 'Patient', 1);
+        
+        SET v_user_id = LAST_INSERT_ID();
+        
+        -- Create patient
+        INSERT INTO patient (patient_id, name, gender, emergency_contact_no, date_of_birth)
+        VALUES (v_user_id, p_patient_name, 'Male', p_patient_contact, DATE_SUB(CURDATE(), INTERVAL p_patient_age YEAR));
+        
+        SET v_patient_id = v_user_id;
+    END IF;
+    
+    -- Check for overlapping appointments (use normalized time slot)
+    SELECT COUNT(*) INTO v_overlap_count
+    FROM appointment 
+    WHERE (
+        (patient_id = v_patient_id AND date = p_date AND time_slot = @normalized_time_slot) OR
+        (doctor_id = p_doctor_id AND date = p_date AND time_slot = @normalized_time_slot AND status != 'Cancelled')
+    );
+    
+    IF v_overlap_count > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Time slot is not available. Please choose a different time.';
+    END IF;
+    
+    -- Get next appointment ID
+    SELECT COALESCE(MAX(appointment_id), 0) + 1 INTO v_appointment_id FROM appointment;
+    
+    -- Create appointment with normalized time slot format
+    INSERT INTO appointment (appointment_id, patient_id, doctor_id, patient_note, date, time_slot, status, time_stamp)
+    VALUES (v_appointment_id, v_patient_id, p_doctor_id, p_patient_note, p_date, @normalized_time_slot, 'Pending', NOW());
+    
+    COMMIT;
+    
+    SELECT v_appointment_id as appointment_id;
+END$$
+
+-- Update appointment
+CREATE PROCEDURE update_appointment(
+    IN p_appointment_id INT,
+    IN p_patient_name VARCHAR(50),
+    IN p_doctor_id INT,
+    IN p_date DATE,
+    IN p_time_slot VARCHAR(13),
+    IN p_patient_note VARCHAR(255),
+    IN p_status VARCHAR(20)
+)
+BEGIN
+    DECLARE v_current_patient_id INT;
+    DECLARE v_current_doctor_id INT;
+    DECLARE v_current_date DATE;
+    DECLARE v_current_time_slot VARCHAR(13);
+    DECLARE v_overlap_count INT;
+    DECLARE v_affected_rows INT;
+    
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+    
+    START TRANSACTION;
+    
+    -- Get current appointment details
+    SELECT patient_id, doctor_id, date, time_slot 
+    INTO v_current_patient_id, v_current_doctor_id, v_current_date, v_current_time_slot
+    FROM appointment 
+    WHERE appointment_id = p_appointment_id;
+    
+    IF v_current_patient_id IS NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Appointment not found';
+    END IF;
+    
+    -- Update patient name if provided and different
+    IF p_patient_name IS NOT NULL AND p_patient_name != '' THEN
+        UPDATE patient 
+        SET name = p_patient_name 
+        WHERE patient_id = v_current_patient_id;
+    END IF;
+    
+    -- NORMALIZE time slot format (remove spaces around hyphen)
+    SET @normalized_time_slot = NULL;
+    IF p_time_slot IS NOT NULL THEN
+        -- Convert "09:00 - 09:30" to "09:00-09:30"
+        SET @normalized_time_slot = REPLACE(p_time_slot, ' - ', '-');
+        -- Also handle case with single spaces
+        SET @normalized_time_slot = REPLACE(@normalized_time_slot, ' -', '-');
+        SET @normalized_time_slot = REPLACE(@normalized_time_slot, '- ', '-');
+    END IF;
+    
+    -- Check for overlapping appointments if date, time_slot, or doctor is being changed
+    IF (p_date IS NOT NULL AND p_date != v_current_date) OR 
+       (p_time_slot IS NOT NULL AND @normalized_time_slot != v_current_time_slot) OR
+       (p_doctor_id IS NOT NULL AND p_doctor_id != v_current_doctor_id) THEN
+        
+        SET @check_date = COALESCE(p_date, v_current_date);
+        SET @check_time_slot = COALESCE(@normalized_time_slot, v_current_time_slot);
+        SET @check_doctor_id = COALESCE(p_doctor_id, v_current_doctor_id);
+        
+        -- Check doctor availability (exclude current appointment from check)
+        SELECT COUNT(*) INTO v_overlap_count
+        FROM appointment 
+        WHERE appointment_id != p_appointment_id 
+          AND doctor_id = @check_doctor_id 
+          AND date = @check_date 
+          AND time_slot = @check_time_slot 
+          AND status != 'Cancelled';
+        
+        IF v_overlap_count > 0 THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Doctor is not available at this time. Please choose a different time.';
+        END IF;
+        
+        -- Check patient availability (exclude current appointment from check)
+        SELECT COUNT(*) INTO v_overlap_count
+        FROM appointment 
+        WHERE appointment_id != p_appointment_id 
+          AND patient_id = v_current_patient_id 
+          AND date = @check_date 
+          AND time_slot = @check_time_slot 
+          AND status != 'Cancelled';
+        
+        IF v_overlap_count > 0 THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Patient already has another appointment at this time. Please choose a different time.';
+        END IF;
+    END IF;
+    
+    -- Update appointment with COALESCE to keep current values if NULL is passed
+    -- Use normalized time slot format
+    UPDATE appointment 
+    SET doctor_id = COALESCE(p_doctor_id, doctor_id),
+        date = COALESCE(p_date, date),
+        time_slot = COALESCE(@normalized_time_slot, time_slot),
+        patient_note = COALESCE(p_patient_note, patient_note),
+        status = COALESCE(p_status, status)
+    WHERE appointment_id = p_appointment_id;
+    
+    SET v_affected_rows = ROW_COUNT();
+    
+    COMMIT;
+    
+    SELECT v_affected_rows as affected_rows;
+END$$
+
+
+-- Delete appointment
+CREATE PROCEDURE delete_appointment(IN p_appointment_id INT)
+BEGIN
+    DELETE FROM appointment WHERE appointment_id = p_appointment_id;
+    SELECT ROW_COUNT() as affected_rows;
+END$$
+
+-- Get appointment by ID
+CREATE PROCEDURE get_appointment_by_id(IN p_appointment_id INT)
+BEGIN
+    SELECT 
+        a.appointment_id,
+        a.patient_id,
+        a.doctor_id,
+        a.patient_note,
+        a.date,
+        a.time_slot,
+        a.status,
+        a.time_stamp,
+        p.name as patient_name,
+        d.name as doctor_name
+    FROM appointment a
+    LEFT JOIN patient p ON a.patient_id = p.patient_id
+    LEFT JOIN doctor d ON a.doctor_id = d.doctor_id
+    WHERE a.appointment_id = p_appointment_id;
+END$$
+
+-- Get all appointments
+CREATE PROCEDURE get_all_appointments()
+BEGIN
+    SELECT 
+        a.appointment_id,
+        a.patient_id,
+        a.doctor_id,
+        a.patient_note,
+        a.date,
+        a.time_slot,
+        a.status,
+        a.time_stamp,
+        p.name as patient_name,
+        d.name as doctor_name
+    FROM appointment a
+    LEFT JOIN patient p ON a.patient_id = p.patient_id
+    LEFT JOIN doctor d ON a.doctor_id = d.doctor_id
+    ORDER BY a.date DESC, a.time_slot ASC;
+END$$
+
+-- Get all doctors for appointments
+CREATE PROCEDURE get_all_doctors_for_appointments()
+BEGIN
+    SELECT 
+        d.doctor_id,
+        d.name,
+        d.gender,
+        d.fee_per_patient,
+        d.basic_monthly_salary,
+        GROUP_CONCAT(DISTINCT s.speciality_name) as specialties
+    FROM doctor d
+    LEFT JOIN doctor_speciality ds ON d.doctor_id = ds.doctor_id
+    LEFT JOIN speciality s ON ds.speciality_id = s.speciality_id
+    GROUP BY d.doctor_id, d.name, d.gender, d.fee_per_patient, d.basic_monthly_salary
+    ORDER BY d.name;
+END$$
+
+-- Get available time slots for a doctor on a specific date
+CREATE PROCEDURE get_available_slots(
+    IN p_doctor_id INT,
+    IN p_date DATE
+)
+BEGIN
+    -- Define all possible time slots
+    DROP TEMPORARY TABLE IF EXISTS all_time_slots;
+    CREATE TEMPORARY TABLE all_time_slots (
+        time_slot VARCHAR(13)
+    );
+    
+    INSERT INTO all_time_slots VALUES 
+        ('08:00-08:30'), ('08:30-09:00'),
+        ('09:00-09:30'), ('09:30-10:00'),
+        ('10:00-10:30'), ('10:30-11:00'),
+        ('11:00-11:30'), ('11:30-12:00'),
+        ('12:00-12:30'), ('12:30-13:00'),
+        ('13:00-13:30'), ('13:30-14:00'),
+        ('14:00-14:30'), ('14:30-15:00'),
+        ('15:00-15:30'), ('15:30-16:00'),
+        ('16:00-16:30'), ('16:30-17:00');
+    
+    -- Get doctor info
+    SELECT 
+        d.doctor_id,
+        d.name as doctor_name,
+        GROUP_CONCAT(DISTINCT s.speciality_name) as specialty
+    INTO @doctor_id, @doctor_name, @specialty
+    FROM doctor d
+    LEFT JOIN doctor_speciality ds ON d.doctor_id = ds.doctor_id
+    LEFT JOIN speciality s ON ds.speciality_id = s.speciality_id
+    WHERE d.doctor_id = p_doctor_id
+    GROUP BY d.doctor_id, d.name;
+    
+    -- Return available slots with doctor info
+    SELECT 
+        p_date as date,
+        ats.time_slot,
+        @doctor_id as doctor_id,
+        @doctor_name as doctor_name,
+        @specialty as specialty
+    FROM all_time_slots ats
+    WHERE ats.time_slot NOT IN (
+        SELECT time_slot 
+        FROM appointment 
+        WHERE doctor_id = p_doctor_id AND date = p_date AND status != 'Cancelled'
+    );
+    
+    DROP TEMPORARY TABLE all_time_slots;
+END$$
+
+DELIMITER ;

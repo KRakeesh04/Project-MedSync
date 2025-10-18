@@ -13,11 +13,14 @@ import { checkServiceCodeHandler, createTreatmentHandler, getAllTreatmentsHandle
 import { getMedicalHistoryHandler } from "../handlers/medicalhistory.handler.ts";
 import { getAllMedicationsHandler, getMedicationsByPatientHandler } from "../handlers/medication.handlers.ts";
 
+import { getAllAppointments, getAppointmentById, createAppointment, createAppointmentFromData, updateAppointment, updateAppointmentStatus, deleteAppointment, getAvailableSlots, getAllDoctorsForAppointments } from "../handlers/appointment.handler.ts";
+
 export const HttpMethod = {
 	GET: "GET",
 	POST: "POST",
 	PUT: "PUT",
 	DELETE: "DELETE",
+	PATCH: "PATCH"
 };
 
 export const Role = {
@@ -96,8 +99,18 @@ var routes: Route[] = [
 	
 	//medication router
 	{ path: "/medications", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllMedicationsHandler },
-	{ path: "/medications/:patientId", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getMedicationsByPatientHandler }
+	{ path: "/medications/:patientId", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getMedicationsByPatientHandler },
 
+	// Appointment routes
+	{ path: "/appointments", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllAppointments },
+	{ path: "/appointments/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAppointmentById },
+	{ path: "/appointments", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: createAppointment },
+	{ path: "/appointments/create", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: createAppointmentFromData },
+	{ path: "/appointments/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: updateAppointment },
+	{ path: "/appointments/:id/status", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PATCH, handler: updateAppointmentStatus },
+	{ path: "/appointments/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.DELETE, handler: deleteAppointment },
+	{ path: "/available-slots", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAvailableSlots },
+	{ path: "/appointment/doctors", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllDoctorsForAppointments },
 ];
 
 
@@ -119,6 +132,11 @@ export const MapRouters = (app: Express) => {
 					route.handler(req, res);
 				});
 				break;
+			case HttpMethod.PATCH:
+				app.patch(route.path, authorizeRoles(route.AccessibleBy), (req, res) => {
+					route.handler(req, res);
+				});
+				break;
 			case HttpMethod.DELETE:
 				app.delete(route.path, authorizeRoles(route.AccessibleBy), (req, res) => {
 					route.handler(req, res);
@@ -136,7 +154,7 @@ function availableForRoles(roles: string[]): string[] {
 	for (const role of roles) {
 		if (role === Role.USER) {
 			for (const r of allRoles) {
-				if (r !== Role.USER || r !== Role.PUBLIC || r !== Role.MEDICAL_STAFF) {
+				if (r !== Role.USER && r !== Role.PUBLIC && r !== Role.MEDICAL_STAFF) {
 					result.add(r);
 				}
 			}
@@ -178,4 +196,3 @@ function availableForRoles(roles: string[]): string[] {
 
 	return Array.from(result);
 }
-
