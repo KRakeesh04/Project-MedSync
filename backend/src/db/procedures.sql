@@ -950,14 +950,15 @@ BEGIN
 
     UPDATE billing_invoice
     SET 
-        remaining_payment_amount = remaining_payment_amount-p_payment,
+        remaining_payment_amount = remaining_payment_amount - p_payment,
         time_stamp = NOW()
-    WHERE id = p_invoice_id;
+    WHERE appointment_id = p_invoice_id;
 
     COMMIT;
 
-    SELECT * FROM billing_invoice WHERE id = p_invoice_id;
+    
 END$$
+
 
 
 -- CREATE PROCEDURE to delete a billing invoice

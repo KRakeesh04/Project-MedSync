@@ -44,18 +44,16 @@ export const updateBillingInvoiceBypayment = async (
   invoice_id: number,
   payment: number,
   
-): Promise<BillingInvoice> => {
+): Promise<void> => {
   try {
     const [rows] = await sql.query(
-      "CALL update_billing_invoice(?, ?, ?, ?, ?)",
+      "CALL update_billing_invoice_bypayment (?, ?)",
       [
         invoice_id,
         payment
       ]
     );
-    const invoice = (rows as any)[0][0] as BillingInvoice;
-    if (!invoice) throw new Error("Billing invoice not updated");
-    return invoice;
+    
   } catch (error) {
     console.error("Error updating billing invoice:", error);
     throw error;

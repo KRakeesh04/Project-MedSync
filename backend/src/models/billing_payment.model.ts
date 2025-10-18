@@ -21,7 +21,6 @@ export const createBillingPayment = async (
       [invoice_id, branch_id, paid_amount, cashier_id]
     );
     
-    
   } catch (error) {
     console.error("Error creating billing payment:", error);
     throw error;

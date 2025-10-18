@@ -20,6 +20,10 @@ export const createNewBillingPayment = async (req: Request, res: Response) => {
       paid_amount,
       cashier_id
     );
+    const updatedInvoice = await updateBillingInvoiceBypayment(
+      invoice_id,
+      paid_amount
+    );
     res.status(200).json({ message: "Billing payment created successfully", payment });
   } catch (error) {
     console.error("Error in createNewBillingPayment handler:", error);
