@@ -16,7 +16,7 @@ import { formatDate } from "@/services/utils";
 import { getAllOutstandingBills, type BillingInvoice } from "@/services/invoiceDetailsServices";
 import { getAllBranches } from "@/services/branchServices";
 
-const OutstandingInvoices: React.FC = () => {
+const AllInvoices: React.FC = () => {
   const [invoices, setInvoices] = useState<BillingInvoice[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
@@ -26,6 +26,25 @@ const OutstandingInvoices: React.FC = () => {
   // Filters
   const [selectedBranch, setSelectedBranch] = useState<string>("All");
   const [branches, setBranches] = useState<{ value: string; label: string }[]>([]);
+
+  // --- Safe helpers to avoid runtime errors in table cells ---
+  const safeNumber = (v: unknown, fallback = 0) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : fallback;
+  };
+
+  const safeFormatDate = (v: unknown) => {
+    try {
+      const s = String(v ?? "");
+      if (!s) return "";
+      const d = new Date(s);
+      if (Number.isNaN(d.getTime())) return s;
+      return formatDate(d.toISOString());
+    } catch {
+      return String(v ?? "");
+    }
+  };
+  // --- end helpers ---
 
   const columns: ColumnDef<BillingInvoice>[] = [
     {
@@ -39,6 +58,7 @@ const OutstandingInvoices: React.FC = () => {
           Appointment ID
         </Button>
       ),
+      cell: ({ row }) => String(row.original.appointment_id ?? ""),
     },
     {
       accessorKey: "total_fee",
@@ -50,6 +70,11 @@ const OutstandingInvoices: React.FC = () => {
         >
           Total Fee
         </Button>
+      ),
+      cell: ({ row }) => (
+        <span className="font-medium text-blue-600">
+          {safeNumber(row.original.total_fee).toFixed(2)}
+        </span>
       ),
     },
     {
@@ -63,6 +88,7 @@ const OutstandingInvoices: React.FC = () => {
           Additional Fee
         </Button>
       ),
+      cell: ({ row }) => safeNumber(row.original.additional_fee).toFixed(2),
     },
     {
       accessorKey: "net_amount",
@@ -75,6 +101,11 @@ const OutstandingInvoices: React.FC = () => {
           Net Amount
         </Button>
       ),
+      cell: ({ row }) => (
+        <span className="font-medium text-green-600">
+          {safeNumber(row.original.net_amount).toFixed(2)}
+        </span>
+      ),
     },
     {
       accessorKey: "remaining_payment_amount",
@@ -84,14 +115,17 @@ const OutstandingInvoices: React.FC = () => {
           className="px-0"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Outstanding Amount
+          Remaining Amount
         </Button>
       ),
-      cell: ({ row }) => (
-        <span className="text-red-600 font-medium">
-          {row.original.remaining_payment_amount.toFixed(2)}
-        </span>
-      ),
+      cell: ({ row }) => {
+        const rem = safeNumber(row.original.remaining_payment_amount);
+        return (
+          <span className={rem > 0 ? "text-red-600 font-medium" : ""}>
+            {rem.toFixed(2)}
+          </span>
+        );
+      },
     },
     {
       accessorKey: "time_stamp",
@@ -104,7 +138,7 @@ const OutstandingInvoices: React.FC = () => {
           Date
         </Button>
       ),
-      cell: ({ row }) => formatDate(row.original.time_stamp),
+      cell: ({ row }) => safeFormatDate(row.original.time_stamp),
     },
     {
       header: "Action",
@@ -113,8 +147,8 @@ const OutstandingInvoices: React.FC = () => {
           size="icon"
           variant="outline"
           onClick={() => {
-            // You can navigate to payment page or open a modal here
             toast.success(`Viewing Invoice ${row.original.appointment_id}`);
+            // navigate or open modal here
           }}
         >
           <Eye />
@@ -138,30 +172,36 @@ const OutstandingInvoices: React.FC = () => {
 
   const fetchInvoices = useCallback(async () => {
     const tableState = table.getState();
-    const page = tableState.pagination.pageIndex + 1;
     const itemsPerPage = tableState.pagination.pageSize;
 
-    toast.loading("Loading...");
+    const toastId = toast.loading("Loading...");
 
     try {
       const response = await getAllOutstandingBills();
 
-      // ✅ Optional filter by branch if needed
-      let filtered = response;
+      // normalize response into an array
+      let data: BillingInvoice[] = [];
+      if (Array.isArray(response)) data = response;
+      else if (response && Array.isArray((response as any).invoices)) data = (response as any).invoices;
+      else if (response && Array.isArray((response as any).data)) data = (response as any).data;
+      else data = (response as any) || [];
+
+      // Optional branch filtering if invoices have branch_id
+      let filtered = data;
       if (selectedBranch !== "All") {
         filtered = filtered.filter(
-          (inv: any) => String(inv.branch_id) === selectedBranch
+          (inv: any) => String(inv.branch_id ?? "") === selectedBranch
         );
       }
 
       setInvoices(filtered);
-      setPageCount(Math.ceil(filtered.length / itemsPerPage));
+      setPageCount(Math.max(1, Math.ceil(filtered.length / itemsPerPage)));
       setErrorCode(null);
     } catch (error) {
-      toast.error("Failed to fetch outstanding invoices");
+      toast.error("Failed to fetch billing invoices");
       setErrorCode(500);
     } finally {
-      toast.dismiss();
+      toast.dismiss(toastId);
     }
   }, [table, selectedBranch]);
 
@@ -174,10 +214,13 @@ const OutstandingInvoices: React.FC = () => {
     const loadBranches = async () => {
       try {
         const data = await getAllBranches();
-        const mappedBranches = data.branches.map((b) => ({
-          value: String(b.branch_id),
-          label: b.name,
-        }));
+        const items = (data && (data as any).branches) || (data as any) || [];
+        const mappedBranches = Array.isArray(items)
+          ? items.map((b: any) => ({
+              value: String(b.branch_id),
+              label: b.name,
+            }))
+          : [];
         setBranches(mappedBranches);
       } catch (err) {
         toast.error("Failed to load branches");
@@ -215,4 +258,4 @@ const OutstandingInvoices: React.FC = () => {
   );
 };
 
-export default OutstandingInvoices;
+export default AllInvoices;

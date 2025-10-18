@@ -997,6 +997,7 @@ END$$
 
 -- CREATE PROCEDURE to insert a new billing payment
 
+
 CREATE PROCEDURE create_billing_payment(
   IN p_invoice_id INT,
   IN p_branch_id INT,
@@ -1018,8 +1019,10 @@ BEGIN
 
   COMMIT;
 
-  SELECT * FROM billing_payment WHERE payment_id = @new_id;
+  
 END$$
+
+
 
 -- CREATE PROCEDURE to update an existing billing payment
 CREATE PROCEDURE update_billing_payment(

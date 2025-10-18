@@ -22,7 +22,8 @@ export const getAllOutstandingBills = async (): Promise<BillingInvoice[]> => {
 
 export const getAllBillingInvoices = async (): Promise<BillingInvoice[]> => {
   try {
-    const response = await axiosInstance.get<BillingInvoice[]>(`/billing-invoices`);   
+    const response = await axiosInstance.get<BillingInvoice[]>(`/billing-invoices`);  
+     
     return response.data;
   } catch (error) {
     console.error("Error fetching all billing payments:", error);

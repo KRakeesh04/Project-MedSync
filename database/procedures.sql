@@ -897,7 +897,7 @@ BEGIN
   ORDER BY p.prescribed_at DESC;
 END$$
 
-DELIMITER;
+
 
 -- billing_invoice model functions
 -- CREATE PROCEDURE to insert a new billing invoice
@@ -1018,8 +1018,10 @@ BEGIN
 
   COMMIT;
 
-  SELECT * FROM billing_payment WHERE payment_id = @new_id;
+  
 END$$
+
+
 
 -- CREATE PROCEDURE to update an existing billing payment
 CREATE PROCEDURE update_billing_payment(
