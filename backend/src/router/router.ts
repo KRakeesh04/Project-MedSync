@@ -111,7 +111,7 @@ var routes: Route[] = [
 	//treatments router
 	{ path: "/treatments", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getTreatmentsHandler },
 	{ path: "/treatments/check-service-code", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: checkServiceCodeHandler },
-	{ path: "/treatments", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: createTreatmentHandler },
+	{ path: "/treatments/add", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: createTreatmentHandler },
 
 	//medical history router
 	{ path: "/medical-histories", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getMedicalHistoriesHandler },

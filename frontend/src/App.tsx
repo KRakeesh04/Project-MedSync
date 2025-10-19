@@ -23,7 +23,6 @@ import ExPatients from './pages/patients/exPatients';
 import Branches from './pages/branches/branches';
 import Home from './pages/Home';
 import MedicalHistory from './pages/patients/medicalhistory/medicalhistory';
-import TreatmentAdd from './pages/patients/treatment/treatment_add';
 import Treatments from './pages/patients/treatment/treatment';
 import Medications from './pages/patients/medication/medication';
 
@@ -303,7 +302,7 @@ function App() {
                   </>
                 } />
 
-                <Route
+                {/* <Route
                   path="/patients/treatment/add"
                   element={
                     <>
@@ -311,7 +310,7 @@ function App() {
                       <TreatmentAdd />
                     </>
                   }
-                />
+                /> */}
 
                 <Route
                   path="/patients/medical-history"

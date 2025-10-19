@@ -226,26 +226,26 @@ INSERT INTO `insurance` (insurance_id, insurance_type, insurance_period, claim_p
 
 -- TREATMENT CATALOGUE (service_code)
 INSERT INTO `treatment_catelogue` (service_code, name, fee, description, speciality_id) VALUES
-(101, 'ECG Scan', 1500.00, 'Electrocardiogram test', 1),
-(102, 'MRI Brain', 8000.00, 'Brain MRI scan', 2),
-(103, 'Skin Therapy', 3000.00, 'Acne/scar treatment', 3),
-(104, 'Child Checkup', 1200.00, 'Routine pediatric check', 4),
-(105, 'Fracture Treatment', 5000.00, 'Bone fracture repair', 5),
-(106, 'Eye Exam', 400.00, 'Routine eye exam', 6),
-(107, 'Endoscopy', 1000.00, 'GI endoscopy', 7),
-(108, 'Psych Consult', 800.00, 'Psychiatry consultation', 8),
-(109, 'ENT Check', 700.00, 'ENT examination', 9),
-(110, 'General Consult', 1000.00, 'General medicine consultation', 10),
-(111, 'Blood Test', 250.00, 'CBC and panels', 10),
-(112, 'CT Scan', 1200.00, 'CT imaging', 2),
-(113, 'Ultrasound', 800.00, 'Ultrasound scan', 5),
-(114, 'Skin Biopsy', 600.00, 'Tissue sample', 3),
-(115, 'Vaccination', 200.00, 'Routine vaccine', 4),
-(116, 'Stress Test', 1800.00, 'Cardiac stress test', 1),
-(117, 'Bone Density', 900.00, 'DEXA scan', 5),
-(118, 'Allergy Test', 350.00, 'Allergy panel', 3),
-(119, 'Counselling', 700.00, 'Therapy session', 8),
-(120, 'Diabetes Panel', 900.00, 'Diabetes bloodwork', 10);
+(1, 'ECG Scan', 1500.00, 'Electrocardiogram test', 1),
+(2, 'MRI Brain', 8000.00, 'Brain MRI scan', 2),
+(3, 'Skin Therapy', 3000.00, 'Acne/scar treatment', 3),
+(4, 'Child Checkup', 1200.00, 'Routine pediatric check', 4),
+(5, 'Fracture Treatment', 5000.00, 'Bone fracture repair', 5),
+(6, 'Eye Exam', 400.00, 'Routine eye exam', 6),
+(7, 'Endoscopy', 1000.00, 'GI endoscopy', 7),
+(8, 'Psych Consult', 800.00, 'Psychiatry consultation', 8),
+(9, 'ENT Check', 700.00, 'ENT examination', 9),
+(10, 'General Consult', 1000.00, 'General medicine consultation', 10),
+(11, 'Blood Test', 250.00, 'CBC and panels', 10),
+(12, 'CT Scan', 1200.00, 'CT imaging', 2),
+(13, 'Ultrasound', 800.00, 'Ultrasound scan', 5),
+(14, 'Skin Biopsy', 600.00, 'Tissue sample', 3),
+(15, 'Vaccination', 200.00, 'Routine vaccine', 4),
+(16, 'Stress Test', 1800.00, 'Cardiac stress test', 1),
+(17, 'Bone Density', 900.00, 'DEXA scan', 5),
+(18, 'Allergy Test', 350.00, 'Allergy panel', 3),
+(19, 'Counselling', 700.00, 'Therapy session', 8),
+(20, 'Diabetes Panel', 900.00, 'Diabetes bloodwork', 10);
 
 
 -- PATIENT_INSURANCE (patient_id references user.user_id)
@@ -358,22 +358,22 @@ INSERT INTO `medical_history` (medical_history_id, appointment_id, visit_date, d
 
 -- TREATMENTS (service_code references treatment_catelogue)
 INSERT INTO `treatment` (service_code, appointment_id) VALUES
-(101, 1),
-(112, 2),
-(114, 3),
-(115, 4),
-(105, 5),
-(116, 6),
-(117, 7),
-(119, 8),
-(109, 9),
-(110, 10),
-(111, 11),
-(104, 12),
-(120, 13),
-(107, 14),
-(106, 15),
-(119, 16);
+(1, 1),
+(12, 2),
+(14, 3),
+(15, 4),
+(5, 5),
+(16, 6),
+(17, 7),
+(19, 8),
+(9, 9),
+(10, 10),
+(11, 11),
+(4, 12),
+(20, 13),
+(7, 14),
+(6, 15),
+(19, 16);
 
 
 -- INSURANCE_CLAIM (approved_by references staff.staff_id)
