@@ -13,7 +13,7 @@ INSERT INTO `branch` (branch_id, name, location, landline_no, created_at) VALUES
 
 -- USERS (admins, managers, staff, doctors-as-users, patients-as-users)
 INSERT INTO `user`(user_id, username, password_hash, role, branch_id, is_approved, created_at) VALUES
-(1, 'super_admin', 'hash_super', 'Super_Admin', 1, TRUE, NOW()),
+(1, 'super_admin', '$2b$10$gMXv0.zIImOvgJmqFe2TmuSf.d1tqvlJLUXm2FsBYTxLafsxXALn.', 'Super_Admin', 1, TRUE, NOW()),
 (2, 'bm_kandy', 'hash_kandy', 'Branch_Manager', 2, TRUE, NOW()),
 (3, 'bm_galle', 'hash_galle', 'Branch_Manager', 3, TRUE, NOW()),
 (4, 'bm_jaffna', 'hash_jaffna', 'Branch_Manager', 4, TRUE, NOW()),
@@ -225,27 +225,27 @@ INSERT INTO `insurance` (insurance_id, insurance_type, insurance_period, claim_p
 
 
 -- TREATMENT CATALOGUE (service_code)
-INSERT INTO `treatment_catelogue` (service_code, name, fee, description, speciality_id) VALUES
-(1, 'ECG Scan', 1500.00, 'Electrocardiogram test', 1),
-(2, 'MRI Brain', 8000.00, 'Brain MRI scan', 2),
-(3, 'Skin Therapy', 3000.00, 'Acne/scar treatment', 3),
-(4, 'Child Checkup', 1200.00, 'Routine pediatric check', 4),
-(5, 'Fracture Treatment', 5000.00, 'Bone fracture repair', 5),
-(6, 'Eye Exam', 400.00, 'Routine eye exam', 6),
-(7, 'Endoscopy', 1000.00, 'GI endoscopy', 7),
-(8, 'Psych Consult', 800.00, 'Psychiatry consultation', 8),
-(9, 'ENT Check', 700.00, 'ENT examination', 9),
-(10, 'General Consult', 1000.00, 'General medicine consultation', 10),
-(11, 'Blood Test', 250.00, 'CBC and panels', 10),
-(12, 'CT Scan', 1200.00, 'CT imaging', 2),
-(13, 'Ultrasound', 800.00, 'Ultrasound scan', 5),
-(14, 'Skin Biopsy', 600.00, 'Tissue sample', 3),
-(15, 'Vaccination', 200.00, 'Routine vaccine', 4),
-(16, 'Stress Test', 1800.00, 'Cardiac stress test', 1),
-(17, 'Bone Density', 900.00, 'DEXA scan', 5),
-(18, 'Allergy Test', 350.00, 'Allergy panel', 3),
-(19, 'Counselling', 700.00, 'Therapy session', 8),
-(20, 'Diabetes Panel', 900.00, 'Diabetes bloodwork', 10);
+INSERT INTO `treatment_catelogue` (service_code, name, fee, description, speciality_id, created_at) VALUES
+(1, 'ECG Scan', 1500.00, 'Electrocardiogram test', 1, NOW()),
+(2, 'MRI Brain', 8000.00, 'Brain MRI scan', 2, NOW()),
+(3, 'Skin Therapy', 3000.00, 'Acne/scar treatment', 3, NOW()),
+(4, 'Child Checkup', 1200.00, 'Routine pediatric check', 4, NOW()),
+(5, 'Fracture Treatment', 5000.00, 'Bone fracture repair', 5, NOW()),
+(6, 'Eye Exam', 400.00, 'Routine eye exam', 6, NOW()),
+(7, 'Endoscopy', 1000.00, 'GI endoscopy', 7, NOW()),
+(8, 'Psych Consult', 800.00, 'Psychiatry consultation', 8, NOW()),
+(9, 'ENT Check', 700.00, 'ENT examination', 9, NOW()),
+(10, 'General Consult', 1000.00, 'General medicine consultation', 10, NOW()),
+(11, 'Blood Test', 250.00, 'CBC and panels', 10, NOW()),
+(12, 'CT Scan', 1200.00, 'CT imaging', 2, NOW()),
+(13, 'Ultrasound', 800.00, 'Ultrasound scan', 5, NOW()),
+(14, 'Skin Biopsy', 600.00, 'Tissue sample', 3, NOW()),
+(15, 'Vaccination', 200.00, 'Routine vaccine', 4, NOW()),
+(16, 'Stress Test', 1800.00, 'Cardiac stress test', 1, NOW()),
+(17, 'Bone Density', 900.00, 'DEXA scan', 5, NOW()),
+(18, 'Allergy Test', 350.00, 'Allergy panel', 3, NOW()),
+(19, 'Counselling', 700.00, 'Therapy session', 8, NOW()),
+(20, 'Diabetes Panel', 900.00, 'Diabetes bloodwork', 10, NOW());
 
 
 -- PATIENT_INSURANCE (patient_id references user.user_id)
@@ -378,13 +378,13 @@ INSERT INTO `treatment` (service_code, appointment_id) VALUES
 
 -- INSURANCE_CLAIM (approved_by references staff.staff_id)
 INSERT INTO `insurance_claim` (claim_id, service_code, patient_id, approved_by, claimed_amount, claimed_at, insurance_id) VALUES
-(1, 101, 11, 9, 1000.00, NOW() - INTERVAL 58 DAY, 1),  -- approved by Asha Rajapaksa
-(2, 112, 12, 56, 6000.00, NOW() - INTERVAL 52 DAY, 2), -- approved by Kasun Kumara
-(3, 114, 13, 56, 240.00, NOW() - INTERVAL 48 DAY, 3), -- approved by Niroshan Perera (new agent)
-(4, 115, 14, 9, 90.00, NOW() - INTERVAL 44 DAY, 4),   -- approved by Asha Rajapaksa
-(5, 105, 15, 56, 4000.00, NOW() - INTERVAL 38 DAY, 5), -- approved by Kasun Kumara
-(6, 111, 21, 9, 200.00, NOW() - INTERVAL 6 DAY, 1),   -- approved by Asha Rajapaksa
-(7, 119, 26, 56, 640.00, NOW() - INTERVAL 1 DAY, 3);  -- approved by Niroshan Perera (new agent)
+(1, 1, 11, 9, 1000.00, NOW() - INTERVAL 58 DAY, 1),  -- approved by Asha Rajapaksa
+(2, 12, 12, 56, 6000.00, NOW() - INTERVAL 52 DAY, 2), -- approved by Kasun Kumara
+(3, 14, 13, 56, 240.00, NOW() - INTERVAL 48 DAY, 3), -- approved by Niroshan Perera (new agent)
+(4, 15, 14, 9, 90.00, NOW() - INTERVAL 44 DAY, 4),   -- approved by Asha Rajapaksa
+(5, 5, 15, 56, 4000.00, NOW() - INTERVAL 38 DAY, 5), -- approved by Kasun Kumara
+(6, 11, 21, 9, 200.00, NOW() - INTERVAL 6 DAY, 1),   -- approved by Asha Rajapaksa
+(7, 19, 26, 56, 640.00, NOW() - INTERVAL 1 DAY, 3);  -- approved by Niroshan Perera (new agent)
 
 
 -- BILLING_INVOICE (appointment_id is PK and FK to appointment)
@@ -462,16 +462,16 @@ INSERT INTO `prescription` (appointment_id, consultation_note, prescription_item
 (45, 'Cardio Rx', 'Beta-blocker 50mg', NOW() - INTERVAL 3 DAY, TRUE);
 
 INSERT INTO `treatment` (service_code, appointment_id) VALUES
-(102, 41),
-(118, 42),
-(115, 43),
-(103, 44),
-(116, 45);
+(2, 41),
+(18, 42),
+(15, 43),
+(3, 44),
+(16, 45);
 
 -- MORE INSURANCE CLAIMS & INVOICES for additional appointments
 INSERT INTO `insurance_claim` (claim_id, service_code, patient_id, approved_by, claimed_amount, claimed_at, insurance_id) VALUES
-(8, 102, 11, 56, 5000.00, NOW() - INTERVAL 13 DAY, 2),
-(9, 118, 12, 9, 350.00, NOW() - INTERVAL 11 DAY, 6);
+(8, 2, 11, 56, 5000.00, NOW() - INTERVAL 13 DAY, 2),
+(9, 18, 12, 9, 350.00, NOW() - INTERVAL 11 DAY, 6);
 
 INSERT INTO `billing_invoice` (appointment_id, additional_fee, total_fee, claim_id, net_amount, remaining_payment_amount, time_stamp) VALUES
 (41, 0.00, 5000.00, 8, 3500.00, 1500.00, NOW() - INTERVAL 13 DAY),

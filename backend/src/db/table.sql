@@ -168,6 +168,7 @@ CREATE TABLE `treatment_catelogue` (
   `fee` numeric(8,2),
   `description` varchar(255),
   `speciality_id` int,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`service_code`),
   FOREIGN KEY (`speciality_id`)
       REFERENCES `speciality`(`speciality_id`)

@@ -18,3 +18,12 @@ export const getAllDoctorSpeciality = async (): Promise<DoctorSpeciality[]> => {
     throw new Error('Database error');
   }
 };
+
+export const addDoctorSpeciality = async (doctor_id: number, speciality_id: number): Promise<void> => {
+  try {
+    await sql.query("CALL link_doctor_specialty(?, ?)", [doctor_id, speciality_id]);
+  } catch (error) {
+    console.error('Error linking doctor speciality:', error);
+    throw error;
+  }
+};

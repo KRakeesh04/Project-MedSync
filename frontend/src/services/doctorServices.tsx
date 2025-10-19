@@ -164,6 +164,61 @@ export const getAllDoctorSpecialities = async (): Promise<DoctorDataWithSpeciali
   }
 };
 
+export const getDoctorsWithSpecialities = async (): Promise<{
+  doctor_count: number;
+  doctors: Array<{
+    doctor_id: number;
+    name: string;
+    specialties: { name: string; added_at: string }[];
+    branch: string | null;
+    added_at: string | null;
+  }>;
+}> => {
+  try {
+    const response = await axiosInstance.get(`/doctors/specialities/overview`);
+    return response.data;
+  } catch (error: unknown) {
+    console.error("Error getting grouped doctors specialities:", error);
+    if (error instanceof AxiosError) {
+      if (error.response?.data?.error) {
+        throw error.response.data.error;
+      }
+      throw error.message;
+    }
+    throw "Unknown error occurred";
+  }
+};
+
+export const assignSpecialityToDoctor = async (doctor_id: number, speciality_id: number) => {
+  try {
+    const response = await axiosInstance.post(`/doctors/specialities/assign`, { doctor_id, speciality_id });
+    return response.data;
+  } catch (error: unknown) {
+    console.error('Error assigning speciality to doctor:', error);
+    if (error instanceof AxiosError) {
+      if (error.response?.data?.error) {
+        throw error.response.data.error;
+      }
+      throw error.message;
+    }
+    throw 'Unknown error occurred';
+  }
+};
+
+export const getAllDoctorNames = async () => {
+  try {
+    const response = await axiosInstance.get<{ doctor_count: number; doctors: Array<{ doctor_id: number; name: string }> }>(`/doctors/names`);
+    return response.data;
+  } catch (error: unknown) {
+    console.error('Error fetching doctor names:', error);
+    if (error instanceof AxiosError) {
+      if (error.response?.data?.error) throw error.response.data.error;
+      throw error.message;
+    }
+    throw 'Unknown error occurred';
+  }
+};
+
 export const getAllDoctorAppointments = async () => {
   try {
     const response = await axiosInstance.get
