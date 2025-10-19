@@ -97,9 +97,9 @@ const DoctorSpeciality: React.FC = () => {
 
   return (
     <div className="space-y-6 p-4">
+        <h2 className="text-lg font-medium">Doctors and Specialties</h2>
       {/* Filters */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <h2 className="text-lg font-medium">Doctors</h2>
 
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           {/* Doctor name search */}

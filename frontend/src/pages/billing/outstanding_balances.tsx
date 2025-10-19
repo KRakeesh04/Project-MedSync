@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-table";
 import type { ColumnDef, SortingState } from "@tanstack/react-table";
 import { DataTable } from "@/components/data-table";
-import toast from "react-hot-toast";
+import toast from "@/lib/toast";
 import { Button } from "@/components/ui/button";
 import { Eye } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -217,9 +217,9 @@ const AllInvoices: React.FC = () => {
         const items = (data && (data as any).branches) || (data as any) || [];
         const mappedBranches = Array.isArray(items)
           ? items.map((b: any) => ({
-              value: String(b.branch_id),
-              label: b.name,
-            }))
+            value: String(b.branch_id),
+            label: b.name,
+          }))
           : [];
         setBranches(mappedBranches);
       } catch (err) {

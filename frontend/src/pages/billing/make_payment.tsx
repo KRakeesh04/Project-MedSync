@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import toast from "react-hot-toast";
+import toast from "@/lib/toast";
 import { useNavigate } from "react-router-dom";
 import { createBillingPayment } from "@/services/billing_paymentServices";
 

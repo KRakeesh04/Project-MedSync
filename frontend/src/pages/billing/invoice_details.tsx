@@ -8,7 +8,7 @@ import {
 } from "@tanstack/react-table";
 import type { ColumnDef, SortingState } from "@tanstack/react-table";
 import { DataTable } from "@/components/data-table";
-import toast from "react-hot-toast";
+import toast from "@/lib/toast";
 import { Button } from "@/components/ui/button";
 import { Eye } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
