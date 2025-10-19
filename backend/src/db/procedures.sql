@@ -1,10 +1,14 @@
--- Active: 1760508928142@@127.0.0.1@3306@project-medsync
+-- Active: 1755111596628@@127.0.0.1@3306@Project-MedSync
 -- use `Project-MedSync`;
 -- User model functions
 DROP PROCEDURE IF EXISTS create_user;
+
 DROP PROCEDURE IF EXISTS update_user;
+
 DROP PROCEDURE IF EXISTS delete_user;
+
 DROP PROCEDURE IF EXISTS get_user_by_id;
+
 DROP PROCEDURE IF EXISTS get_user_by_username;
 
 DROP PROCEDURE IF EXISTS get_all_users;
@@ -149,6 +153,10 @@ DROP PROCEDURE IF EXISTS get_medical_histories_by_patient_id;
 -- medication model functions
 DROP PROCEDURE IF EXISTS get_all_medications;
 
+DROP PROCEDURE IF EXISTS get_all_medications_for_pagination;
+
+DROP PROCEDURE IF EXISTS get_medications_count;
+
 DROP PROCEDURE IF EXISTS get_medications_by_patient_id;
 
 -- Appointment model functions
@@ -179,7 +187,6 @@ DROP PROCEDURE IF EXISTS get_billing_payment_by_id;
 DROP PROCEDURE IF EXISTS get_billing_payments_by_invoice_id;
 
 DROP PROCEDURE IF EXISTS get_all_billing_payments;
-
 
 DELIMITER $$
 
@@ -907,20 +914,51 @@ END$$
 -- medication model functions
 CREATE PROCEDURE get_all_medications()
 BEGIN
-    SELECT appointment_id, consultation_note, prescription_items_details, prescribed_at, is_active, patient_id, name
-    FROM prescription
-    NATURAL JOIN appointment
-    NATURAL JOIN patient;
+    SELECT a.appointment_id, pr.consultation_note, pr.prescription_items_details, pr.prescribed_at, pr.is_active, p.patient_id, p.name, d.doctor_id, d.name, b.branch_id, b.name AS branch_name
+    FROM prescription pr
+    LEFT JOIN appointment a ON pr.appointment_id = a.appointment_id
+    LEFT JOIN patient p ON a.patient_id = p.patient_id
+    LEFT JOIN doctor d ON a.doctor_id = d.doctor_id
+    LEFT JOIN `user` u ON u.user_id = d.doctor_id
+    LEFT JOIN `branch` b ON u.branch_id = b.branch_id;
+END$$
+
+CREATE PROCEDURE get_all_medications_for_pagination(IN p_count INT, IN p_offset INT, IN p_branch_id INT)
+BEGIN
+    SELECT a.appointment_id, b.branch_id, b.name AS branch_name, p.patient_id, p.name AS patient_name, d.doctor_id, d.name AS doctor_name, pr.consultation_note, pr.prescription_items_details, pr.prescribed_at, pr.is_active
+    FROM prescription pr
+    LEFT JOIN appointment a ON pr.appointment_id = a.appointment_id
+    LEFT JOIN patient p ON a.patient_id = p.patient_id
+    LEFT JOIN doctor d ON a.doctor_id = d.doctor_id
+    LEFT JOIN `user` u ON u.user_id = d.doctor_id
+    LEFT JOIN `branch` b ON u.branch_id = b.branch_id
+    WHERE (p_branch_id = -1) OR (u.branch_id = p_branch_id)
+    LIMIT p_count
+    OFFSET p_offset;
+END$$
+
+CREATE PROCEDURE get_medications_count(IN p_branch_id INT)
+BEGIN
+    SELECT COUNT(*) AS medication_count
+    FROM prescription pr
+    LEFT JOIN appointment a ON pr.appointment_id = a.appointment_id
+    LEFT JOIN doctor d ON a.doctor_id = d.doctor_id
+    LEFT JOIN `user` u ON u.user_id = d.doctor_id
+    LEFT JOIN `branch` b ON u.branch_id = b.branch_id
+    WHERE (p_branch_id = -1) OR (u.branch_id = p_branch_id);
 END$$
 
 CREATE PROCEDURE get_medications_by_patient_id(IN p_patient_id INT)
 BEGIN
-  SELECT p.appointment_id, a.patient_id, pat.name AS name, p.consultation_note AS consultation_note, p.prescription_items_details, p.prescribed_at, p.is_active
-  FROM prescription AS p
-  JOIN appointment  AS a   ON p.appointment_id = a.appointment_id
-  JOIN patient      AS pat ON a.patient_id     = pat.patient_id
-  WHERE a.patient_id = p_patient_id
-  ORDER BY p.prescribed_at DESC;
+    SELECT a.appointment_id, b.branch_id, b.name AS branch_name, p.patient_id, p.name AS patient_name, d.doctor_id, d.name AS doctor_name, pr.consultation_note, pr.prescription_items_details, pr.prescribed_at, pr.is_active
+    FROM prescription pr
+    LEFT JOIN appointment a ON pr.appointment_id = a.appointment_id
+    LEFT JOIN patient p ON a.patient_id = p.patient_id
+    LEFT JOIN doctor d ON a.doctor_id = d.doctor_id
+    LEFT JOIN `user` u ON u.user_id = d.doctor_id
+    LEFT JOIN `branch` b ON u.branch_id = b.branch_id
+    WHERE a.patient_id = p_patient_id
+  ORDER BY pr.prescribed_at DESC;
 END$$
 
 -- Appointment model functions
@@ -1080,4 +1118,5 @@ CREATE PROCEDURE get_all_billing_payments()
 BEGIN
     SELECT * FROM `billing_payment`;
 END$$
-DELIMITER ;
+
+DELIMITER;

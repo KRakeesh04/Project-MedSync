@@ -1,5 +1,4 @@
--- Active: 1760508928142@@127.0.0.1@3306@project-medsync
--- Active: 1760508928142@@127.0.0.1@3306@project-medsync1760504316590@@root@null
+-- Active: 1755111596628@@127.0.0.1@3306@Project-MedSync
 -- BRANCHES
 INSERT INTO `branch` (branch_id, name, location, landline_no, created_at) VALUES
 (1, 'Colombo', 'Colombo 07', '0112567890', NOW()),
