@@ -7,6 +7,7 @@ import StaffSignIn from "./pages/Authentication/staff-sign-in";
 import StaffSignUp from './pages/Authentication/staff-sign-up';
 import Users from './pages/users/activeUsers';
 import DoctorsDetails from './pages/doctors/doctorsDetails';
+import DoctorsPatientsHistory from './pages/doctors/doctorsPatientsHistory';
 import { ThemeProvider } from './components/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
 import DoctorSpeciality from './pages/doctors/doctorSpeciality';
@@ -243,15 +244,15 @@ function App() {
               }
             /> */}
 
-                {/* <Route
-              path="/doctors-patients-history"
-              element={
-                <>
-                  <PageTitle title="Patients' history | MedSync" />
-                  <DoctorsPatientsHistory />
-                </>
-              }
-            /> */}
+                <Route
+                  path="/doctors-patients-history"
+                  element={
+                    <>
+                      <PageTitle title="Patients' history | MedSync" />
+                      <DoctorsPatientsHistory />
+                    </>
+                  }
+                />
 
 
 
