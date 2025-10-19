@@ -46,7 +46,7 @@ export async function createTreatment(
   payload: Omit<TreatmentCreateInput, "fee"> & { fee: number }
 ) {
   try {
-    const resp = await axiosInstance.post<{ treatment: Treatment }>('/treatments', payload);
+    const resp = await axiosInstance.post<{ treatment: Treatment }>('/treatments/add', payload);
     return resp.data;
   } catch (err: unknown) {
     console.error('Error creating treatment:', err);
