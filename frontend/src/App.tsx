@@ -77,16 +77,10 @@ function App() {
     });
   }, []);
 
-  return loading ? (
+  return (
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-      <DashboardSkeleton />
-    </ThemeProvider>
-  ) : (
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <>
-        <Toaster position="top-right" />
         <Routes>
-
           <Route
             index
             element={
@@ -96,143 +90,151 @@ function App() {
               </>
             }
           />
+        </Routes>
 
-          <Route element={<LoginLayout />}>
+        {loading === true ? (
+          <DashboardSkeleton />
+        ) : (
+          <>
+            <Toaster position="top-right" />
+            <Routes>
 
-            <Route
-              path="/sign-in"
-              element={
-                <>
-                  <PageTitle title="Sign-in | MedSync" />
-                  <PatientSignIn />
-                </>
-              }
-            />
+              <Route element={<LoginLayout />}>
 
-            <Route
-              path="/sign-up"
-              element={
-                <>
-                  <PageTitle title="Sign-up | MedSync" />
-                  <PatientSignUp />
-                </>
-              }
-            />
+                <Route
+                  path="/sign-in"
+                  element={
+                    <>
+                      <PageTitle title="Sign-in | MedSync" />
+                      <PatientSignIn />
+                    </>
+                  }
+                />
 
-            <Route
-              path="/staff/sign-in"
-              element={
-                <>
-                  <PageTitle title="Sign-in | MedSync" />
-                  <StaffSignIn />
-                </>
-              }
-            />
+                <Route
+                  path="/sign-up"
+                  element={
+                    <>
+                      <PageTitle title="Sign-up | MedSync" />
+                      <PatientSignUp />
+                    </>
+                  }
+                />
 
-            <Route
-              path="/staff/sign-up"
-              element={
-                <>
-                  <PageTitle title="Sign-up | MedSync" />
-                  <StaffSignUp />
-                </>
-              }
-            />
+                <Route
+                  path="/staff/sign-in"
+                  element={
+                    <>
+                      <PageTitle title="Sign-in | MedSync" />
+                      <StaffSignIn />
+                    </>
+                  }
+                />
 
-          </Route>
-          <Route element={<DefaultLayout />}>
+                <Route
+                  path="/staff/sign-up"
+                  element={
+                    <>
+                      <PageTitle title="Sign-up | MedSync" />
+                      <StaffSignUp />
+                    </>
+                  }
+                />
 
-            <Route
-              path="/dashboard"
-              element={
-                <>
-                  <PageTitle title="Dashboard | MedSync" />
-                  <DashboardRedirect />
-                </>
-              }
-            />
+              </Route>
+              <Route element={<DefaultLayout />}>
 
-            <Route
-              path="/users/active"
-              element={
-                <>
-                  <PageTitle title="Active Users | MedSync" />
-                  <Users />
-                </>
-              }
-            />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <>
+                      <PageTitle title="Dashboard | MedSync" />
+                      <DashboardRedirect />
+                    </>
+                  }
+                />
 
-            <Route
-              path="/users/inactive"
-              element={
-                <>
-                  <PageTitle title="Deleted Users | MedSync" />
-                  <InactiveUsers />
-                </>
-              }
-            />
+                <Route
+                  path="/users/active"
+                  element={
+                    <>
+                      <PageTitle title="Active Users | MedSync" />
+                      <Users />
+                    </>
+                  }
+                />
 
-            <Route
-              path="/staff"
-              element={
-                <>
-                  <PageTitle title="Staff | MedSync" />
-                  <StaffPage />
-                </>
-              }
-            />
+                <Route
+                  path="/users/inactive"
+                  element={
+                    <>
+                      <PageTitle title="Deleted Users | MedSync" />
+                      <InactiveUsers />
+                    </>
+                  }
+                />
 
-            <Route
-              path="/branch-managers"
-              element={
-                <>
-                  <PageTitle title="Branch Managers | MedSync" />
-                  <BranchManagerPage />
-                </>
-              }
-            />
+                <Route
+                  path="/staff"
+                  element={
+                    <>
+                      <PageTitle title="Staff | MedSync" />
+                      <StaffPage />
+                    </>
+                  }
+                />
 
-            <Route
-              path="/current-patients"
-              element={
-                <>
-                  <PageTitle title="Patients | MedSync" />
-                  <CurrentPatients />
-                </>
-              }
-            />
+                <Route
+                  path="/branch-managers"
+                  element={
+                    <>
+                      <PageTitle title="Branch Managers | MedSync" />
+                      <BranchManagerPage />
+                    </>
+                  }
+                />
 
-            <Route
-              path="/ex-patients"
-              element={
-                <>
-                  <PageTitle title="Ex-Patients | MedSync" />
-                  <ExPatients />
-                </>
-              }
-            />
+                <Route
+                  path="/current-patients"
+                  element={
+                    <>
+                      <PageTitle title="Patients | MedSync" />
+                      <CurrentPatients />
+                    </>
+                  }
+                />
 
-            <Route
-              path="/branches"
-              element={
-                <>
-                  <PageTitle title="Branch | MedSync" />
-                  <Branches />
-                </>
-              }
-            />
+                <Route
+                  path="/ex-patients"
+                  element={
+                    <>
+                      <PageTitle title="Ex-Patients | MedSync" />
+                      <ExPatients />
+                    </>
+                  }
+                />
 
-            <Route
-              path="/doctors"
-              element={
-                <>
-                  <PageTitle title="Doctors | MedSync" />
-                  <DoctorsDetails />
-                </>
-              }
-            />
+                <Route
+                  path="/branches"
+                  element={
+                    <>
+                      <PageTitle title="Branch | MedSync" />
+                      <Branches />
+                    </>
+                  }
+                />
 
-            {/* <Route
+                <Route
+                  path="/doctors"
+                  element={
+                    <>
+                      <PageTitle title="Doctors | MedSync" />
+                      <DoctorsDetails />
+                    </>
+                  }
+                />
+
+                {/* <Route
               path="/doctors-appointments"
               element={
                 <>
@@ -242,7 +244,7 @@ function App() {
               }
             /> */}
 
-            {/* <Route
+                {/* <Route
               path="/doctors-patients-history"
               element={
                 <>
@@ -254,114 +256,116 @@ function App() {
 
 
 
-            <Route
-              path="/doctors/specialities"
-              element={
-                <>
-                  <PageTitle title="Doctors' Speciality | MedSync" />
-                  <DoctorSpeciality />
-                </>
-              }
-            />
+                <Route
+                  path="/doctors/specialities"
+                  element={
+                    <>
+                      <PageTitle title="Doctors' Speciality | MedSync" />
+                      <DoctorSpeciality />
+                    </>
+                  }
+                />
 
-            <Route
-              path="/doctors/add"
-              element={
-                <>
-                  <PageTitle title="Add Doctor | MedSync" />
-                  <AddDoctor />
-                </>
-              }
-            />
+                <Route
+                  path="/doctors/add"
+                  element={
+                    <>
+                      <PageTitle title="Add Doctor | MedSync" />
+                      <AddDoctor />
+                    </>
+                  }
+                />
 
-            <Route
-              path="/speciality"
-              element={
-                <>
-                  <PageTitle title="Speciality | MedSync" />
-                  <Speciality />
-                </>
-              }
-            />
+                <Route
+                  path="/speciality"
+                  element={
+                    <>
+                      <PageTitle title="Speciality | MedSync" />
+                      <Speciality />
+                    </>
+                  }
+                />
 
-            <Route
-              path="/logs"
-              element={
-                <>
-                  <PageTitle title="Logs | MedSync" />
-                  <LogsTable />
-                </>
-              }
-            />
+                <Route
+                  path="/logs"
+                  element={
+                    <>
+                      <PageTitle title="Logs | MedSync" />
+                      <LogsTable />
+                    </>
+                  }
+                />
 
-            <Route path="/patients/treatment" element={
-              <>
-                <PageTitle title="Patient Treatments | MedSync" />
-                <Treatments />
-              </>
-            } />
+                <Route path="/patients/treatment" element={
+                  <>
+                    <PageTitle title="Patient Treatments | MedSync" />
+                    <Treatments />
+                  </>
+                } />
 
-            <Route
-              path="/patients/treatment/add"
-              element={
-                <>
-                  <PageTitle title="Add Treatment | MedSync" />
-                  <TreatmentAdd />
-                </>
-              }
-            />
+                <Route
+                  path="/patients/treatment/add"
+                  element={
+                    <>
+                      <PageTitle title="Add Treatment | MedSync" />
+                      <TreatmentAdd />
+                    </>
+                  }
+                />
 
-            <Route
-              path="/patients/medical-history"
-              element={
-                <>
-                  <PageTitle title="Patient Medical History | MedSync" />
-                  <MedicalHistory />
-                </>
-              }
-            />
-
-
-            <Route
-              path="/patients/medication"
-              element={
-                <>
-                  <PageTitle title="Patient Medications | MedSync" />
-                  <Medications />
-                </>
-              }
-            />
-            <Route
-            path="/make-payment"
-            element={
-              <>
-                <PageTitle title="Make Payment | MedSync" />
-                <MakePayment />
-              </>
-            }
-          />
-          <Route
-            path="/invoice_details"
-            element={
-              <>
-                <PageTitle title="Invoice Details | MedSync" />
-                <AllInvoices />
-              </>
-            }
-          />
-          <Route 
-            path="/outstanding-balances"
-            element={
-              <>
-                <PageTitle title="Outstanding Balances | MedSync" />
-                <OutstandingInvoices />
-              </>
-            }
-          />
+                <Route
+                  path="/patients/medical-history"
+                  element={
+                    <>
+                      <PageTitle title="Patient Medical History | MedSync" />
+                      <MedicalHistory />
+                    </>
+                  }
+                />
 
 
-          </Route>
-        </Routes>
+                <Route
+                  path="/patients/medication"
+                  element={
+                    <>
+                      <PageTitle title="Patient Medications | MedSync" />
+                      <Medications />
+                    </>
+                  }
+                />
+                <Route
+                  path="/make-payment"
+                  element={
+                    <>
+                      <PageTitle title="Make Payment | MedSync" />
+                      <MakePayment />
+                    </>
+                  }
+                />
+                <Route
+                  path="/invoice_details"
+                  element={
+                    <>
+                      <PageTitle title="Invoice Details | MedSync" />
+                      <AllInvoices />
+                    </>
+                  }
+                />
+                <Route
+                  path="/outstanding-balances"
+                  element={
+                    <>
+                      <PageTitle title="Outstanding Balances | MedSync" />
+                      <OutstandingInvoices />
+                    </>
+                  }
+                />
+
+
+              </Route>
+            </Routes>
+          </>
+        )}
       </>
     </ThemeProvider>
   );
