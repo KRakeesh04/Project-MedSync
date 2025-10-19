@@ -1,27 +1,33 @@
 import axiosInstance from "../axiosConfig";
-import type { medication } from "./medicationServices";
 
 export interface medicalHistory {
-    medical_history_id: number;
-    appointment_id: number;
-    visit_date: string;
-    diagnosis: string;
-    symptoms: string;
-    allergies: string;
-    notes: string;
-    follow_up_date: string;
-    created_at: string;
-    updated_at: string;
+  medical_history_id: number;
+  appointment_id: number;
+  visit_date: string;
+  diagnosis: string;
+  symptoms: string;
+  allergies: string;
+  notes: string;
+  follow_up_date: string;
+  created_at: string;
+  updated_at: string;
 }
 
-export const getallmedicalhistories = async () => {
-    try {
-        const resp = await axiosInstance.get<{ histories: Array<medicalHistory> }>("/medical-histories");
-        return resp.data.histories;
-    } catch (error) {
-        console.error("Error fetching medical histories:", error);
-        throw error;
-    }
+export const getallmedicalhistories = async (
+  count: number,
+  offset: number,
+  branch: string,
+) => {
+  try {
+    const resp = await axiosInstance.get<{
+      histories: Array<medicalHistory>;
+      total_count: number;
+    }>(`/medical-histories?count=${count}&offset=${offset}&branch=${branch}`);
+    return resp.data;
+  } catch (error) {
+    console.error("Error fetching medical histories:", error);
+    throw error;
+  }
 };
 
 type WrappedA = { medicalHistories: medicalHistory[] };

@@ -10,8 +10,8 @@ import { getAllStaff, updateStaffByID } from "../handlers/staff.handler.ts";
 import { addNewSpecialty, getAllSpecialties } from "../handlers/speciality.handler.ts";
 
 import { checkServiceCodeHandler, createTreatmentHandler, getAllTreatmentsHandler } from "../handlers/treatment.handler.ts";
-import { getMedicalHistoriesByPatientHandler, getMedicalHistoryHandler } from "../handlers/medicalhistory.handler.ts";
-import { getAllMedicationsHandler, getMedicationsByPatientHandler, getMedicationsHandler } from "../handlers/medication.handlers.ts";
+import { getMedicalHistoriesByPatientHandler, getMedicalHistoriesHandler, getMedicalHistoryHandler } from "../handlers/medicalhistory.handler.ts";
+import { getMedicationsByPatientHandler, getMedicationsHandler } from "../handlers/medication.handlers.ts";
 
 import {
   createNewBillingPayment,
@@ -112,7 +112,7 @@ var routes: Route[] = [
 	{path: "/treatments", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler:createTreatmentHandler },
 
 	//medical history router
-	{path: "/medical-histories", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler:getMedicalHistoryHandler },
+	{path: "/medical-histories", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler:getMedicalHistoriesHandler },
 	{path: "/medical-histories/:patientId", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler:getMedicalHistoriesByPatientHandler },
 
 	//medication router

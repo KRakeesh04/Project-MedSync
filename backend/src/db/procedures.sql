@@ -148,6 +148,10 @@ DROP PROCEDURE IF EXISTS check_service_code_exists;
 -- medical history model functions
 DROP PROCEDURE IF EXISTS get_all_medical_histories;
 
+DROP PROCEDURE IF EXISTS get_all_medical_histories_for_pagination;
+
+DROP PROCEDURE IF EXISTS get_medical_histories_count;
+
 DROP PROCEDURE IF EXISTS get_medical_histories_by_patient_id;
 
 -- medication model functions
@@ -899,6 +903,33 @@ END$$
 CREATE PROCEDURE get_all_medical_histories()
 BEGIN
     SELECT * FROM `medical_history`;
+END$$
+
+CREATE PROCEDURE get_all_medical_histories_for_pagination(
+    IN p_count INT,
+    IN p_offset INT,
+    IN p_branch_id INT
+)
+BEGIN
+    SELECT mh.medical_history_id, a.appointment_id, a.date AS visit_date, mh.diagnosis, mh.symptoms, mh.allergies, mh.notes, mh.follow_up_date, mh.created_at, mh.updated_at
+    FROM medical_history mh
+    JOIN appointment a ON mh.appointment_id = a.appointment_id
+    JOIN patient p ON a.patient_id = p.patient_id
+    JOIN `user` u ON p.patient_id = u.user_id
+    WHERE (p_branch_id = -1) OR (u.branch_id = p_branch_id)
+    ORDER BY mh.created_at DESC
+    LIMIT p_count
+    OFFSET p_offset;
+END$$
+
+CREATE PROCEDURE get_medical_histories_count(IN p_branch_id INT)
+BEGIN
+    SELECT COUNT(*) AS total_count
+    FROM medical_history mh
+    JOIN appointment a ON mh.appointment_id = a.appointment_id
+    JOIN patient p ON a.patient_id = p.patient_id
+    JOIN `user` u ON p.patient_id = u.user_id
+    WHERE (p_branch_id = -1) OR (u.branch_id = p_branch_id);
 END$$
 
 CREATE PROCEDURE get_medical_histories_by_patient_id(IN p_patient_id INT)
