@@ -128,7 +128,7 @@ const LogsTable: React.FC = () => {
 
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: 30,
   });
   const [pageCount, setPageCount] = useState<number>(-1); // total pages
 
