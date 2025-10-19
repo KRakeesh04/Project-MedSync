@@ -143,6 +143,10 @@ DROP PROCEDURE IF EXISTS create_treatment;
 
 DROP PROCEDURE IF EXISTS get_all_treatments;
 
+DROP PROCEDURE IF EXISTS get_treatments_for_pagination;
+
+DROP PROCEDURE IF EXISTS get_treatments_count;
+
 DROP PROCEDURE IF EXISTS check_service_code_exists;
 
 -- medical history model functions
@@ -875,6 +879,23 @@ from treatment_catelogue as tc left outer join speciality as s on tc.speciality_
   ORDER BY service_code;
 END$$
 
+CREATE PROCEDURE get_treatments_for_pagination(
+    IN p_count INT,
+    IN p_offset INT
+)
+BEGIN
+    SELECT tc.service_code, tc.name, tc.fee, tc.description, tc.speciality_id, s.speciality_name, tc.created_at
+    FROM treatment_catelogue tc
+    LEFT JOIN speciality s ON tc.speciality_id = s.speciality_id
+    ORDER BY tc.service_code
+    LIMIT p_count OFFSET p_offset;
+END$$
+
+CREATE PROCEDURE get_treatments_count()
+BEGIN
+    SELECT COUNT(service_code) AS treatment_count FROM treatment_catelogue;
+END$$
+
 CREATE PROCEDURE check_service_code_exists(IN p_code INT)
 BEGIN
   SELECT EXISTS(
@@ -883,20 +904,19 @@ BEGIN
 END$$
 
 CREATE PROCEDURE create_treatment(
-  IN p_service_code INT,
   IN p_name         VARCHAR(50),
   IN p_fee          DECIMAL(8,2),
   IN p_description  VARCHAR(255),
   IN p_speciality_id INT
 )
 BEGIN
-  INSERT INTO treatment_catelogue(service_code, name, fee, description, speciality_id)
-  VALUES (p_service_code, p_name, p_fee, p_description, p_speciality_id);
+  INSERT INTO treatment_catelogue(name, fee, description, speciality_id)
+  VALUES (p_name, p_fee, p_description, p_speciality_id);
 
   SELECT
     service_code, name, fee, description, speciality_id, NOW() AS created_at
   FROM treatment_catelogue
-  WHERE service_code = p_service_code;
+  WHERE service_code = LAST_INSERT_ID();
 END$$
 
 -- medical history model functions

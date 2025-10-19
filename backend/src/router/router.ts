@@ -8,25 +8,26 @@ import { getLogsForPagination } from "../handlers/log.handler.ts";
 import { dischargePatientByID, getPatientDetailsByID, getPatients, updateCurrentPatientDetails } from "../handlers/patient.handler.ts";
 import { getAllStaff, updateStaffByID } from "../handlers/staff.handler.ts";
 import { addNewSpecialty, getAllSpecialties } from "../handlers/speciality.handler.ts";
+import { getSpecialityNames } from "../handlers/speciality.handler.ts";
 
-import { checkServiceCodeHandler, createTreatmentHandler, getAllTreatmentsHandler } from "../handlers/treatment.handler.ts";
-import { getMedicalHistoriesByPatientHandler, getMedicalHistoriesHandler, getMedicalHistoryHandler } from "../handlers/medicalhistory.handler.ts";
+import { checkServiceCodeHandler, createTreatmentHandler, getTreatmentsHandler } from "../handlers/treatment.handler.ts";
+import { getMedicalHistoriesByPatientHandler, getMedicalHistoriesHandler } from "../handlers/medicalhistory.handler.ts";
 import { getMedicationsByPatientHandler, getMedicationsHandler } from "../handlers/medication.handlers.ts";
 
 import {
-  createNewBillingPayment,
-  updateCurrentBillingPayment,
-  deleteBillingPaymentById,
-  getBillingPayment,
-  getAllBillingPaymentsHandler,
-  getBillingPaymentsByInvoice
+	createNewBillingPayment,
+	updateCurrentBillingPayment,
+	deleteBillingPaymentById,
+	getBillingPayment,
+	getAllBillingPaymentsHandler,
+	getBillingPaymentsByInvoice
 } from "../handlers/billing_payment.handler.ts";
 
 import {
-  createNewBillingInvoice,
-  updateCurrentBillingInvoiceByPayment,
-  deleteBillingInvoiceById,
-  getAllBillingInvoicesHandler,
+	createNewBillingInvoice,
+	updateCurrentBillingInvoiceByPayment,
+	deleteBillingInvoiceById,
+	getAllBillingInvoicesHandler,
 	getAllOutstandingBillsHandler
 } from "../handlers/billing_invoice.handler.ts";
 import { getAppointmentsbyPatientIdHandler } from "../handlers/appointment.handler.ts";
@@ -85,6 +86,7 @@ var routes: Route[] = [
 
 	// speciality router
 	{ path: "/specialities", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllSpecialties },
+	{ path: "/specialities/names", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getSpecialityNames },
 	{ path: "/specialities/add", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: addNewSpecialty },
 
 	// branches router
@@ -105,35 +107,35 @@ var routes: Route[] = [
 
 	// logs router
 	{ path: "/logs", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getLogsForPagination },
-	
+
 	//treatments router
-	{path: "/treatments", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler:getAllTreatmentsHandler },
-	{path: "/treatments/check-service-code", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler:checkServiceCodeHandler },
-	{path: "/treatments", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler:createTreatmentHandler },
+	{ path: "/treatments", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getTreatmentsHandler },
+	{ path: "/treatments/check-service-code", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: checkServiceCodeHandler },
+	{ path: "/treatments", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: createTreatmentHandler },
 
 	//medical history router
-	{path: "/medical-histories", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler:getMedicalHistoriesHandler },
-	{path: "/medical-histories/:patientId", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler:getMedicalHistoriesByPatientHandler },
+	{ path: "/medical-histories", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getMedicalHistoriesHandler },
+	{ path: "/medical-histories/:patientId", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getMedicalHistoriesByPatientHandler },
 
 	//medication router
 	{ path: "/medications", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getMedicationsHandler },
 	{ path: "/medications/:patientId", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getMedicationsByPatientHandler },
 
 	// billing payment router
-  { path: "/billing-payment", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: createNewBillingPayment },
-  { path: "/billing-payment/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: updateCurrentBillingPayment },
-  { path: "/billing-payment/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.DELETE, handler: deleteBillingPaymentById },
-  { path: "/billing-payment/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getBillingPayment },
-  { path: "/billing-payments", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllBillingPaymentsHandler },
-  { path: "/billing-payments/invoice/:invoice_id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getBillingPaymentsByInvoice },
+	{ path: "/billing-payment", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: createNewBillingPayment },
+	{ path: "/billing-payment/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: updateCurrentBillingPayment },
+	{ path: "/billing-payment/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.DELETE, handler: deleteBillingPaymentById },
+	{ path: "/billing-payment/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getBillingPayment },
+	{ path: "/billing-payments", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllBillingPaymentsHandler },
+	{ path: "/billing-payments/invoice/:invoice_id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getBillingPaymentsByInvoice },
 
 	// billing invoice router
-  { path: "/billing-invoice", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: createNewBillingInvoice },
-  { path: "/billing-invoice/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: updateCurrentBillingInvoiceByPayment },
-  { path: "/billing-invoice/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.DELETE, handler: deleteBillingInvoiceById },
-  { path: "/outstanding-bills", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllOutstandingBillsHandler },
-	{path: "/billing-invoices", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllBillingInvoicesHandler },
-	
+	{ path: "/billing-invoice", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: createNewBillingInvoice },
+	{ path: "/billing-invoice/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: updateCurrentBillingInvoiceByPayment },
+	{ path: "/billing-invoice/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.DELETE, handler: deleteBillingInvoiceById },
+	{ path: "/outstanding-bills", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllOutstandingBillsHandler },
+	{ path: "/billing-invoices", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllBillingInvoicesHandler },
+
 	//appointment router
 	{ path: "/patient/appointments/:patientId", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAppointmentsbyPatientIdHandler }
 ];

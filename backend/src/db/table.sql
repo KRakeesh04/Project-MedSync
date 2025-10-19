@@ -163,7 +163,7 @@ CREATE TABLE `insurance` (
 );
 
 CREATE TABLE `treatment_catelogue` (
-  `service_code` int,
+  `service_code` int AUTO_INCREMENT,
   `name` varchar(50),
   `fee` numeric(8,2),
   `description` varchar(255),
