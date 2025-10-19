@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import authorizeRoles from "../auth/auth.js";
-import { addNewDoctor, getAllDoctorsForPagination, getAllDoctorSpecialities, getDoctorDetailsByID } from "../handlers/doctor.handler.js"
+import { addNewDoctor, getAllDoctorsForPagination, getAllDoctorSpecialities, getDoctorDetailsByID, getDoctorsWithSpecialities, assignDoctorSpeciality, getAllDoctorsNamesHandler } from "../handlers/doctor.handler.js"
 import { deleteUser, getDeletedUsers, getUsers, restoreUser, updateUser } from "../handlers/user.handler.ts";
 import { patientSignup, staffSignup, userLogin, validateUser } from "../handlers/auth.handler.ts";
 import { createNewBranch, getAllBranchNames, getBranches, updateBranchByID } from "../handlers/branch.handler.ts";
@@ -83,6 +83,9 @@ var routes: Route[] = [
 	{ path: "/doctors/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getDoctorDetailsByID },
 	{ path: "/doctors/add", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: addNewDoctor },
 	{ path: "/doctors/specialities", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllDoctorSpecialities },
+	{ path: "/doctors/specialities/overview", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getDoctorsWithSpecialities },
+	{ path: "/doctors/specialities/assign", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: assignDoctorSpeciality },
+	{ path: "/doctors/names", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllDoctorsNamesHandler },
 
 	// speciality router
 	{ path: "/specialities", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllSpecialties },
