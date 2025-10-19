@@ -77,6 +77,7 @@ import {
 import { NavLink, useNavigate } from "react-router-dom";
 import { LOCAL_STORAGE__ROLE, LOCAL_STORAGE__TOKEN, LOCAL_STORAGE__USER, LOCAL_STORAGE__USER_ID, LOCAL_STORAGE__USERNAME } from "@/services/authServices";
 import { formatRole, Role } from "@/services/utils";
+import { ModeToggle } from "./mode-toggle";
 
 
 const ROLE_SUPER_ADMIN = Role.SUPER_ADMIN;
@@ -236,22 +237,6 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
         icon: FileClock,
         // hideIf: (role) => typeof role !== "string" ||
         //   [ROLE_PATIENT, ROLE_INSURANCE_AGENT, ROLE_RECEPTIONIST, ROLE_BILLING_STAFF].includes(role),
-      },
-      {
-        type: "child",
-        title: "**Appointment details",
-        url: "/doctors-appointments",
-        icon: FileUser,
-        // hideIf: (role) => typeof role !== "string" ||
-        //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
-      },
-      {
-        type: "child",
-        title: "**Patients' history",
-        url: "/doctors-patients-history",
-        icon: BookUser,
-        // hideIf: (role) => typeof role !== "string" ||
-        //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
       },
     ],
   },
@@ -486,8 +471,14 @@ export function AppSidebar() {
               <div>
                 <img src="/logo.svg" />
               </div>
-              <div>
-                <PanelRightOpen size={20} className="cursor-pointer" onClick={toggleSidebar} />
+              <div className="flex ml-auto flex-col items-center">
+                <div
+                  onClick={toggleSidebar}
+                  className="h-9 w-9 flex items-center justify-center rounded-md cursor-pointer"
+                >
+                  <PanelRightOpen size={20} />
+                </div>
+                <ModeToggle />
               </div>
             </SidebarMenuItem>
             :
