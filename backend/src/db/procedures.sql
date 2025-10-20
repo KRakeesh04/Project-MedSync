@@ -89,6 +89,23 @@ DROP PROCEDURE IF EXISTS get_branch_for_pagination;
 
 DROP PROCEDURE IF EXISTS get_all_branch_count;
 
+-- Insurance model functions
+DROP PROCEDURE IF EXISTS create_insurance_type;
+
+DROP PROCEDURE IF EXISTS update_insurance_type;
+
+DROP PROCEDURE IF EXISTS get_insurance_type_by_id;
+
+DROP PROCEDURE IF EXISTS get_all_insurance_types;
+
+DROP PROCEDURE IF EXISTS get_insurance_type_count;
+
+DROP PROCEDURE IF EXISTS get_insurance_types_for_pagination;
+
+-- Insurance history model functions
+
+DROP PROCEDURE IF EXISTS get_all_insurance_histories;
+
 -- User_Contact model functions
 DROP PROCEDURE IF EXISTS create_user_contact;
 
@@ -216,24 +233,21 @@ DROP PROCEDURE IF EXISTS get_billing_payments_by_invoice_id;
 
 DROP PROCEDURE IF EXISTS get_all_billing_payments;
 
--- Drop procedure for monthly revenue
 DROP PROCEDURE IF EXISTS get_monthly_revenue;
 
--- Drop procedure for patients count per branch
 DROP PROCEDURE IF EXISTS patients_count_per_branch;
 
--- Drop procedure for doctors appointments (paginated)
 DROP PROCEDURE IF EXISTS get_doctors_appointments;
 
--- Drop procedure for total appointments count (all doctors)
 DROP PROCEDURE IF EXISTS get_appointments_count;
 
--- Drop procedure for appointments by doctor id
 DROP PROCEDURE IF EXISTS get_appointments_by_doctor_id;
-
--- Drop procedure for appointments by doctor id count
 DROP PROCEDURE IF EXISTS get_appointments_by_doctor_id_count;
 
+-- dashboard functions
+DROP PROCEDURE IF EXISTS get_total_patients_count; 
+
+DROP PROCEDURE IF EXISTS get_total_staffs_count;
 
 DELIMITER $$
 
@@ -694,6 +708,74 @@ CREATE PROCEDURE delete_branch(IN p_id INT)
 BEGIN
     DELETE FROM `branch` WHERE branch_id = p_id;
 END$$
+
+-- insurance type model functions
+CREATE PROCEDURE create_insurance_type(
+    IN p_insurance_type VARCHAR(50),
+    IN p_insurance_period VARCHAR(20),
+    IN p_claim_percentage DECIMAL(5,2)
+)
+BEGIN
+    INSERT INTO `insurance` (insurance_type, insurance_period, claim_percentage)
+    VALUES (p_insurance_type, p_insurance_period, p_claim_percentage);
+END$$
+
+CREATE PROCEDURE update_insurance_type(
+    IN p_insurance_type_id INT,
+    IN p_insurance_type VARCHAR(50),
+    IN p_insurance_period VARCHAR(20),
+    IN p_claim_percentage DECIMAL(5,2)
+)
+BEGIN
+    UPDATE `insurance`
+    SET insurance_type = p_insurance_type,
+        insurance_period = p_insurance_period,
+        claim_percentage = p_claim_percentage
+    WHERE insurance_id = p_insurance_type_id;
+END$$
+
+CREATE PROCEDURE get_insurance_type_by_id(
+    IN p_insurance_type_id INT,
+    OUT p_insurance_type VARCHAR(50),
+    OUT p_insurance_period INT,
+    OUT p_claim_percentage DECIMAL(5,2)
+)
+BEGIN
+    SELECT insurance_type, insurance_period, claim_percentage
+    FROM `insurance`
+    WHERE insurance_id = p_insurance_type_id;
+END$$
+
+CREATE PROCEDURE get_all_insurance_types()
+BEGIN
+    SELECT insurance_id,insurance_type, insurance_period, claim_percentage,created_at
+    FROM `insurance`
+    ORDER BY insurance_id;
+END$$
+
+CREATE PROCEDURE get_insurance_type_count()
+BEGIN
+    SELECT COUNT(insurance_id) AS insurance_count
+    FROM `insurance`;
+END$$
+
+CREATE PROCEDURE get_insurance_types_for_pagination(
+    IN insurance_count INT,
+     IN count_start INT)
+BEGIN
+    SELECT insurance_id,insurance_type, insurance_period, claim_percentage,created_at
+    FROM `insurance`
+    ORDER BY insurance_id
+    LIMIT insurance_count OFFSET count_start;
+END$$
+
+-- insurance history modelfunction
+
+CREATE PROCEDURE get_all_insurance_histories()
+BEGIN
+    SELECT * FROM `insurance_claim`;
+END$$
+
 
 -- user contact model functions
 CREATE PROCEDURE create_user_contact(
@@ -1560,13 +1642,13 @@ END$$
 -- get total patients count
 CREATE PROCEDURE get_total_patients_count()
 BEGIN
-    SELECT COUNT(*) INTO total_count FROM patient;
+    SELECT COUNT(*) AS total_count FROM patient;
 END$$
 
 -- get total staff count
 CREATE PROCEDURE get_total_staffs_count()
 BEGIN
-    SELECT COUNT(*) INTO staffs_count FROM staff;
+    SELECT COUNT(*) AS staffs_count FROM staff;
 END$$
 
 

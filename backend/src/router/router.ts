@@ -39,6 +39,8 @@ import { getMonthlyRevenueHandler } from "../handlers/billingpayment.handlers.ts
 import {  getAppointmentsByDoctorIdCountHandler, getAppointmentsByDoctorIdHandler, getAppointmentsbyPatientIdHandler, getAppointmentsCountByMonthHandler, getDoctorsAppointmentsForPagination } from "../handlers/appointment.handler.ts";
 import { getAllAppointments, getAppointmentById, createAppointment, createAppointmentFromData, updateAppointment, updateAppointmentStatus, deleteAppointment, getAvailableSlots, getAllDoctorsForAppointments } from "../handlers/appointment.handler.ts";
 
+import { createNewInsuranceType, getAllInsuranceTypeNames, getInsuranceTypes, updateInsuranceTypeByID } from "../handlers/insurance.handler.ts";
+import { getInsuranceHistoryHandler } from "../handlers/insurancehistory.handler.ts";
 
 export const HttpMethod = {
 	GET: "GET",
@@ -170,6 +172,16 @@ var routes: Route[] = [
 	//billing and payment router
 	{ path: "/billing/monthly-revenue", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getMonthlyRevenueHandler },
 	
+	//insurance router
+	{ path: "/all-insurance-types", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllInsuranceTypeNames },
+	{ path: "/insurance-types", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getInsuranceTypes },
+	{ path: "/insurance-types/add", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: createNewInsuranceType },
+	{ path: "/insurance-types/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: updateInsuranceTypeByID },
+
+	//insurance history router
+	{path: "/insurance-histories", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler:getInsuranceHistoryHandler },
+
+
 ];
 
 
