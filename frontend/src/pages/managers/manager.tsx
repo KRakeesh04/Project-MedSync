@@ -1,19 +1,15 @@
-import { DataTable } from "../../components/data-table"
 import { useCallback, useEffect, useState } from "react";
-import { getCoreRowModel, getSortedRowModel, useReactTable, type ColumnDef, type SortingState } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import toast from "@/lib/toast";
-import { createTimer, formatSalary } from "@/services/utils";
-import { Eye } from "lucide-react";
+import { createTimer, formatSalary, Role } from "@/services/utils";
+import { Eye, Trash } from "lucide-react";
 import { Label } from "../../components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 import { getAllBranches } from "../../services/branchServices";
-import { LOCAL_STORAGE__USER } from "@/services/authServices";
+import { LOCAL_STORAGE__USER, LOCAL_STORAGE__ROLE } from "@/services/authServices";
 import { Navigate } from "react-router-dom";
 import ViewBranchManager from "./manager-view";
 import { getAllManagers, type BranchManager } from "@/services/managerServices";
-
-
 
 const BranchManagerPage: React.FC = () => {
   const [manager, setManager] = useState<Array<BranchManager>>([]);
@@ -24,102 +20,13 @@ const BranchManagerPage: React.FC = () => {
   const [selectedBranch, setSelectedBranch] = useState("All");
   const [errorCode, setErrorCode] = useState<number | null>(null);
   const user = localStorage.getItem(LOCAL_STORAGE__USER)
+  const role = localStorage.getItem(LOCAL_STORAGE__ROLE) || "";
+  const isSuperAdmin = role === Role.SUPER_ADMIN;
+  const isBranchManager = role === Role.BRANCH_MANAGER;
+
   if (!user) {
     return <Navigate to="/sign-in" replace />;
   }
-
-  const columns: ColumnDef<BranchManager>[] = [
-    {
-      accessorKey: "manager_id",
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="px-0"
-        >
-          Manager ID
-        </Button>
-      ),
-    },
-    {
-      accessorKey: "name",
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="px-0"
-        >
-          Name
-        </Button>
-      ),
-    },
-    {
-      accessorKey: "branch_name",
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="px-0"
-        >
-          Branch
-        </Button>
-      ),
-    },
-    {
-      accessorKey: "gender",
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="px-0"
-        >
-          Gender
-        </Button>
-      ),
-    },
-    {
-      accessorKey: "monthly_salary",
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="px-0"
-        >
-          Monthly Salary
-        </Button>
-      ),
-      cell: ({ row }) => formatSalary(Number(row.original.monthly_salary)),
-    },
-    {
-      header: "Actions",
-      cell: ({ row }) => {
-        return (
-          <Button
-            size="icon"
-            variant="outline"
-            onClick={() => {
-              setSelectedManager(row.original);
-              setAction("edit");
-            }}
-          >
-            <Eye />
-          </Button>
-        );
-      },
-    },
-  ]
-
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const table = useReactTable({
-    data: manager,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    onSortingChange: setSorting,
-    getSortedRowModel: getSortedRowModel(),
-    state: {
-      sorting,
-    },
-  });
 
   const fetchStaff = useCallback(async () => {
     const loadingId = toast.loading("Loading...");
@@ -131,7 +38,7 @@ const BranchManagerPage: React.FC = () => {
             ? -1
             : Number(selectedBranch)
         ),
-        createTimer(500),
+        createTimer(300),
       ]);
 
       if (response[0].status === "rejected") {
@@ -150,7 +57,7 @@ const BranchManagerPage: React.FC = () => {
     } finally {
       toast.dismiss(loadingId);
     }
-  }, [table, selectedBranch]);
+  }, [selectedBranch]);
 
   useEffect(() => {
     const fetchBranches = async () => {
@@ -172,6 +79,7 @@ const BranchManagerPage: React.FC = () => {
   useEffect(() => {
     fetchStaff();
   }, [fetchStaff, selectedBranch, errorCode]);
+
   return (
     <div className="space-y-6 p-4">
       <ViewBranchManager
@@ -212,7 +120,43 @@ const BranchManagerPage: React.FC = () => {
           </Select>
         </div>
       </div>
-      <DataTable table={table} errorCode={errorCode} hideHeader={true} />
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {manager.map((m) => (
+          <article key={m.manager_id} className="bg-card p-4 rounded-lg shadow-sm border border-border flex flex-col justify-between hover:shadow-md hover:translate-y-[-2px] transition-all">
+            <div>
+              <h3 className="text-base font-semibold">{m.name}</h3>
+              {isSuperAdmin ? (
+                <>
+                  <p className="mt-2 text-sm text-muted-foreground">Branch: {m.branch_name}</p>
+                  <p className="mt-2 text-sm text-muted-foreground">Salary: {formatSalary(Number(m.monthly_salary))}</p>
+                  <p className="mt-2 text-sm text-muted-foreground">Gender: {m.gender}</p>
+                </>
+              ) : isBranchManager ? (
+                <>
+                  <p className="mt-2 text-sm text-muted-foreground">Branch: {m.branch_name}</p>
+                  <p className="mt-2 text-sm text-muted-foreground">Gender: {m.gender}</p>                </>
+              ) : null}
+            </div>
+
+            <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
+              <div>#{m.manager_id}</div>
+              <div className="flex items-center gap-3">
+                {isSuperAdmin ? (
+                  <>
+                    <Button size="icon" variant="outline" onClick={() => { setSelectedManager(m); setAction("edit"); }}>
+                      <Eye />
+                    </Button>
+                    <Button size="icon" variant="destructive" onClick={() => { /* TODO: delete action if needed */ }}>
+                      <Trash />
+                    </Button>
+                  </>
+                ) : null}
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
     </div>
   );
 };

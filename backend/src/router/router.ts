@@ -33,6 +33,7 @@ import {
 import { getAppointmentsbyPatientIdHandler } from "../handlers/appointment.handler.ts";
 import { getDoctorsPatientsOverviewHandler } from "../handlers/doctorPatients.handler.ts";
 import { getFullPatientDetailsHandler } from "../handlers/patientFull.handler.ts";
+import { getAllBranchManagers, createBranchManager, updateBranchManager } from "../handlers/branch_manager.handler.ts";
 
 
 export const HttpMethod = {
@@ -145,7 +146,12 @@ var routes: Route[] = [
 	{ path: "/billing-invoices", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllBillingInvoicesHandler },
 
 	//appointment router
-	{ path: "/patient/appointments/:patientId", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAppointmentsbyPatientIdHandler }
+	{ path: "/patient/appointments/:patientId", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAppointmentsbyPatientIdHandler },
+
+	// branch managers router
+	{ path: "/branch-managers", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllBranchManagers },
+	{ path: "/branch-managers", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: createBranchManager },
+	{ path: "/branch-managers/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: updateBranchManager },
 ];
 
 

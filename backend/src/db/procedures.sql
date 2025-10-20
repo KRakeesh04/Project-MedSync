@@ -72,6 +72,8 @@ DROP PROCEDURE IF EXISTS get_branch_manager_by_branch_id;
 
 DROP PROCEDURE IF EXISTS get_all_branch_manager;
 
+DROP PROCEDURE IF EXISTS get_all_branch_managers;
+
 -- Branch model functions
 DROP PROCEDURE IF EXISTS create_branch;
 
@@ -570,6 +572,21 @@ BEGIN
     FROM `branch_manager` b
     JOIN `user` u ON u.user_id = b.manager_id
     WHERE u.branch_id = p_branch_id;
+END$$
+
+CREATE PROCEDURE get_all_branch_managers()
+BEGIN
+    SELECT
+        b.manager_id,
+        b.name,
+        b.monthly_salary,
+        b.gender,
+        u.branch_id,
+        br.name AS branch_name
+    FROM `branch_manager` b
+    LEFT JOIN `user` u ON u.user_id = b.manager_id
+    LEFT JOIN `branch` br ON br.branch_id = u.branch_id
+    ORDER BY b.manager_id;
 END$$
 
 CREATE PROCEDURE get_all_branch_manager(IN staff_count INT, IN count_start INT)
