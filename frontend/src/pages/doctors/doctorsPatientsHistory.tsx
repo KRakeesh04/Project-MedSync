@@ -81,7 +81,7 @@ export default function DoctorsPatientsHistory() {
                 </div>
 
                 <div className="mt-3 flex items-center justify-between text-sm text-muted-foreground">
-                  <div>
+                  <div className='flex flex-col place-items-start'>
                     <div>Last visit: {formatDate(String(doc.lastVisit)) ?? '—'}</div>
                     {doc.lastPatientName && (
                       <div className="text-sm">
