@@ -13,6 +13,11 @@ export interface Patient {
   branch_name: string,
 };
 
+export interface getPatientsCountPerBranchResponse {
+  branch_name: string;
+  patient_count: number;
+}
+
 export const getPatients = async (
   isExPatient: number,
   count: number,
@@ -45,6 +50,36 @@ export const updatePatientByID = async (data: {
     const response = await axiosInstance.put(`/patient/${data.patient_id}`, data);
     return response.data;
   } catch (error) {
+    throw error;
+  }
+};
+
+
+export const getFullPatientDetails = async (patientId: number) => {
+  try {
+    const response = await axiosInstance.get(`/patient/full/${patientId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching full patient details:', error);
+    throw error;
+  }
+};
+
+// services/patientServices.ts
+export const getPatientsCountPerBranch = async (): Promise<{ branch_name: string; patient_count: number }[]> => {
+  try {
+    // Backend actually returns { counts: { branch: string; total_patients: number }[] }
+    const response = await axiosInstance.get<{ counts: { branch: string; total_patients: number }[] }>(
+      "/patient/count/per-branch"
+    );
+
+    // 🔁 Normalize to the shape your component uses
+    return response.data.counts.map(({ branch, total_patients }) => ({
+      branch_name: branch,
+      patient_count: total_patients,
+    }));
+  } catch (error) {
+    console.error("Error fetching patients count per branch:", error);
     throw error;
   }
 };

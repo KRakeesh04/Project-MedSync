@@ -94,3 +94,18 @@ export const updateBranchByID = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+export const fetchTotalBranchesCount = async (req: Request, res: Response) => {
+  try {
+    const branch_count: number = await getBranchCount();
+    if (branch_count == undefined) {
+      console.log("error in finding the branch count, count = " + branch_count);
+      res.status(500).json({ error: "Internal Server Error" });
+      return;
+    }
+    res.status(200).json({ total_count: branch_count });
+  } catch (error) {
+    console.error("Error in fetchTotalBranchesCount handler:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};

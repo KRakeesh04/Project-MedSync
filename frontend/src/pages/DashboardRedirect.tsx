@@ -1,7 +1,7 @@
 import { Navigate } from "react-router-dom";
 import PageTitle from "@/components/PageTitle";
 import PatientDashboard from "./patientDashboard";
-import AdminDashboard from "./adminDashboard";
+import AdminDashboard from "./adminDashboard/adminDashboard";
 import { LOCAL_STORAGE__USER } from "@/services/authServices";
 
 const DashboardRedirect = () => {

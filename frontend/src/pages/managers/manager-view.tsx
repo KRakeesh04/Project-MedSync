@@ -34,6 +34,7 @@ const ViewBranchManager: React.FC<ViewManagerProps> = ({
   onFinished,
   onClose,
 }) => {
+  const [managerUserId, setManagerUserId] = useState("");
   const [name, setName] = useState("");
   const [gender, setGender] = useState("");
   const [branch, setBranch] = useState<number | "">("");
@@ -51,6 +52,7 @@ const ViewBranchManager: React.FC<ViewManagerProps> = ({
   // populate user details
   useEffect(() => {
     if (selectedManager) {
+      setManagerUserId(selectedManager.manager_id.toString());
       setName(selectedManager.name);
       setGender(selectedManager.gender);
       setBranch(selectedManager.branch_id ?? "");
@@ -97,8 +99,8 @@ const ViewBranchManager: React.FC<ViewManagerProps> = ({
         <div className="grid gap-4 py-2">
           {/* name */}
           <div className="grid gap-2">
-            <Label htmlFor="name">Full Name</Label>
-            <Input id="name" value={name} disabled className="md:w-[50%]" />
+            <Label htmlFor="name">User ID</Label>
+            <Input id="name" value={managerUserId} disabled className="md:w-[50%]" />
           </div>
 
           <div className="grid gap-4 py-2">
@@ -186,7 +188,7 @@ const ViewBranchManager: React.FC<ViewManagerProps> = ({
         <DialogFooter>
           {isEditing ? (
             <>
-              div   <Button variant="outline" onClick={() => setIsEditing(false)}>
+              <Button variant="outline" onClick={() => setIsEditing(false)}>
                 Cancel
               </Button>
               <Button onClick={handleUpdate}>Update</Button>

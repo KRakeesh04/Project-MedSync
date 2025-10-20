@@ -206,7 +206,7 @@ const CurrentPatients: React.FC = () => {
     } finally {
       toast.dismiss(loadingId);
     }
-  }, [table, selectedGender, selectedBloodType, selectedBranch]);
+  }, [table, pagination, selectedGender, selectedBloodType, selectedBranch]);
 
   useEffect(() => {
     fetchPatients();
@@ -232,11 +232,9 @@ const CurrentPatients: React.FC = () => {
 
   return (
     <div className="space-y-6 p-4">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h2 className="text-lg font-medium">Current Patients</h2>
-          <p className="text-sm text-muted-foreground">{patientCount} items</p>
-        </div>
+      <div>
+        <h2 className="text-lg font-medium">Current Patients</h2>
+        <p className="text-sm text-muted-foreground">{patientCount} items</p>
       </div>
       <div className="grid gap-4 grid-cols-8 mb-4">
         <div className="grid gap-2">

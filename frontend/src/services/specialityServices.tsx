@@ -81,3 +81,20 @@ export const deleteSpeciality = async (speciality_id: number) => {
     throw "Unknown error occurred";
   }
 };
+
+export const getSpecialityNames = async () => {
+  try {
+    const response = await axiosInstance.get<{
+      speciality_count: number;
+      specialities: Array<Pick<Speciality, 'speciality_id' | 'speciality_name'>>;
+    }>(`/specialities/names`);
+    return response.data;
+  } catch (error: unknown) {
+    console.error("Error getting speciality names:", error);
+    if (error instanceof AxiosError) {
+      if (error.response?.data?.error) throw error.response.data.error;
+      throw error.message;
+    }
+    throw "Unknown error occurred";
+  }
+};

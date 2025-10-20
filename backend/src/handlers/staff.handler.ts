@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { getAllStaffForPagination, getStaffCount, UpdateStaff, type Staff } from "../models/staff.model.ts";
+import { getAllStaffForPagination, getStaffCount, getTotalStaffsCount, UpdateStaff, type Staff } from "../models/staff.model.ts";
 
 
 export const updateStaffByID = async (req: Request, res: Response) => {
@@ -50,6 +50,16 @@ export const getAllStaff = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("Error in getAllStaff handler:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const fetchTotalStaffsCount = async (req: Request, res: Response) => {
+  try {
+    const total_count: Number = await getTotalStaffsCount();
+    res.status(200).json({ total_count });
+  } catch (error) {
+    console.error("Error in getTotalStaffsCount handler:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };

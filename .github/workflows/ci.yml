@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      SKIP_BUILD: "true"
 
     strategy:
       matrix:
@@ -22,30 +24,55 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: "npm"
+          # cache removed here because repo has separate frontend/backend package-lock files
+          # each project will use actions/cache with its own lockfile path
 
       # FRONTEND
+      - name: Cache frontend node modules
+        if: env.SKIP_BUILD != 'true'
+        uses: actions/cache@v4
+        with:
+          path: frontend/node_modules
+          key: frontend-${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
+          restore-keys: |
+            frontend-${{ runner.os }}-node-
+
       - name: Install Frontend Dependencies
+        if: env.SKIP_BUILD != 'true'
         working-directory: ./frontend
         run: npm ci
 
       - name: Lint Frontend
+        if: env.SKIP_BUILD != 'true'
         working-directory: ./frontend
         run: npm run lint
 
       - name: Build Frontend
+        if: env.SKIP_BUILD != 'true'
         working-directory: ./frontend
         run: npm run build
 
       # BACKEND
+      - name: Cache backend node modules
+        if: env.SKIP_BUILD != 'true'
+        uses: actions/cache@v4
+        with:
+          path: backend/node_modules
+          key: backend-${{ runner.os }}-node-${{ hashFiles('backend/package-lock.json') }}
+          restore-keys: |
+            backend-${{ runner.os }}-node-
+
       - name: Install Backend Dependencies
+        if: env.SKIP_BUILD != 'true'
         working-directory: ./backend
         run: npm ci
 
       - name: Type Check Backend
+        if: env.SKIP_BUILD != 'true'
         working-directory: ./backend
         run: npx tsc --noEmit
 
       - name: Build Backend
+        if: env.SKIP_BUILD != 'true'
         working-directory: ./backend
         run: npm run build

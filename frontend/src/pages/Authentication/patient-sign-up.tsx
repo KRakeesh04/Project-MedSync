@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { patientSignup, type PatientData } from "@/services/authServices"
 import { getAllBranches } from "@/services/branchServices"
-import { toMySQLDate } from "@/services/utils"
+import { isValidEmail, toMySQLDate } from "@/services/utils"
 import { useEffect, useState } from "react"
 import toast from "@/lib/toast"
 import { Link, useNavigate } from "react-router-dom"
@@ -104,6 +104,12 @@ const PatientSignUp: React.FC = () => {
       selectedBranch === ""
     ) {
       toast.warning("Please fill all the required details");
+      setLoading(false);
+    } else if (!(nic.length == 9 || nic.length == 12)) {
+      toast.warning("NIC must be 9 or 12 characters long");
+      setLoading(false);
+    } else if (isValidEmail(email) === false && email !== "") {
+      toast.warning("Invalid email format");
       setLoading(false);
     } else if (password !== confirmPassword) {
       toast.error("Passwords do not match")
