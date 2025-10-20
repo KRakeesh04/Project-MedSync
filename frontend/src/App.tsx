@@ -50,6 +50,7 @@ import OutstandingInvoices from './pages/billing/outstanding_balances';
 import InsuranceTypesPage from './pages/insurance/insurancetypes';
 import InsuranceHistory from './pages/insurance/insuranceHistory';
 
+
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
   const { pathname } = useLocation();

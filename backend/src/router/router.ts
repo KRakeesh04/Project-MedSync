@@ -157,7 +157,7 @@ var routes: Route[] = [
 	{ path: "/billing-invoices", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllBillingInvoicesHandler },
 
 	//appointment router
-  { path: "/appointments/monthly-counts", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAppointmentsCountByMonthHandler },
+  	{ path: "/appointments/monthly-counts", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAppointmentsCountByMonthHandler },
 	{ path: "/patient/appointments/:patientId", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAppointmentsbyPatientIdHandler },
 	{ path: "/doctors/appointments/:doctorId", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAppointmentsByDoctorIdHandler },
 	{ path: "/doctors/appointments/:doctorId/count", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAppointmentsByDoctorIdCountHandler },
@@ -181,7 +181,20 @@ var routes: Route[] = [
 	//insurance history router
 	{path: "/insurance-histories", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler:getInsuranceHistoryHandler },
 
-
+	//appointments page routes
+	// Get all appointments
+	{ path: "/appointments", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllAppointments },
+	
+	// Get single appointment by ID
+	{ path: "/appointments/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAppointmentById },
+	// Create appointment
+	{ path: "/appointments", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: createAppointment },
+	{ path: "/appointments/create", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: createAppointmentFromData },
+	{ path: "/appointments/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: updateAppointment },
+	{ path: "/appointments/:id/status", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PATCH, handler: updateAppointmentStatus },
+	{ path: "/appointments/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.DELETE, handler: deleteAppointment },
+	{ path: "/available-slots", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAvailableSlots },
+	{ path: "/appointment/doctors", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllDoctorsForAppointments },
 ];
 
 
