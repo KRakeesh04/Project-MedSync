@@ -899,10 +899,12 @@ END$$
 
 CREATE PROCEDURE get_doctor_by_id(IN p_id INT)
 BEGIN
-    SELECT d.doctor_id, d.name, d.gender, b.branch_id, b.name AS branch_name, d.fee_per_patient, d.basic_monthly_salary
+    SELECT d.doctor_id, d.name, d.gender, b.branch_id, b.name AS branch_name, d.fee_per_patient, d.basic_monthly_salary,speciality_name
     FROM `doctor` d
     LEFT JOIN `user` u ON d.doctor_id = u.user_id
     LEFT JOIN `branch` b ON u.branch_id = b.branch_id
+	JOIN   doctor_speciality AS ds ON ds.doctor_id = d.doctor_id
+    JOIN speciality AS s ON ds.speciality_id = s.speciality_id 
     WHERE d.doctor_id = p_id;
 END$$
 

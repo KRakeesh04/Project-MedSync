@@ -249,7 +249,7 @@ export default function DoctorDashboard() {
                 <span className="uppercase tracking-wide text-xs text-gray-400">Speciality</span>
               </div>
               <p className="text-lg font-medium text-gray-100">
-                {doctor?.gender ? `${doctor.gender} Specialist` : "General Physician"}
+                {doctor?.speciality_name ? `${doctor.speciality_name} Specialist` : "General Physician"}
               </p>
               <p className="text-sm text-gray-400">
                 Keep patient histories up to date and review notes before consultations.
