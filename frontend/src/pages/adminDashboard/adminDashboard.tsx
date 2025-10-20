@@ -21,7 +21,6 @@ import { fetchMonthlyRevenueForYear } from "@/services/adminDashboardServices";
 import { getPatientsCountPerBranch } from "@/services/patientServices";
 import { BranchPatientsPieChart } from "./piechartbranchesandpatients";
 import DoctorsAppointment from "./doctorsAppointmenttable";
-import DoctorsAppointmentsByDoctorId from "./doctorsAppointmentByDcotor_id";
 import { getAppointmentsByDoctorIdCount} from "@/services/appoinmentServices";
 
 const AdminDashboard: React.FC = () => {
@@ -219,35 +218,7 @@ const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
-      <h2 className="text-lg font-medium">
-        Doctors view {doctorDetails?.name ?? ""}
-      </h2>
-
-      <div>
-        <DoctorsAppointmentsByDoctorId />
-      </div>
-
-      {/* Appointments count card */}
-      <div className="mt-6 w-[400px]">
-        <Card className="bg-neutral-900 border border-neutral-800 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-500/30 transition-all duration-300">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-gray-100 text-base font-medium flex items-center gap-2">
-              Appointments
-            </CardTitle>
-            <div className="p-2 rounded-full bg-neutral-800">
-              <Users className="h-5 w-5 text-blue-400" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <p className="text-4xl font-semibold text-gray-100">
-              {appointmentsCount}
-            </p>
-          </CardContent>
-          <CardFooter>
-            <p className="text-sm text-gray-400">Appointments</p>
-          </CardFooter>
-        </Card>
-      </div>
+      
     </>
   );
 };
