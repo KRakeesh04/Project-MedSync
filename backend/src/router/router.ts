@@ -35,8 +35,10 @@ import { getFullPatientDetailsHandler } from "../handlers/patientFull.handler.ts
 import { getAllBranchManagers, createBranchManager, updateBranchManager, addNewBranchManager, getBranchesWithoutManagerHandler } from "../handlers/branch_manager.handler.ts";
 
 
-import {  getAppointmentsByDoctorIdCountHandler, getAppointmentsByDoctorIdHandler, getAppointmentsbyPatientIdHandler, getAppointmentsCountByMonthHandler, getDoctorsAppointmentsForPagination } from "../handlers/appointment.handler.ts";
 import { getMonthlyRevenueHandler } from "../handlers/billingpayment.handlers.ts";
+import {  getAppointmentsByDoctorIdCountHandler, getAppointmentsByDoctorIdHandler, getAppointmentsbyPatientIdHandler, getAppointmentsCountByMonthHandler, getDoctorsAppointmentsForPagination } from "../handlers/appointment.handler.ts";
+import { getAllAppointments, getAppointmentById, createAppointment, createAppointmentFromData, updateAppointment, updateAppointmentStatus, deleteAppointment, getAvailableSlots, getAllDoctorsForAppointments } from "../handlers/appointment.handler.ts";
+
 import { createNewInsuranceType, getAllInsuranceTypeNames, getInsuranceTypes, updateInsuranceTypeByID } from "../handlers/insurance.handler.ts";
 import { getInsuranceHistoryHandler } from "../handlers/insurancehistory.handler.ts";
 
@@ -45,6 +47,7 @@ export const HttpMethod = {
 	POST: "POST",
 	PUT: "PUT",
 	DELETE: "DELETE",
+	PATCH: "PATCH"
 };
 
 export const Role = {
@@ -200,6 +203,11 @@ export const MapRouters = (app: Express) => {
 					route.handler(req, res);
 				});
 				break;
+			case HttpMethod.PATCH:
+				app.patch(route.path, authorizeRoles(route.AccessibleBy), (req, res) => {
+					route.handler(req, res);
+				});
+				break;
 			case HttpMethod.DELETE:
 				app.delete(route.path, authorizeRoles(route.AccessibleBy), (req, res) => {
 					route.handler(req, res);
@@ -217,7 +225,7 @@ function availableForRoles(roles: string[]): string[] {
 	for (const role of roles) {
 		if (role === Role.USER) {
 			for (const r of allRoles) {
-				if (r !== Role.USER || r !== Role.PUBLIC || r !== Role.MEDICAL_STAFF) {
+				if (r !== Role.USER && r !== Role.PUBLIC && r !== Role.MEDICAL_STAFF) {
 					result.add(r);
 				}
 			}
@@ -259,4 +267,3 @@ function availableForRoles(roles: string[]): string[] {
 
 	return Array.from(result);
 }
-
