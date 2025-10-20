@@ -15,13 +15,15 @@ import { Label } from "@/components/ui/label";
 import toast from "@/lib/toast";
 import { useNavigate } from "react-router-dom";
 import { createBillingPayment } from "@/services/billing_paymentServices";
+import { LOCAL_STORAGE__USER_ID, LOCAL_STORAGE__USERNAME } from '@/services/authServices';
 
 const MakePayment: React.FC = () => {
   const navigate = useNavigate();
   const [invoiceId, setInvoiceId] = useState<number | "">("");
   const [branchId, setBranchId] = useState<number | "">("");
+  const [cashierId, setCashierId] = useState<string | "">(localStorage.getItem(LOCAL_STORAGE__USER_ID) ?? "");
+  const [cashierName] = useState<string | null>(localStorage.getItem(LOCAL_STORAGE__USERNAME));
   const [paidAmount, setPaidAmount] = useState<number | "">("");
-  const [cashierId, setCashierId] = useState<number | "">("");
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleMakePayment = async (e: React.FormEvent) => {
@@ -50,7 +52,7 @@ const MakePayment: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-dvh">
+    <div className="flex items-start justify-center min-h-dvh pt-12">
       <Card className="w-full max-w-[96vw] md:max-w-[450px]">
         <CardHeader>
           <CardTitle>Make a Payment</CardTitle>
@@ -77,6 +79,7 @@ const MakePayment: React.FC = () => {
                 type="number"
                 placeholder="Enter invoice ID"
                 value={invoiceId}
+                min={0}
                 onChange={(e) => setInvoiceId(Number(e.target.value))}
                 required
               />
@@ -92,6 +95,20 @@ const MakePayment: React.FC = () => {
                 required
               />
             </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="cashierId">Cashier ID</Label>
+              <Input
+                id="cashierId"
+                type="text"
+                placeholder="Cashier ID"
+                value={cashierId}
+                disabled
+                className="bg-slate-50"
+              />
+              {cashierName && <div className="text-sm text-muted-foreground">Logged in as: {cashierName}</div>}
+            </div>
+
             <div className="grid gap-2">
               <Label htmlFor="paidAmount">Paid Amount</Label>
               <Input
@@ -99,18 +116,8 @@ const MakePayment: React.FC = () => {
                 type="number"
                 placeholder="Enter paid amount"
                 value={paidAmount}
+                min={0}
                 onChange={(e) => setPaidAmount(Number(e.target.value))}
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="cashierId">Cashier ID</Label>
-              <Input
-                id="cashierId"
-                type="number"
-                placeholder="Enter cashier ID"
-                value={cashierId}
-                onChange={(e) => setCashierId(Number(e.target.value))}
                 required
               />
             </div>
