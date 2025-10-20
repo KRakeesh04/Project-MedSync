@@ -242,10 +242,11 @@ DROP PROCEDURE IF EXISTS get_doctors_appointments;
 DROP PROCEDURE IF EXISTS get_appointments_count;
 
 DROP PROCEDURE IF EXISTS get_appointments_by_doctor_id;
+
 DROP PROCEDURE IF EXISTS get_appointments_by_doctor_id_count;
 
 -- dashboard functions
-DROP PROCEDURE IF EXISTS get_total_patients_count; 
+DROP PROCEDURE IF EXISTS get_total_patients_count;
 
 DROP PROCEDURE IF EXISTS get_total_staffs_count;
 
@@ -775,7 +776,6 @@ CREATE PROCEDURE get_all_insurance_histories()
 BEGIN
     SELECT * FROM `insurance_claim`;
 END$$
-
 
 -- user contact model functions
 CREATE PROCEDURE create_user_contact(
@@ -1363,7 +1363,6 @@ BEGIN
     SELECT v_affected_rows as affected_rows;
 END$$
 
-
 -- Delete appointment
 CREATE PROCEDURE delete_appointment(IN p_appointment_id INT)
 BEGIN
@@ -1480,7 +1479,6 @@ BEGIN
     DROP TEMPORARY TABLE all_time_slots;
 END$$
 
-DELIMITER ;
 -- Appointment model functions
 CREATE PROCEDURE get_appointments_by_patient_id(IN p_patient_id INT)
 BEGIN
@@ -1651,10 +1649,8 @@ BEGIN
     SELECT COUNT(*) AS staffs_count FROM staff;
 END$$
 
-
 -- proc for getting appointments based on month
 DROP PROCEDURE IF EXISTS get_monthly_appointment_counts;
-
 
 CREATE PROCEDURE get_monthly_appointment_counts(
   IN in_start DATE,                 -- e.g. '2025-01-01'
@@ -1735,7 +1731,6 @@ CREATE PROCEDURE patients_count_per_branch()
 
 END$$
 
-
 -- doctors  appointment
 CREATE PROCEDURE get_doctors_appointments(IN appt_count INT,
     IN count_start INT)
@@ -1774,5 +1769,4 @@ begin
 
 end $$
 
-
-DELIMITER ;
+DELIMITER;
