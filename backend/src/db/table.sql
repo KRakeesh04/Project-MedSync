@@ -307,3 +307,24 @@ CREATE TABLE `patient_insurance` (
       REFERENCES `insurance`(`insurance_id`)
 );
 
+CREATE INDEX idx_user_username ON user(username);
+CREATE INDEX idx_user_branch_id ON user(branch_id);
+
+-- User contact
+CREATE INDEX idx_user_contact_user_id ON user_contact(user_id);
+
+-- Appointment table
+CREATE INDEX idx_appointment_doctor ON appointment(doctor_id);
+CREATE INDEX idx_appointment_patient ON appointment(patient_id);
+CREATE INDEX idx_appointment_date_status ON appointment(date, status);
+
+-- Billing invoice
+CREATE INDEX idx_billing_claim ON billing_invoice(claim_id);
+
+-- Treatment
+CREATE INDEX idx_treatment_appointment ON treatment(appointment_id);
+CREATE INDEX idx_treatment_service_code ON treatment(service_code);
+
+-- Insurance claim
+CREATE INDEX idx_insurance_claim_patient ON insurance_claim(patient_id);
+CREATE INDEX idx_insurance_claim_insurance ON insurance_claim(insurance_id);
