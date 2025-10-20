@@ -697,7 +697,7 @@ END$$
 -- insurance type model functions
 CREATE PROCEDURE create_insurance_type(
     IN p_insurance_type VARCHAR(50),
-    IN p_insurance_period INT,
+    IN p_insurance_period VARCHAR(20),
     IN p_claim_percentage DECIMAL(5,2)
 )
 BEGIN
@@ -708,7 +708,7 @@ END$$
 CREATE PROCEDURE update_insurance_type(
     IN p_insurance_type_id INT,
     IN p_insurance_type VARCHAR(50),
-    IN p_insurance_period INT,
+    IN p_insurance_period VARCHAR(20),
     IN p_claim_percentage DECIMAL(5,2)
 )
 BEGIN

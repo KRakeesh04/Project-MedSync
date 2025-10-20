@@ -2,10 +2,10 @@ import { AxiosError } from "axios";
 import axiosInstance from "../axiosConfig";
 
 export interface InsuranceTypes {
- insurance_id: number,  
-  insurance_type: string,  
-  insurance_period: string,  
-  claim_percentage: number,  
+  insurance_id: number,
+  insurance_type: string,
+  insurance_period: string,
+  claim_percentage: number,
   created_at: string
 }
 export const getInsuranceTypesDataForPagination = async (
@@ -52,7 +52,7 @@ export const getInsuranceById = async (insuranceId: number) => {
 export const editInsurance = async (data: {
   insurance_id: number;
   insurance_type: string;
-  insurance_period: number;
+  insurance_period: string;
   claim_percentage: number;
 }) => {
   try {
@@ -69,4 +69,20 @@ export const editInsurance = async (data: {
     throw "Unknown error occurred";
   }
 };
-  
+
+export const addInsuranceType = async (data: { insurance_type: string; insurance_period: string; claim_percentage: number }) => {
+  try {
+    const res = await axiosInstance.post(`/insurance-types/add`, data);
+    return res.data;
+  } catch (error) {
+    console.error('Error adding insurance type:', error);
+    if (error instanceof AxiosError) {
+      if (error.response?.data?.error) {
+        throw error.response.data.error;
+      }
+      throw error.message;
+    }
+    throw 'Unknown error occurred';
+  }
+};
+

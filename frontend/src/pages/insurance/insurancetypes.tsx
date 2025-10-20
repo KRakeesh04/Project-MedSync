@@ -9,6 +9,10 @@ import { getInsuranceTypesDataForPagination, type InsuranceTypes } from "@/servi
 import ViewInsurance from "@/pages/insurance/insurancetypes-view";
 import { LOCAL_STORAGE__USER } from "@/services/authServices";
 import { Navigate } from "react-router-dom";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { addInsuranceType } from '@/services/insuranceService';
 
 const InsuranceTypesPage: React.FC = () => {
   const [insuranceTypes, setInsuranceTypes] = useState<Array<InsuranceTypes>>([]);
@@ -16,7 +20,9 @@ const InsuranceTypesPage: React.FC = () => {
   const [selectedInsurance, setSelectedInsurance] = useState<InsuranceTypes | null>(null);
   const [action, setAction] = useState<"edit" | null>(null);
   const [errorCode, setErrorCode] = useState<number | null>(null);
-  
+  const [createOpen, setCreateOpen] = useState(false);
+  const [createForm, setCreateForm] = useState({ insurance_type: '', insurance_period: '', claim_percentage: '' });
+
   const user = localStorage.getItem(LOCAL_STORAGE__USER);
   if (!user) {
     return <Navigate to="/sign-in" replace />;
@@ -71,8 +77,8 @@ const InsuranceTypesPage: React.FC = () => {
         </Button>
       ),
       cell: ({ row }) => `${(Number(row.original.claim_percentage) * 100).toFixed(1)} %`,
-        },
-        {
+    },
+    {
       accessorKey: "created_at",
       header: ({ column }) => (
         <Button
@@ -181,6 +187,53 @@ const InsuranceTypesPage: React.FC = () => {
           setSelectedInsurance(null);
         }}
       />
+
+      <div className="flex justify-end">
+        <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-blue-600 hover:bg-blue-700">New Insurance Type</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>New Insurance Type</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-3 mt-2 flex flex-col gap-2">
+              <div className="flex flex-col gap-2">
+                <Label>Insurance Type</Label>
+                <Input value={createForm.insurance_type} onChange={(e) => setCreateForm({ ...createForm, insurance_type: e.target.value })} />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label>Insurance Period</Label>
+                <Input placeholder="Eg: 1 Year" value={createForm.insurance_period} onChange={(e) => setCreateForm({ ...createForm, insurance_period: e.target.value })} />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label>Claim Percentage (0-1)</Label>
+                <Input placeholder="Eg: 0.1" type="number" value={createForm.claim_percentage} onChange={(e) => setCreateForm({ ...createForm, claim_percentage: e.target.value })} />
+              </div>
+            </div>
+            <DialogFooter>
+              <div className="flex justify-end gap-2 w-full">
+                <Button variant="ghost" onClick={() => setCreateOpen(false)}>Cancel</Button>
+                <Button onClick={async () => {
+                  if (!createForm.insurance_type || !createForm.insurance_period || createForm.claim_percentage === '') {
+                    toast.error('Please fill required fields');
+                    return;
+                  }
+                  try {
+                    await addInsuranceType({ insurance_type: createForm.insurance_type, insurance_period: createForm.insurance_period, claim_percentage: Number(createForm.claim_percentage) });
+                    toast.success('Insurance type added');
+                    setCreateOpen(false);
+                    setCreateForm({ insurance_type: '', insurance_period: '', claim_percentage: '' });
+                    await fetchInsuranceTypes();
+                  } catch (err) {
+                    toast.error('Failed to add insurance type');
+                  }
+                }}>Create</Button>
+              </div>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
 
       <DataTable table={table} errorCode={errorCode} />
     </div>

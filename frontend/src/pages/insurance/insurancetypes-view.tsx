@@ -15,7 +15,7 @@ interface ViewInsuranceProps {
 
 const ViewInsurance: React.FC<ViewInsuranceProps> = ({ isOpen, selectedInsurance, onFinished, onClose }) => {
   const [insuranceType, setInsuranceType] = useState("");
-  const [insurancePeriod, setInsurancePeriod] = useState<number | "">("");
+  const [insurancePeriod, setInsurancePeriod] = useState<string>("");
   const [claimPercentage, setClaimPercentage] = useState<number | "">("");
   const [isEditing, setIsEditing] = useState(false);
 
@@ -23,11 +23,7 @@ const ViewInsurance: React.FC<ViewInsuranceProps> = ({ isOpen, selectedInsurance
   useEffect(() => {
     if (selectedInsurance) {
       setInsuranceType(selectedInsurance.insurance_type);
-      setInsurancePeriod(
-        typeof selectedInsurance.insurance_period === "string"
-          ? Number(selectedInsurance.insurance_period)
-          : selectedInsurance.insurance_period ?? ""
-      );
+      setInsurancePeriod(String(selectedInsurance.insurance_period ?? ""));
       setClaimPercentage(selectedInsurance.claim_percentage ?? "");
       setIsEditing(false);
     }
@@ -41,7 +37,7 @@ const ViewInsurance: React.FC<ViewInsuranceProps> = ({ isOpen, selectedInsurance
       const data = {
         insurance_id: selectedInsurance.insurance_id,
         insurance_type: insuranceType,
-  insurance_period: Number(insurancePeriod),
+        insurance_period: String(insurancePeriod),
         claim_percentage: Number(claimPercentage),
       };
       const response = await editInsurance(data);
@@ -86,12 +82,11 @@ const ViewInsurance: React.FC<ViewInsuranceProps> = ({ isOpen, selectedInsurance
               <Label htmlFor="insurance_period">Insurance Period</Label>
               <Input
                 id="insurance_period"
-                type="number"
-                value={insurancePeriod?.toString()}
+                type="text"
+                value={insurancePeriod}
                 disabled={!isEditing}
                 onChange={(e) => {
-                  const v = e.target.value;
-                  setInsurancePeriod(v === "" ? "" : Number(v));
+                  setInsurancePeriod(e.target.value);
                 }}
               />
             </div>

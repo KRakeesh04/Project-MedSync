@@ -1,12 +1,10 @@
 import type { Request, Response } from "express";
 import { createInsuranceType, getAllInsuranceTypes, getInsuranceTypeCount, getInsuranceTypesForPagination, updateInsuranceType } from "../models/insurancetype.model.ts";
 
-
 interface insuranceTypeNames {
   insurance_id: number,
   insurance_type: string,
 }
-
 
 export const createNewInsuranceType = async (req: Request, res: Response) => {
   let { insurance_type, insurance_period, claim_percentage } = req.body;
@@ -22,7 +20,6 @@ export const createNewInsuranceType = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 
 export const getInsuranceTypes = async (req: Request, res: Response) => {
   const { count, offset } = req.query;

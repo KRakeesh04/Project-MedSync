@@ -154,7 +154,7 @@ CREATE TABLE `doctor_speciality` (
 );
 
 CREATE TABLE `insurance` (
-  `insurance_id` int,
+  `insurance_id` int AUTO_INCREMENT,
   `insurance_type` varchar(20),
   `insurance_period` varchar(20),
   `claim_percentage` numeric(2,2),

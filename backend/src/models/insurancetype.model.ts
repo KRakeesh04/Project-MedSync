@@ -1,10 +1,10 @@
 import sql from "../db/db.ts";
 
 export interface InsuranceTypes {
- insurance_id: number,  
-  insurance_type: string,  
-  insurance_period: string,  
-  claim_percentage: number,  
+  insurance_id: number,
+  insurance_type: string,
+  insurance_period: string,
+  claim_percentage: number,
   created_at: string
 }
 
