@@ -1,3 +1,4 @@
+-- Active: 1755111596628@@127.0.0.1@3306@Project-MedSync
 -- use `Project-MedSync`;
 -- User model functions
 DROP PROCEDURE IF EXISTS create_user;
@@ -117,6 +118,9 @@ DROP PROCEDURE IF EXISTS get_all_doctors_count;
 
 DROP PROCEDURE IF EXISTS get_doctor_by_id;
 
+-- Doctors-Patients Overview function
+DROP PROCEDURE IF EXISTS get_doctors_patients_overview;
+
 -- speciality model functions
 DROP PROCEDURE IF EXISTS create_speciality;
 
@@ -142,17 +146,30 @@ DROP PROCEDURE IF EXISTS create_treatment;
 
 DROP PROCEDURE IF EXISTS get_all_treatments;
 
+DROP PROCEDURE IF EXISTS get_treatments_for_pagination;
+
+DROP PROCEDURE IF EXISTS get_treatments_count;
+
 DROP PROCEDURE IF EXISTS check_service_code_exists;
 
 -- medical history model functions
 DROP PROCEDURE IF EXISTS get_all_medical_histories;
+
+DROP PROCEDURE IF EXISTS get_all_medical_histories_for_pagination;
+
+DROP PROCEDURE IF EXISTS get_medical_histories_count;
 
 DROP PROCEDURE IF EXISTS get_medical_histories_by_patient_id;
 
 -- medication model functions
 DROP PROCEDURE IF EXISTS get_all_medications;
 
+DROP PROCEDURE IF EXISTS get_all_medications_for_pagination;
+
+DROP PROCEDURE IF EXISTS get_medications_count;
+
 DROP PROCEDURE IF EXISTS get_medications_by_patient_id;
+
 -- Appointment model functions
 DROP PROCEDURE IF EXISTS get_appointments_by_patient_id;
 
@@ -779,6 +796,41 @@ BEGIN
         AND (doc_branch = -1 OR u.branch_id = doc_branch);
 END$$
 
+-- Procedure to get doctors patients overview (used by backend model)
+CREATE PROCEDURE get_doctors_patients_overview()
+BEGIN
+    SELECT
+        d.doctor_id,
+        d.name,
+        (
+            SELECT GROUP_CONCAT(s.speciality_name SEPARATOR ', ')
+            FROM doctor_speciality ds
+            JOIN speciality s ON ds.speciality_id = s.speciality_id
+            WHERE ds.doctor_id = d.doctor_id
+        ) AS speciality,
+        COUNT(DISTINCT a.patient_id) AS patientsCount,
+        MAX(a.date) AS lastVisit,
+        (
+            SELECT p.name
+            FROM appointment a2
+            JOIN patient p ON a2.patient_id = p.patient_id
+            WHERE a2.doctor_id = d.doctor_id
+            ORDER BY a2.date DESC, a2.time_slot DESC
+            LIMIT 1
+        ) AS lastPatientName,
+        (
+            SELECT a3.patient_id
+            FROM appointment a3
+            WHERE a3.doctor_id = d.doctor_id
+            ORDER BY a3.date DESC, a3.time_slot DESC
+            LIMIT 1
+        ) AS lastPatientId
+    FROM doctor d
+    LEFT JOIN appointment a ON d.doctor_id = a.doctor_id
+    GROUP BY d.doctor_id, d.name
+    ORDER BY patientsCount DESC, d.name ASC;
+END$$
+
 -- Speciality model functions
 CREATE PROCEDURE create_speciality(
     IN p_speciality_name VARCHAR(20),
@@ -865,6 +917,23 @@ from treatment_catelogue as tc left outer join speciality as s on tc.speciality_
   ORDER BY service_code;
 END$$
 
+CREATE PROCEDURE get_treatments_for_pagination(
+    IN p_count INT,
+    IN p_offset INT
+)
+BEGIN
+    SELECT tc.service_code, tc.name, tc.fee, tc.description, tc.speciality_id, s.speciality_name, tc.created_at
+    FROM treatment_catelogue tc
+    LEFT JOIN speciality s ON tc.speciality_id = s.speciality_id
+    ORDER BY tc.service_code
+    LIMIT p_count OFFSET p_offset;
+END$$
+
+CREATE PROCEDURE get_treatments_count()
+BEGIN
+    SELECT COUNT(service_code) AS treatment_count FROM treatment_catelogue;
+END$$
+
 CREATE PROCEDURE check_service_code_exists(IN p_code INT)
 BEGIN
   SELECT EXISTS(
@@ -873,26 +942,52 @@ BEGIN
 END$$
 
 CREATE PROCEDURE create_treatment(
-  IN p_service_code INT,
   IN p_name         VARCHAR(50),
   IN p_fee          DECIMAL(8,2),
   IN p_description  VARCHAR(255),
   IN p_speciality_id INT
 )
 BEGIN
-  INSERT INTO treatment_catelogue(service_code, name, fee, description, speciality_id)
-  VALUES (p_service_code, p_name, p_fee, p_description, p_speciality_id);
+  INSERT INTO treatment_catelogue(name, fee, description, speciality_id)
+  VALUES (p_name, p_fee, p_description, p_speciality_id);
 
   SELECT
     service_code, name, fee, description, speciality_id, NOW() AS created_at
   FROM treatment_catelogue
-  WHERE service_code = p_service_code;
+  WHERE service_code = LAST_INSERT_ID();
 END$$
 
 -- medical history model functions
 CREATE PROCEDURE get_all_medical_histories()
 BEGIN
     SELECT * FROM `medical_history`;
+END$$
+
+CREATE PROCEDURE get_all_medical_histories_for_pagination(
+    IN p_count INT,
+    IN p_offset INT,
+    IN p_branch_id INT
+)
+BEGIN
+    SELECT mh.medical_history_id, a.appointment_id, a.date AS visit_date, mh.diagnosis, mh.symptoms, mh.allergies, mh.notes, mh.follow_up_date, mh.created_at, mh.updated_at
+    FROM medical_history mh
+    JOIN appointment a ON mh.appointment_id = a.appointment_id
+    JOIN patient p ON a.patient_id = p.patient_id
+    JOIN `user` u ON p.patient_id = u.user_id
+    WHERE (p_branch_id = -1) OR (u.branch_id = p_branch_id)
+    ORDER BY mh.created_at DESC
+    LIMIT p_count
+    OFFSET p_offset;
+END$$
+
+CREATE PROCEDURE get_medical_histories_count(IN p_branch_id INT)
+BEGIN
+    SELECT COUNT(*) AS total_count
+    FROM medical_history mh
+    JOIN appointment a ON mh.appointment_id = a.appointment_id
+    JOIN patient p ON a.patient_id = p.patient_id
+    JOIN `user` u ON p.patient_id = u.user_id
+    WHERE (p_branch_id = -1) OR (u.branch_id = p_branch_id);
 END$$
 
 CREATE PROCEDURE get_medical_histories_by_patient_id(IN p_patient_id INT)
@@ -908,125 +1003,62 @@ END$$
 -- medication model functions
 CREATE PROCEDURE get_all_medications()
 BEGIN
-    SELECT appointment_id, consultation_note, prescription_items_details, prescribed_at, is_active, patient_id, name
-    FROM prescription
-    NATURAL JOIN appointment
-    NATURAL JOIN patient;
+    SELECT a.appointment_id, pr.consultation_note, pr.prescription_items_details, pr.prescribed_at, pr.is_active, p.patient_id, p.name, d.doctor_id, d.name, b.branch_id, b.name AS branch_name
+    FROM prescription pr
+    LEFT JOIN appointment a ON pr.appointment_id = a.appointment_id
+    LEFT JOIN patient p ON a.patient_id = p.patient_id
+    LEFT JOIN doctor d ON a.doctor_id = d.doctor_id
+    LEFT JOIN `user` u ON u.user_id = d.doctor_id
+    LEFT JOIN `branch` b ON u.branch_id = b.branch_id;
+END$$
+
+CREATE PROCEDURE get_all_medications_for_pagination(IN p_count INT, IN p_offset INT, IN p_branch_id INT)
+BEGIN
+    SELECT a.appointment_id, b.branch_id, b.name AS branch_name, p.patient_id, p.name AS patient_name, d.doctor_id, d.name AS doctor_name, pr.consultation_note, pr.prescription_items_details, pr.prescribed_at, pr.is_active
+    FROM prescription pr
+    LEFT JOIN appointment a ON pr.appointment_id = a.appointment_id
+    LEFT JOIN patient p ON a.patient_id = p.patient_id
+    LEFT JOIN doctor d ON a.doctor_id = d.doctor_id
+    LEFT JOIN `user` u ON u.user_id = d.doctor_id
+    LEFT JOIN `branch` b ON u.branch_id = b.branch_id
+    WHERE (p_branch_id = -1) OR (u.branch_id = p_branch_id)
+    LIMIT p_count
+    OFFSET p_offset;
+END$$
+
+CREATE PROCEDURE get_medications_count(IN p_branch_id INT)
+BEGIN
+    SELECT COUNT(*) AS medication_count
+    FROM prescription pr
+    LEFT JOIN appointment a ON pr.appointment_id = a.appointment_id
+    LEFT JOIN doctor d ON a.doctor_id = d.doctor_id
+    LEFT JOIN `user` u ON u.user_id = d.doctor_id
+    LEFT JOIN `branch` b ON u.branch_id = b.branch_id
+    WHERE (p_branch_id = -1) OR (u.branch_id = p_branch_id);
 END$$
 
 CREATE PROCEDURE get_medications_by_patient_id(IN p_patient_id INT)
 BEGIN
-  SELECT p.appointment_id, a.patient_id, pat.name AS name, p.consultation_note AS consultation_note, p.prescription_items_details, p.prescribed_at, p.is_active
-  FROM prescription AS p
-  JOIN appointment  AS a   ON p.appointment_id = a.appointment_id
-  JOIN patient      AS pat ON a.patient_id     = pat.patient_id
-  WHERE a.patient_id = p_patient_id
-  ORDER BY p.prescribed_at DESC;
+    SELECT a.appointment_id, b.branch_id, b.name AS branch_name, p.patient_id, p.name AS patient_name, d.doctor_id, d.name AS doctor_name, pr.consultation_note, pr.prescription_items_details, pr.prescribed_at, pr.is_active
+    FROM prescription pr
+    LEFT JOIN appointment a ON pr.appointment_id = a.appointment_id
+    LEFT JOIN patient p ON a.patient_id = p.patient_id
+    LEFT JOIN doctor d ON a.doctor_id = d.doctor_id
+    LEFT JOIN `user` u ON u.user_id = d.doctor_id
+    LEFT JOIN `branch` b ON u.branch_id = b.branch_id
+    WHERE a.patient_id = p_patient_id
+  ORDER BY pr.prescribed_at DESC;
 END$$
 
 -- Appointment model functions
--- CREATE PROCEDURE get_appointments_by_patient_id(IN p_patient_id INT)
--- BEGIN
--- 	select ap.appointment_id , ap.doctor_id, ap.date, ap.time_slot, ap.status, d.name
--- 	from appointment as ap join doctor as d
--- 	on ap.doctor_id= d.doctor_id
--- 	where ap.patient_id = p_patient_id
--- 	ORDER BY ap.date DESC;
--- END$$
-
--- -- billing_invoice model functions
--- CREATE PROCEDURE create_billing_invoice(
---     IN p_appointment_id INT,
---     IN p_additional_fee DECIMAL(10,2),
---     IN p_total_fee DECIMAL(10,2),
---     IN p_claim_id INT,
---     IN p_net_amount DECIMAL(10,2),
---     IN p_remaining_payment_amount DECIMAL(10,2)
--- )
--- BEGIN
---     INSERT INTO `billing_invoice`
---     (appointment_id, additional_fee, total_fee, claim_id, net_amount, remaining_payment_amount, time_stamp)
---     VALUES
---     (p_appointment_id, p_additional_fee, p_total_fee, p_claim_id, p_net_amount, p_remaining_payment_amount, NOW());
--- END$$
-
--- CREATE PROCEDURE update_billing_invoice(
---     IN p_invoice_id INT,
---     IN p_additional_fee DECIMAL(10,2),
---     IN p_total_fee DECIMAL(10,2),
---     IN p_net_amount DECIMAL(10,2),
---     IN p_remaining_payment_amount DECIMAL(10,2)
--- )
--- BEGIN
---     UPDATE `billing_invoice`
---     SET additional_fee = p_additional_fee,
---         total_fee = p_total_fee,
---         net_amount = p_net_amount,
---         remaining_payment_amount = p_remaining_payment_amount,
---         time_stamp = NOW()
---     WHERE id = p_invoice_id;
--- END$$
-
--- CREATE PROCEDURE delete_billing_invoice(IN p_invoice_id INT)
--- BEGIN
---     DELETE FROM `billing_invoice` WHERE id = p_invoice_id;
--- END$$
-
--- CREATE PROCEDURE get_billing_invoice_by_id(IN p_invoice_id INT)
--- BEGIN
---     SELECT * FROM `billing_invoice` WHERE id = p_invoice_id;
--- END$$
-
--- CREATE PROCEDURE get_all_billing_invoices()
--- BEGIN
---     SELECT * FROM `billing_invoice`;
--- END$$
-
--- -- billing_payment model functions
--- CREATE PROCEDURE create_billing_payment(
---     IN p_payment_id INT,
---     IN p_invoice_id INT,
---     IN p_branch_id INT,
---     IN p_paid_amount NUMERIC(8,2),
---     IN p_cashier_id INT
--- )
--- BEGIN
---     INSERT INTO `billing_payment`
---     (payment_id, invoice_id, branch_id, paid_amount, cashier_id, time_stamp)
---     VALUES
---     (p_payment_id, p_invoice_id, p_branch_id, p_paid_amount, p_cashier_id, NOW());
--- END$$
-
--- CREATE PROCEDURE update_billing_payment(
---     IN p_payment_id INT,
---     IN p_paid_amount NUMERIC(8,2)
--- )
--- BEGIN
---     UPDATE `billing_payment`
---     SET paid_amount = p_paid_amount,
---         time_stamp = NOW()
---     WHERE payment_id = p_payment_id;
--- END$$
-
--- CREATE PROCEDURE delete_billing_payment(IN p_payment_id INT)
--- BEGIN
---     DELETE FROM `billing_payment` WHERE payment_id = p_payment_id;
--- END$$
-
--- CREATE PROCEDURE get_billing_payment_by_id(IN p_payment_id INT)
--- BEGIN
---     SELECT * FROM `billing_payment` WHERE payment_id = p_payment_id;
--- END$$
-
--- CREATE PROCEDURE get_billing_payments_by_invoice_id(IN p_invoice_id INT)
--- BEGIN
---     SELECT * FROM `billing_payment` WHERE invoice_id = p_invoice_id;
--- END$$
-
--- CREATE PROCEDURE get_all_billing_payments()
--- BEGIN
---     SELECT * FROM `billing_payment`;
--- END$$
+CREATE PROCEDURE get_appointments_by_patient_id(IN p_patient_id INT)
+BEGIN
+	select ap.appointment_id , ap.doctor_id, ap.date, ap.time_slot, ap.status, d.name
+	from appointment as ap join doctor as d
+	on ap.doctor_id= d.doctor_id
+	where ap.patient_id = p_patient_id
+	ORDER BY ap.date DESC;
+END$$
 
 -- billing_invoice model functions
 CREATE PROCEDURE create_billing_invoice(
@@ -1056,7 +1088,8 @@ END$$
 
 CREATE PROCEDURE update_billing_invoice_bypayment(
     IN p_invoice_id INT,
-    IN p_payment DECIMAL(10,2)  
+    IN p_payment DECIMAL(10,2)
+   
 )
 BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
@@ -1068,11 +1101,11 @@ BEGIN
 
     UPDATE billing_invoice
     SET 
-        remaining_payment_amount = remaining_payment_amount-p_payment,
+        remaining_payment_amount = remaining_payment_amount - p_payment,
         time_stamp = NOW()
     WHERE appointment_id = p_invoice_id;
 
-    COMMIT;    
+    COMMIT;
 END$$
 
 CREATE PROCEDURE delete_billing_invoice(IN p_invoice_id INT)

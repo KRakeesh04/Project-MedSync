@@ -1,4 +1,4 @@
--- Active: 1760508928142@@127.0.0.1@3306@project-medsync
+-- Active: 1755111596628@@127.0.0.1@3306@Project-MedSync
 -- USE `Project-MedSync`;
 
 -- child → parent drop order
@@ -163,11 +163,12 @@ CREATE TABLE `insurance` (
 );
 
 CREATE TABLE `treatment_catelogue` (
-  `service_code` int,
+  `service_code` int AUTO_INCREMENT,
   `name` varchar(50),
   `fee` numeric(8,2),
   `description` varchar(255),
   `speciality_id` int,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`service_code`),
   FOREIGN KEY (`speciality_id`)
       REFERENCES `speciality`(`speciality_id`)
