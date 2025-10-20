@@ -53,6 +53,18 @@ export const updatePatientByID = async (data: {
     throw error;
   }
 };
+
+
+export const getFullPatientDetails = async (patientId: number) => {
+  try {
+    const response = await axiosInstance.get(`/patient/full/${patientId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching full patient details:', error);
+    throw error;
+  }
+};
+
 // services/patientServices.ts
 export const getPatientsCountPerBranch = async (): Promise<{ branch_name: string; patient_count: number }[]> => {
   try {

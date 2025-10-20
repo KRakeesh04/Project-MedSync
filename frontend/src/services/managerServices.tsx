@@ -15,7 +15,7 @@ export const getAllManagers = async (branch: number) => {
     const managers = await axiosInstance.get<{
       manager_count: number;
       managers: Array<BranchManager>;
-    }>(`/managers?branch=${branch}`);
+    }>(`/branch-managers?branch=${branch}`);
     return managers.data;
   } catch (error: unknown) {
     console.error("Error getting branch manager data:", error);
@@ -37,7 +37,12 @@ export const updateManagerDetails = async (data: {
   monthly_salary: string;
 }): Promise<{ message: string }> => {
   try {
-    const response = await axiosInstance.put(`/managers/${data.manager_id}`, data);
+    const payload = {
+      fullname: data.name,
+      monthly_salary: Number(data.monthly_salary || 0),
+      gender: data.gender,
+    };
+    const response = await axiosInstance.put(`/branch-managers/${data.manager_id}`, payload);
     return response.data;
   } catch (error) {
     throw error;

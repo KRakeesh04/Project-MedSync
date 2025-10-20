@@ -1,3 +1,4 @@
+-- Active: 1755111596628@@127.0.0.1@3306@Project-MedSync
 -- BRANCHES
 INSERT INTO `branch` (branch_id, name, location, landline_no, created_at) VALUES
 (1, 'Colombo', 'Colombo 07', '0112567890', NOW()),
@@ -12,7 +13,7 @@ INSERT INTO `branch` (branch_id, name, location, landline_no, created_at) VALUES
 
 -- USERS (admins, managers, staff, doctors-as-users, patients-as-users)
 INSERT INTO `user`(user_id, username, password_hash, role, branch_id, is_approved, created_at) VALUES
-(1, 'super_admin', 'hash_super', 'Super_Admin', 1, TRUE, NOW()),
+(1, 'super_admin', '$2b$10$gMXv0.zIImOvgJmqFe2TmuSf.d1tqvlJLUXm2FsBYTxLafsxXALn.', 'Super_Admin', 1, TRUE, NOW()),
 (2, 'bm_kandy', 'hash_kandy', 'Branch_Manager', 2, TRUE, NOW()),
 (3, 'bm_galle', 'hash_galle', 'Branch_Manager', 3, TRUE, NOW()),
 (4, 'bm_jaffna', 'hash_jaffna', 'Branch_Manager', 4, TRUE, NOW()),
@@ -67,7 +68,27 @@ INSERT INTO `user`(user_id, username, password_hash, role, branch_id, is_approve
 (53, 'recept_rohan', 'hash_recept2', 'Receptionist', 2, TRUE, NOW()),
 (54, 'bill_mala', 'hash_bill2', 'Billing_Staff', 2, TRUE, NOW()),
 (55, 'agent_kasun', 'hash_agent2', 'Insurance_Agent', 3, TRUE, NOW()),
-(56, 'agent02', 'hash_agent2', 'Insurance_Agent', 2, TRUE, NOW());
+(56, 'agent02', 'hash_agent2', 'Insurance_Agent', 2, TRUE, NOW()),
+(57, 'doc_perera',   'hash_doc_57', 'Doctor', 1, TRUE, NOW()),
+(58, 'doc_silva',    'hash_doc_58', 'Doctor', 1, TRUE, NOW()),
+(59, 'doc_fernando', 'hash_doc_59', 'Doctor', 1, TRUE, NOW()),
+(60, 'doc_wijesinghe','hash_doc_60','Doctor', 1, TRUE, NOW()),
+(61, 'doc_jayasinghe','hash_doc_61','Doctor', 1, TRUE, NOW()),
+(62, 'doc_sarah',    'hash_doc_62', 'Doctor', 1, TRUE, NOW()),
+(63, 'doc_james',    'hash_doc_63', 'Doctor', 1, TRUE, NOW()),
+(64, 'doc_amanda',   'hash_doc_64', 'Doctor', 1, TRUE, NOW()),
+(65, 'doc_john',     'hash_doc_65', 'Doctor', 1, TRUE, NOW()),
+(66, 'doc_jane',     'hash_doc_66', 'Doctor', 1, TRUE, NOW()),
+(67, 'doc_mike',     'hash_doc_67', 'Doctor', 1, TRUE, NOW()),
+(68, 'doc_emily',    'hash_doc_68', 'Doctor', 1, TRUE, NOW()),
+(69, 'doc_rodrigo',  'hash_doc_69', 'Doctor', 1, TRUE, NOW()),
+(70, 'doc_nperera',  'hash_doc_70', 'Doctor', 1, TRUE, NOW()),
+(71, 'doc_sjayasena','hash_doc_71','Doctor', 1, TRUE, NOW()),
+(72, 'doc_hsilva',   'hash_doc_72', 'Doctor', 1, TRUE, NOW()),
+(73, 'doc_lfernando','hash_doc_73','Doctor', 1, TRUE, NOW()),
+(74, 'doc_akumara',  'hash_doc_74', 'Doctor', 1, TRUE, NOW()),
+(75, 'doc_bjayawardena','hash_doc_75','Doctor',1, TRUE, NOW()),
+(76, 'doc_cdias',    'hash_doc_76', 'Doctor', 1, TRUE, NOW());
 
 -- STAFF (staff_id references user.user_id)
 INSERT INTO `staff` (staff_id, name, type, monthly_salary, gender) VALUES
@@ -165,52 +186,50 @@ INSERT INTO `speciality` (speciality_id, speciality_name, description) VALUES
 
 -- DOCTORS (doctor table is independent of user)
 INSERT INTO `doctor` (doctor_id, name, fee_per_patient, basic_monthly_salary, gender) VALUES
-(1, 'Dr. Perera', 2500.00, 175000.00, 'Male'),
-(2, 'Dr. Silva', 3000.00, 180000.00, 'Male'),
-(3, 'Dr. Fernando', 2200.00, 160000.00, 'Female'),
-(4, 'Dr. Wijesinghe', 2700.00, 170000.00, 'Female'),
-(5, 'Dr. Jayasinghe', 2600.00, 165000.00, 'Male'),
-(6, 'Dr. Sarah Connor', 1300.00, 58000.00, 'Female'),
-(7, 'Dr. James Wilson', 950.00, 47000.00, 'Male'),
-(8, 'Dr. Amanda Chen', 1150.00, 53000.00, 'Female'),
-(9, 'Dr. John Doe', 1000.00, 50000.00, 'Male'),
-(10, 'Dr. Jane Smith', 1200.00, 55000.00, 'Female'),
-(11, 'Dr. Mike Johnson', 900.00, 48000.00, 'Male'),
-(12, 'Dr. Emily Davis', 1100.00, 52000.00, 'Female'),
-(13, 'Dr. K. Rodrigo', 2000.00, 120000.00, 'Male'),
-(14, 'Dr. N. Perera', 1800.00, 115000.00, 'Female'),
-(15, 'Dr. S. Jayasena', 1600.00, 110000.00, 'Male'),
-(16, 'Dr. H. Silva', 1400.00, 90000.00, 'Female'),
-(17, 'Dr. L. Fernando', 1700.00, 105000.00, 'Male'),
-(18, 'Dr. A. Kumara', 1500.00, 85000.00, 'Female'),
-(19, 'Dr. B. Jayawardena', 1550.00, 88000.00, 'Male'),
-(20, 'Dr. C. Dias', 1450.00, 82000.00, 'Female');
-
+(57, 'Dr. Perera', 2500.00, 175000.00, 'Male'),
+(58, 'Dr. Silva', 3000.00, 180000.00, 'Male'),
+(59, 'Dr. Fernando', 2200.00, 160000.00, 'Female'),
+(60, 'Dr. Wijesinghe', 2700.00, 170000.00, 'Female'),
+(61, 'Dr. Jayasinghe', 2600.00, 165000.00, 'Male'),
+(62, 'Dr. Sarah Connor', 1300.00, 58000.00, 'Female'),
+(63, 'Dr. James Wilson', 950.00, 47000.00, 'Male'),
+(64, 'Dr. Amanda Chen', 1150.00, 53000.00, 'Female'),
+(65, 'Dr. John Doe', 1000.00, 50000.00, 'Male'),
+(66, 'Dr. Jane Smith', 1200.00, 55000.00, 'Female'),
+(67, 'Dr. Mike Johnson', 900.00, 48000.00, 'Male'),
+(68, 'Dr. Emily Davis', 1100.00, 52000.00, 'Female'),
+(69, 'Dr. K. Rodrigo', 2000.00, 120000.00, 'Male'),
+(70, 'Dr. N. Perera', 1800.00, 115000.00, 'Female'),
+(71, 'Dr. S. Jayasena', 1600.00, 110000.00, 'Male'),
+(72, 'Dr. H. Silva', 1400.00, 90000.00, 'Female'),
+(73, 'Dr. L. Fernando', 1700.00, 105000.00, 'Male'),
+(74, 'Dr. A. Kumara', 1500.00, 85000.00, 'Female'),
+(75, 'Dr. B. Jayawardena', 1550.00, 88000.00, 'Male'),
+(76, 'Dr. C. Dias', 1450.00, 82000.00, 'Female');
 
 -- DOCTOR_SPECIALITY
 INSERT INTO `doctor_speciality` (doctor_id, speciality_id, added_at) VALUES
-(1, 1, NOW()),
-(2, 2, NOW()),
-(3, 3, NOW()),
-(4, 4, NOW()),
-(5, 5, NOW()),
-(6, 1, NOW()),
-(6, 5, NOW()),
-(7, 5, NOW()),
-(8, 2, NOW()),
-(9, 1, NOW()),
-(10, 2, NOW()),
-(11, 5, NOW()),
-(12, 4, NOW()),
-(13, 10, NOW()),
-(14, 7, NOW()),
-(15, 9, NOW()),
-(16, 3, NOW()),
-(17, 6, NOW()),
-(18, 8, NOW()),
-(19, 10, NOW()),
-(20, 1, NOW());
-
+(57, 1, NOW()),
+(58, 2, NOW()),
+(59, 3, NOW()),
+(60, 4, NOW()),
+(61, 5, NOW()),
+(62, 1, NOW()),
+(62, 5, NOW()),
+(63, 5, NOW()),
+(64, 2, NOW()),
+(65, 1, NOW()),
+(66, 2, NOW()),
+(67, 5, NOW()),
+(68, 4, NOW()),
+(69, 10, NOW()),
+(70, 7, NOW()),
+(71, 9, NOW()),
+(72, 3, NOW()),
+(73, 6, NOW()),
+(74, 8, NOW()),
+(75, 10, NOW()),
+(76, 1, NOW());
 
 -- INSURANCE PLANS
 INSERT INTO `insurance` (insurance_id, insurance_type, insurance_period, claim_percentage, created_at) VALUES
@@ -224,27 +243,27 @@ INSERT INTO `insurance` (insurance_id, insurance_type, insurance_period, claim_p
 
 
 -- TREATMENT CATALOGUE (service_code)
-INSERT INTO `treatment_catelogue` (service_code, name, fee, description, speciality_id) VALUES
-(101, 'ECG Scan', 1500.00, 'Electrocardiogram test', 1),
-(102, 'MRI Brain', 8000.00, 'Brain MRI scan', 2),
-(103, 'Skin Therapy', 3000.00, 'Acne/scar treatment', 3),
-(104, 'Child Checkup', 1200.00, 'Routine pediatric check', 4),
-(105, 'Fracture Treatment', 5000.00, 'Bone fracture repair', 5),
-(106, 'Eye Exam', 400.00, 'Routine eye exam', 6),
-(107, 'Endoscopy', 1000.00, 'GI endoscopy', 7),
-(108, 'Psych Consult', 800.00, 'Psychiatry consultation', 8),
-(109, 'ENT Check', 700.00, 'ENT examination', 9),
-(110, 'General Consult', 1000.00, 'General medicine consultation', 10),
-(111, 'Blood Test', 250.00, 'CBC and panels', 10),
-(112, 'CT Scan', 1200.00, 'CT imaging', 2),
-(113, 'Ultrasound', 800.00, 'Ultrasound scan', 5),
-(114, 'Skin Biopsy', 600.00, 'Tissue sample', 3),
-(115, 'Vaccination', 200.00, 'Routine vaccine', 4),
-(116, 'Stress Test', 1800.00, 'Cardiac stress test', 1),
-(117, 'Bone Density', 900.00, 'DEXA scan', 5),
-(118, 'Allergy Test', 350.00, 'Allergy panel', 3),
-(119, 'Counselling', 700.00, 'Therapy session', 8),
-(120, 'Diabetes Panel', 900.00, 'Diabetes bloodwork', 10);
+INSERT INTO `treatment_catelogue` (service_code, name, fee, description, speciality_id, created_at) VALUES
+(1, 'ECG Scan', 1500.00, 'Electrocardiogram test', 1, NOW()),
+(2, 'MRI Brain', 8000.00, 'Brain MRI scan', 2, NOW()),
+(3, 'Skin Therapy', 3000.00, 'Acne/scar treatment', 3, NOW()),
+(4, 'Child Checkup', 1200.00, 'Routine pediatric check', 4, NOW()),
+(5, 'Fracture Treatment', 5000.00, 'Bone fracture repair', 5, NOW()),
+(6, 'Eye Exam', 400.00, 'Routine eye exam', 6, NOW()),
+(7, 'Endoscopy', 1000.00, 'GI endoscopy', 7, NOW()),
+(8, 'Psych Consult', 800.00, 'Psychiatry consultation', 8, NOW()),
+(9, 'ENT Check', 700.00, 'ENT examination', 9, NOW()),
+(10, 'General Consult', 1000.00, 'General medicine consultation', 10, NOW()),
+(11, 'Blood Test', 250.00, 'CBC and panels', 10, NOW()),
+(12, 'CT Scan', 1200.00, 'CT imaging', 2, NOW()),
+(13, 'Ultrasound', 800.00, 'Ultrasound scan', 5, NOW()),
+(14, 'Skin Biopsy', 600.00, 'Tissue sample', 3, NOW()),
+(15, 'Vaccination', 200.00, 'Routine vaccine', 4, NOW()),
+(16, 'Stress Test', 1800.00, 'Cardiac stress test', 1, NOW()),
+(17, 'Bone Density', 900.00, 'DEXA scan', 5, NOW()),
+(18, 'Allergy Test', 350.00, 'Allergy panel', 3, NOW()),
+(19, 'Counselling', 700.00, 'Therapy session', 8, NOW()),
+(20, 'Diabetes Panel', 900.00, 'Diabetes bloodwork', 10, NOW());
 
 
 -- PATIENT_INSURANCE (patient_id references user.user_id)
@@ -268,10 +287,17 @@ INSERT INTO `patient_insurance` (patient_id, insurance_id, created_at, is_expire
 (27, 3, NOW() - INTERVAL 12 DAY, FALSE),
 (28, 4, NOW() - INTERVAL 80 DAY, FALSE),
 (29, 5, NOW() - INTERVAL 33 DAY, FALSE),
-(30, 6, NOW() - INTERVAL 7 DAY, FALSE);
+(30, 6, NOW() - INTERVAL 7 DAY, FALSE),
+(31, 2, NOW() - INTERVAL 120 DAY, FALSE),
+(32, 3, NOW() - INTERVAL 60 DAY, FALSE),
+(33, 4, NOW() - INTERVAL 200 DAY, TRUE),
+(34, 5, NOW() - INTERVAL 30 DAY, FALSE),
+(35, 2, NOW() - INTERVAL 10 DAY, FALSE);
 
 
 -- APPOINTMENTS (many, dates relative to CURDATE())
+SET @DOCTOR_OFFSET := 56;
+SET FOREIGN_KEY_CHECKS=0;
 INSERT INTO `appointment` (appointment_id, patient_id, doctor_id, patient_note, date, time_slot, status, time_stamp) VALUES
 (1, 11, 1, 'Chest pain and palpitations', CURDATE() - INTERVAL 60 DAY, '09:00-09:30', 'Completed', NOW() - INTERVAL 60 DAY),
 (2, 12, 2, 'Frequent headaches', CURDATE() - INTERVAL 55 DAY, '10:00-10:30', 'Completed', NOW() - INTERVAL 55 DAY),
@@ -318,7 +344,22 @@ INSERT INTO `appointment` (appointment_id, patient_id, doctor_id, patient_note, 
 (37, 47, 17, 'BP check', CURDATE() + INTERVAL 40 DAY, '10:00-10:30', 'Booked', NOW()),
 (38, 48, 18, 'Allergy tests', CURDATE() + INTERVAL 45 DAY, '11:00-11:30', 'Booked', NOW()),
 (39, 49, 19, 'Orthopedic review', CURDATE() + INTERVAL 50 DAY, '12:00-12:30', 'Booked', NOW()),
-(40, 50, 20, 'Diabetes education', CURDATE() + INTERVAL 60 DAY, '14:00-14:30', 'Booked', NOW());
+(40, 50, 20, 'Diabetes education', CURDATE() + INTERVAL 60 DAY, '14:00-14:30', 'Booked', NOW()),
+
+(41, 11, 2, 'Annual review', CURDATE() - INTERVAL 14 DAY, '09:00-09:30', 'Completed', NOW() - INTERVAL 14 DAY),
+(42, 12, 3, 'Skin patch test', CURDATE() - INTERVAL 12 DAY, '10:00-10:30', 'Completed', NOW() - INTERVAL 12 DAY),
+(43, 13, 4, 'Vaccination follow-up', CURDATE() - INTERVAL 10 DAY, '11:00-11:30', 'Completed', NOW() - INTERVAL 10 DAY),
+(44, 14, 5, 'XRAY review', CURDATE() - INTERVAL 7 DAY, '12:00-12:30', 'Completed', NOW() - INTERVAL 7 DAY),
+(45, 15, 6, 'Cardio check', CURDATE() - INTERVAL 3 DAY, '13:00-13:30', 'Completed', NOW() - INTERVAL 3 DAY),
+
+(46, 16, 7, 'Orthopedic review', CURDATE() - INTERVAL 2 DAY, '14:00-14:30', 'Completed', NOW() - INTERVAL 2 DAY),
+(47, 17, 8, 'Therapy session', CURDATE() - INTERVAL 1 DAY, '15:00-15:30', 'Completed', NOW() - INTERVAL 1 DAY),
+(48, 18, 9, 'ENT follow up', CURDATE(), '09:00-09:30', 'Completed', NOW()),
+(49, 19, 10, 'General consult', CURDATE() + INTERVAL 2 DAY, '10:00-10:30', 'Booked', NOW()),
+(50, 20, 1, 'Pre-op assessment', CURDATE() + INTERVAL 4 DAY, '11:00-11:30', 'Booked', NOW());
+-- Adjust doctor_id in appointments to match newly inserted doctors
+UPDATE `appointment` SET doctor_id = doctor_id + @DOCTOR_OFFSET WHERE doctor_id BETWEEN 1 AND 20;
+SET FOREIGN_KEY_CHECKS=1;
 
 
 -- PRESCRIPTIONS (linked to appointments)
@@ -338,7 +379,12 @@ INSERT INTO `prescription` (appointment_id, consultation_note, prescription_item
 (13, 'Fever care', 'Paracetamol 500mg PRN', NOW() - INTERVAL 4 DAY, TRUE),
 (14, 'GI support', 'Omeprazole 20mg', NOW() - INTERVAL 2 DAY, TRUE),
 (15, 'Eye drops', 'Artificial tears', NOW() - INTERVAL 1 DAY, TRUE),
-(16, 'Therapy meds', 'No meds - therapy only', NOW(), TRUE);
+(16, 'Therapy meds', 'No meds - therapy only', NOW(), TRUE),
+(41, 'Continue current meds', 'Statin 20mg', NOW() - INTERVAL 14 DAY, TRUE),
+(42, 'Allergy Rx', 'Antihistamine once daily', NOW() - INTERVAL 12 DAY, TRUE),
+(43, 'Vaccine booster', 'Booster dose administered', NOW() - INTERVAL 10 DAY, TRUE),
+(44, 'Pain meds', 'Acetaminophen 500mg', NOW() - INTERVAL 7 DAY, FALSE),
+(45, 'Cardio Rx', 'Beta-blocker 50mg', NOW() - INTERVAL 3 DAY, TRUE);
 
 
 -- MEDICAL_HISTORY
@@ -357,33 +403,40 @@ INSERT INTO `medical_history` (medical_history_id, appointment_id, visit_date, d
 
 -- TREATMENTS (service_code references treatment_catelogue)
 INSERT INTO `treatment` (service_code, appointment_id) VALUES
-(101, 1),
-(112, 2),
-(114, 3),
-(115, 4),
-(105, 5),
-(116, 6),
-(117, 7),
-(119, 8),
-(109, 9),
-(110, 10),
-(111, 11),
-(104, 12),
-(120, 13),
-(107, 14),
-(106, 15),
-(119, 16);
+(1, 1),
+(12, 2),
+(14, 3),
+(15, 4),
+(5, 5),
+(16, 6),
+(17, 7),
+(19, 8),
+(9, 9),
+(10, 10),
+(11, 11),
+(4, 12),
+(20, 13),
+(7, 14),
+(6, 15),
+(19, 16),
+(2, 41),
+(18, 42),
+(15, 43),
+(3, 44),
+(16, 45);
 
 
 -- INSURANCE_CLAIM (approved_by references staff.staff_id)
 INSERT INTO `insurance_claim` (claim_id, service_code, patient_id, approved_by, claimed_amount, claimed_at, insurance_id) VALUES
-(1, 101, 11, 9, 1000.00, NOW() - INTERVAL 58 DAY, 1),  -- approved by Asha Rajapaksa
-(2, 112, 12, 56, 6000.00, NOW() - INTERVAL 52 DAY, 2), -- approved by Kasun Kumara
-(3, 114, 13, 56, 240.00, NOW() - INTERVAL 48 DAY, 3), -- approved by Niroshan Perera (new agent)
-(4, 115, 14, 9, 90.00, NOW() - INTERVAL 44 DAY, 4),   -- approved by Asha Rajapaksa
-(5, 105, 15, 56, 4000.00, NOW() - INTERVAL 38 DAY, 5), -- approved by Kasun Kumara
-(6, 111, 21, 9, 200.00, NOW() - INTERVAL 6 DAY, 1),   -- approved by Asha Rajapaksa
-(7, 119, 26, 56, 640.00, NOW() - INTERVAL 1 DAY, 3);  -- approved by Niroshan Perera (new agent)
+(1, 1, 11, 9, 1000.00, NOW() - INTERVAL 58 DAY, 1),  -- approved by Asha Rajapaksa
+(2, 12, 12, 56, 6000.00, NOW() - INTERVAL 52 DAY, 2), -- approved by Kasun Kumara
+(3, 14, 13, 56, 240.00, NOW() - INTERVAL 48 DAY, 3), -- approved by Niroshan Perera (new agent)
+(4, 15, 14, 9, 90.00, NOW() - INTERVAL 44 DAY, 4),   -- approved by Asha Rajapaksa
+(5, 5, 15, 56, 4000.00, NOW() - INTERVAL 38 DAY, 5), -- approved by Kasun Kumara
+(6, 11, 21, 9, 200.00, NOW() - INTERVAL 6 DAY, 1),   -- approved by Asha Rajapaksa
+(7, 19, 26, 56, 640.00, NOW() - INTERVAL 1 DAY, 3),  -- approved by Niroshan Perera (new agent)
+(8, 2, 11, 56, 5000.00, NOW() - INTERVAL 13 DAY, 2),
+(9, 18, 12, 9, 350.00, NOW() - INTERVAL 11 DAY, 6);
 
 
 -- BILLING_INVOICE (appointment_id is PK and FK to appointment)
@@ -394,18 +447,22 @@ INSERT INTO `billing_invoice` (appointment_id, additional_fee, total_fee, claim_
 (4, 0.00, 90.00, 4, 90.00, 0.00, NOW() - INTERVAL 44 DAY),
 (5, 150.00, 4150.00, 5, 4000.00, 150.00, NOW() - INTERVAL 38 DAY),
 (11, 0.00, 250.00, 6, 200.00, 50.00, NOW() - INTERVAL 6 DAY),
-(16, 0.00, 700.00, 7, 640.00, 60.00, NOW() - INTERVAL 1 DAY);
+(16, 0.00, 700.00, 7, 640.00, 60.00, NOW() - INTERVAL 1 DAY),
+(41, 0.00, 5000.00, 8, 3500.00, 1500.00, NOW() - INTERVAL 13 DAY),
+(42, 0.00, 400.00, 9, 300.00, 100.00, NOW() - INTERVAL 11 DAY);
 
 
 -- BILLING_PAYMENT (cashier_id references staff.staff_id)
-INSERT INTO `billing_payment` (payment_id, invoice_id, branch_id, paid_amount, time_stamp, cashier_id) VALUES
-(1, 1, 1, 1700.00, NOW() - INTERVAL 57 DAY, 8),
-(2, 2, 2, 3500.00, NOW() - INTERVAL 51 DAY, 54),
-(3, 3, 3, 240.00, NOW() - INTERVAL 47 DAY, 8),
-(4, 4, 4, 90.00, NOW() - INTERVAL 43 DAY, 54),
-(5, 5, 5, 4000.00, NOW() - INTERVAL 37 DAY, 54),
-(6, 11, 1, 200.00, NOW() - INTERVAL 5 DAY, 8),
-(7, 16, 2, 640.00, NOW() - INTERVAL 1 DAY, 54);
+INSERT INTO `billing_payment` (invoice_id, branch_id, paid_amount, time_stamp, cashier_id) VALUES
+( 1, 1, 1700.00, NOW() - INTERVAL 57 DAY, 8),
+( 2, 2, 3500.00, NOW() - INTERVAL 51 DAY, 54),
+( 3, 3, 240.00, NOW() - INTERVAL 47 DAY, 8),
+( 4, 4, 90.00, NOW() - INTERVAL 43 DAY, 54),
+( 5, 5, 4000.00, NOW() - INTERVAL 37 DAY, 54),
+( 11, 1, 200.00, NOW() - INTERVAL 5 DAY, 8),
+( 16, 2, 640.00, NOW() - INTERVAL 1 DAY, 54),
+(41, 1, 3500.00, NOW() - INTERVAL 12 DAY, 54),
+(42, 1, 300.00, NOW() - INTERVAL 10 DAY, 8);
 
 
 -- ACTION
@@ -439,52 +496,4 @@ INSERT INTO `log` (log_id, user_id, user_role, action_id, table_name, record_id,
 (15, 1, 'Super_Admin', 5, 'system', 0, NOW() - INTERVAL 1 DAY, 'System backup performed');
 
 
--- ADDITIONAL BULK APPOINTMENTS/PRESCRIPTIONS/TREATMENTS
--- 10 more quick appointments across different patients and doctors
-INSERT INTO `appointment` (appointment_id, patient_id, doctor_id, patient_note, date, time_slot, status, time_stamp) VALUES
-(41, 11, 2, 'Annual review', CURDATE() - INTERVAL 14 DAY, '09:00-09:30', 'Completed', NOW() - INTERVAL 14 DAY),
-(42, 12, 3, 'Skin patch test', CURDATE() - INTERVAL 12 DAY, '10:00-10:30', 'Completed', NOW() - INTERVAL 12 DAY),
-(43, 13, 4, 'Vaccination follow-up', CURDATE() - INTERVAL 10 DAY, '11:00-11:30', 'Completed', NOW() - INTERVAL 10 DAY),
-(44, 14, 5, 'XRAY review', CURDATE() - INTERVAL 7 DAY, '12:00-12:30', 'Completed', NOW() - INTERVAL 7 DAY),
-(45, 15, 6, 'Cardio check', CURDATE() - INTERVAL 3 DAY, '13:00-13:30', 'Completed', NOW() - INTERVAL 3 DAY),
-(46, 16, 7, 'Orthopedic review', CURDATE() - INTERVAL 2 DAY, '14:00-14:30', 'Completed', NOW() - INTERVAL 2 DAY),
-(47, 17, 8, 'Therapy session', CURDATE() - INTERVAL 1 DAY, '15:00-15:30', 'Completed', NOW() - INTERVAL 1 DAY),
-(48, 18, 9, 'ENT follow up', CURDATE(), '09:00-09:30', 'Completed', NOW()),
-(49, 19, 10, 'General consult', CURDATE() + INTERVAL 2 DAY, '10:00-10:30', 'Booked', NOW()),
-(50, 20, 1, 'Pre-op assessment', CURDATE() + INTERVAL 4 DAY, '11:00-11:30', 'Booked', NOW());
 
-INSERT INTO `prescription` (appointment_id, consultation_note, prescription_items_details, prescribed_at, is_active) VALUES
-(41, 'Continue current meds', 'Statin 20mg', NOW() - INTERVAL 14 DAY, TRUE),
-(42, 'Allergy Rx', 'Antihistamine once daily', NOW() - INTERVAL 12 DAY, TRUE),
-(43, 'Vaccine booster', 'Booster dose administered', NOW() - INTERVAL 10 DAY, TRUE),
-(44, 'Pain meds', 'Acetaminophen 500mg', NOW() - INTERVAL 7 DAY, FALSE),
-(45, 'Cardio Rx', 'Beta-blocker 50mg', NOW() - INTERVAL 3 DAY, TRUE);
-
-INSERT INTO `treatment` (service_code, appointment_id) VALUES
-(102, 41),
-(118, 42),
-(115, 43),
-(103, 44),
-(116, 45);
-
--- MORE INSURANCE CLAIMS & INVOICES for additional appointments
-INSERT INTO `insurance_claim` (claim_id, service_code, patient_id, approved_by, claimed_amount, claimed_at, insurance_id) VALUES
-(8, 102, 11, 56, 5000.00, NOW() - INTERVAL 13 DAY, 2),
-(9, 118, 12, 9, 350.00, NOW() - INTERVAL 11 DAY, 6);
-
-INSERT INTO `billing_invoice` (appointment_id, additional_fee, total_fee, claim_id, net_amount, remaining_payment_amount, time_stamp) VALUES
-(41, 0.00, 5000.00, 8, 3500.00, 1500.00, NOW() - INTERVAL 13 DAY),
-(42, 0.00, 400.00, 9, 300.00, 100.00, NOW() - INTERVAL 11 DAY);
-
-INSERT INTO `billing_payment` (payment_id, invoice_id, branch_id, paid_amount, time_stamp, cashier_id) VALUES
-(8, 41, 1, 3500.00, NOW() - INTERVAL 12 DAY, 54),
-(9, 42, 1, 300.00, NOW() - INTERVAL 10 DAY, 8);
-
-
--- FINAL PATIENT_INSURANCE ADDS to boost dataset
-INSERT INTO `patient_insurance` (patient_id, insurance_id, created_at, is_expired) VALUES
-(31, 2, NOW() - INTERVAL 120 DAY, FALSE),
-(32, 3, NOW() - INTERVAL 60 DAY, FALSE),
-(33, 4, NOW() - INTERVAL 200 DAY, TRUE),
-(34, 5, NOW() - INTERVAL 30 DAY, FALSE),
-(35, 2, NOW() - INTERVAL 10 DAY, FALSE);

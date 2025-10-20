@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { getAllSpecialities } from '@/services/specialityServices';
+import { getSpecialityNames } from '@/services/specialityServices';
 import { addDoctor } from '@/services/doctorServices';
 import { getAllBranches } from '@/services/branchServices';
 import { toast } from 'sonner';
@@ -25,7 +25,7 @@ export default function AddDoctor() {
   type Specialty = {
     speciality_id: number;
     speciality_name: string;
-    description: string;
+    description?: string;
   };
 
   const [branches, setBranches] = useState<{ value: string; label: string }[]>([]);
@@ -48,9 +48,10 @@ export default function AddDoctor() {
 
     const fetchSpecialties = async () => {
       try {
-        const data = await getAllSpecialities()
+        const data = await getSpecialityNames();
         if (data.speciality_count > 0) {
-          setSpecialties(data.specialities);
+          // data.specialities contains only id and name; keep compatibility with existing UI
+          setSpecialties(data.specialities as Specialty[]);
         } else {
           toast.warning("No specialties found. Please add specialties first.");
         }
@@ -74,7 +75,7 @@ export default function AddDoctor() {
       });
       toast.success('Doctor added successfully');
       navigate('/doctors');
-    } catch (error : any) {
+    } catch (error: any) {
       toast.error(error || 'Failed to add doctor');
     } finally {
       setLoading(false);
@@ -139,7 +140,16 @@ export default function AddDoctor() {
                   id="fee"
                   type="number"
                   value={formData.fee_per_patient}
-                  onChange={(e) => setFormData({ ...formData, fee_per_patient: e.target.value })}
+                  step={100}
+                  min={0}
+                  onWheel={(e) => (e.currentTarget as HTMLInputElement).blur()}
+                  onChange={(e) => {
+                    const val = e.target.value;
+
+                    if (val === '' || Number(val) >= 0) {
+                      setFormData({ ...formData, fee_per_patient: val });
+                    }
+                  }}
                   required
                 />
               </div>
@@ -150,6 +160,8 @@ export default function AddDoctor() {
                   id="salary"
                   type="number"
                   value={formData.basic_monthly_salary}
+                  step={1000}
+                  min={0}
                   onChange={(e) => setFormData({ ...formData, basic_monthly_salary: e.target.value })}
                   required
                 />

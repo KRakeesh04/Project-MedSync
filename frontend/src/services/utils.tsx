@@ -49,6 +49,25 @@ export function toMySQLDate(dateStr: string): string {
 	return `${year}-${m}-${d}`; // YYYY-MM-DD
 }
 
+export function toDisplayDate(mysqlDateStr: string): string {
+	if (!mysqlDateStr) return "";
+
+	const [year, month, day] = mysqlDateStr.split("-");
+	const d = day.padStart(2, "0");
+	const m = month.padStart(2, "0");
+
+	const parsed = new Date(mysqlDateStr);
+	if (!isNaN(parsed.getTime())) {
+		const dd = String(parsed.getDate()).padStart(2, "0");
+		const mm = String(parsed.getMonth() + 1).padStart(2, "0");
+		const yyyy = String(parsed.getFullYear());
+		return `${dd}/${mm}/${yyyy}`; // DD/MM/YYYY
+	}
+
+	// Fallback for MySQL YYYY-MM-DD input (existing behavior)
+	return `${d}/${m}/${year}`; // DD/MM/YYYY
+}
+
 export function formatSalary(amount: number): string {
 	return amount.toLocaleString("en-LK", {
 		style: "currency",

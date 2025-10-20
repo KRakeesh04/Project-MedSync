@@ -38,3 +38,18 @@ export const addNewSpecialty = async (req: Request, res: Response) => {
   }
 };
 
+export const getSpecialityNames = async (req: Request, res: Response) => {
+  try {
+    const rows: Speciality[] = await getAllSpecialities();
+    if (!rows || rows.length === 0) {
+      return res.status(200).json({ speciality_count: 0, specialities: [] });
+    }
+
+    const list = rows.map((s) => ({ speciality_id: s.speciality_id, speciality_name: s.speciality_name }));
+    return res.status(200).json({ speciality_count: list.length, specialities: list });
+  } catch (error) {
+    console.error('Database error (speciality names):', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
