@@ -206,7 +206,7 @@ const CurrentPatients: React.FC = () => {
     } finally {
       toast.dismiss(loadingId);
     }
-  }, [table, selectedGender, selectedBloodType, selectedBranch]);
+  }, [table, pagination, selectedGender, selectedBloodType, selectedBranch]);
 
   useEffect(() => {
     fetchPatients();

@@ -114,7 +114,16 @@ export const getPatientsCount = async (
       blood_group,
       gender
     ]);
-    return rows[0][0].patient_count;
+    if (rows && Array.isArray(rows) && rows[0]) {
+      if (Array.isArray(rows[0]) && rows[0][0] && typeof rows[0][0].patient_count !== 'undefined') {
+        return rows[0][0].patient_count;
+      }
+      if (typeof rows[0].patient_count !== 'undefined') {
+        return rows[0].patient_count;
+      }
+    }
+    if (rows && typeof rows.patient_count !== 'undefined') return rows.patient_count;
+    return 0 as Number;
   } catch (error) {
     console.error("Error fetching count of patients:", error);
     throw error;

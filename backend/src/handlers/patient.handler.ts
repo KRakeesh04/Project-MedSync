@@ -75,8 +75,10 @@ export const getPatients = async (req: Request, res: Response) => {
       res.status(404).json({ error: "Patients not found" });
       return;
     }
+
+    const isExPatientBool = Boolean(parseInt(String(isExPatient)));
     const patient_count: Number = await getPatientsCount(
-      Boolean(isExPatient),
+      isExPatientBool,
       String(branch),
       String(bloodGroup),
       String(gender)
