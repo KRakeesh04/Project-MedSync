@@ -33,6 +33,21 @@ export const createBranchManager = async (req: Request, res: Response) => {
   }
 };
 
+export const addNewBranchManager = async (req: Request, res: Response) => {
+  try {
+    const { name, gender, monthly_salary, branch_id } = req.body;
+    if (!name || !gender || !branch_id) {
+      return res.status(400).json({ error: 'Please provide all required fields' });
+    }
+
+    await model.createManagerByAdmin(String(name), String(gender), Number(monthly_salary || 0), Number(branch_id));
+    return res.status(201).json({ message: 'Branch manager added successfully' });
+  } catch (error) {
+    console.error('Error adding branch manager by admin:', error);
+    return res.status(500).json({ error: 'Failed to add branch manager' });
+  }
+};
+
 export const updateBranchManager = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -47,5 +62,45 @@ export const updateBranchManager = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error in updateBranchManager handler:", error);
     res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const getAvailableManagerCandidatesHandler = async (req: Request, res: Response) => {
+  try {
+    const candidates = await model.getAvailableManagerCandidates();
+    res.status(200).json({ candidate_count: candidates.length, candidates });
+  } catch (error) {
+    console.error('Error in getAvailableManagerCandidatesHandler:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+export const getBranchesWithoutManagerHandler = async (req: Request, res: Response) => {
+  try {
+    const branches = await model.getBranchesWithoutManager();
+    res.status(200).json({ branch_count: branches.length, branches });
+  } catch (error) {
+    console.error('Error in getBranchesWithoutManagerHandler:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+export const assignManagerToBranchHandler = async (req: Request, res: Response) => {
+  try {
+    const { manager_id, branch_id, fullname, monthly_salary, gender } = req.body;
+    if (!manager_id || !branch_id || !fullname) {
+      return res.status(400).json({ error: 'manager_id, branch_id and fullname are required' });
+    }
+
+    // create branch manager entry
+    await model.createManager(Number(manager_id), String(fullname), Number(monthly_salary || 0), String(gender || ''));
+
+    // update user's branch_id
+    await model.assignUserToBranch(Number(manager_id), Number(branch_id));
+
+    res.status(201).json({ message: 'Manager assigned to branch successfully' });
+  } catch (error) {
+    console.error('Error in assignManagerToBranchHandler:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 };

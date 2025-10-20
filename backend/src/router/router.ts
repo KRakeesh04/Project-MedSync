@@ -32,11 +32,10 @@ import {
 } from "../handlers/billing_invoice.handler.ts";
 import { getDoctorsPatientsOverviewHandler } from "../handlers/doctorPatients.handler.ts";
 import { getFullPatientDetailsHandler } from "../handlers/patientFull.handler.ts";
-import { getAllBranchManagers, createBranchManager, updateBranchManager } from "../handlers/branch_manager.handler.ts";
+import { getAllBranchManagers, createBranchManager, updateBranchManager, addNewBranchManager, getBranchesWithoutManagerHandler } from "../handlers/branch_manager.handler.ts";
 
 
 import {  getAppointmentsByDoctorIdCountHandler, getAppointmentsByDoctorIdHandler, getAppointmentsbyPatientIdHandler, getAppointmentsCountByMonthHandler, getDoctorsAppointmentsForPagination } from "../handlers/appointment.handler.ts";
-import { getPatientsCount } from "../models/patient.model.ts";
 import { getMonthlyRevenueHandler } from "../handlers/billingpayment.handlers.ts";
 
 export const HttpMethod = {
@@ -126,12 +125,12 @@ var routes: Route[] = [
 	{ path: "/logs", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getLogsForPagination },
 
 	//treatments router
-	{ path: "/treatments", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllTreatmentsHandler },
+	{ path: "/treatments", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getTreatmentsHandler },
 	{ path: "/treatments/check-service-code", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: checkServiceCodeHandler },
 	{ path: "/treatments", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: createTreatmentHandler },
 
 	//medical history router
-	{ path: "/medical-histories", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getMedicalHistoryHandler },
+	{ path: "/medical-histories", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getMedicalHistoriesHandler },
 	{ path: "/medical-histories/:patientId", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getMedicalHistoriesByPatientHandler },
 	//medication router
 	{ path: "/medications", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getMedicationsHandler },
@@ -162,10 +161,12 @@ var routes: Route[] = [
 	{ path: "/branch-managers", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllBranchManagers },
 	{ path: "/branch-managers", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: createBranchManager },
 	{ path: "/branch-managers/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: updateBranchManager },
-	
+	{ path: "/branches/without-manager", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getBranchesWithoutManagerHandler },
+	{ path: "/branch-managers/add", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: addNewBranchManager },
 	
 	//billing and payment router
-	{ path: "/billing/monthly-revenue", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getMonthlyRevenueHandler }
+	{ path: "/billing/monthly-revenue", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getMonthlyRevenueHandler },
+	
 ];
 
 

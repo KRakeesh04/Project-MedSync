@@ -9,7 +9,11 @@ import { getAllBranches } from "../../services/branchServices";
 import { LOCAL_STORAGE__USER, LOCAL_STORAGE__ROLE } from "@/services/authServices";
 import { Navigate } from "react-router-dom";
 import ViewBranchManager from "./manager-view";
-import { getAllManagers, type BranchManager } from "@/services/managerServices";
+import { getAllManagers } from "@/services/managerServices";
+import type { BranchManager } from "@/services/managerServices";
+import { getBranchesWithoutManager, addBranchManager } from "@/services/managerServices";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { useRef } from 'react';
 
 const BranchManagerPage: React.FC = () => {
   const [manager, setManager] = useState<Array<BranchManager>>([]);
@@ -19,6 +23,11 @@ const BranchManagerPage: React.FC = () => {
   const [branches, setBranches] = useState<{ value: string; label: string }[]>([]);
   const [selectedBranch, setSelectedBranch] = useState("All");
   const [errorCode, setErrorCode] = useState<number | null>(null);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [availableBranchesForCreate, setAvailableBranchesForCreate] = useState<Array<{ branch_id: number; name: string }>>([]);
+  const [createForm, setCreateForm] = useState({ name: '', gender: '', monthly_salary: '' });
+  const [selectedCreateBranch, setSelectedCreateBranch] = useState<number | null>(null);
+  const createDataFetchedRef = useRef(false);
   const user = localStorage.getItem(LOCAL_STORAGE__USER)
   const role = localStorage.getItem(LOCAL_STORAGE__ROLE) || "";
   const isSuperAdmin = role === Role.SUPER_ADMIN;
@@ -59,6 +68,14 @@ const BranchManagerPage: React.FC = () => {
     }
   }, [selectedBranch]);
 
+  function nameFormatToUsername(name: string) {
+    return name
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, "")
+      .replace(/\s+/g, "_");
+  }
+
   useEffect(() => {
     const fetchBranches = async () => {
       try {
@@ -73,7 +90,22 @@ const BranchManagerPage: React.FC = () => {
       }
     };
 
+    const fetchCreateData = async () => {
+      try {
+        if (createDataFetchedRef.current) return;
+        const brRes = await getBranchesWithoutManager();
+        const branchesRaw: Array<{ branch_id: number; name: string; location?: string }> = brRes.branches || [];
+        // deduplicate by branch_id in case of accidental duplicates
+        const unique = Array.from(new Map(branchesRaw.map((b) => [b.branch_id, b])).values()) as { branch_id: number; name: string; location?: string }[];
+        setAvailableBranchesForCreate(unique);
+        createDataFetchedRef.current = true;
+      } catch (err) {
+        console.error('Failed to load branches for create', err);
+      }
+    };
+
     fetchBranches();
+    fetchCreateData();
   }, []);
 
   useEffect(() => {
@@ -91,10 +123,88 @@ const BranchManagerPage: React.FC = () => {
           setSelectedManager(null);
         }}
       />
-
       <div>
         <h2 className="text-lg font-medium">All Branch Managers</h2>
         <p className="text-sm text-muted-foreground">{managerCount} items</p>
+      </div>
+
+      <div className="flex items-center justify-end">
+        <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-blue-600 hover:bg-blue-700">New Branch Manager</Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[520px]">
+            <DialogHeader>
+                <DialogTitle>New Branch Manager</DialogTitle>
+                <div className="text-sm text-muted-foreground mt-1">
+                  <div>Default credentials (preview):</div>
+                  <div className="mt-1 font-mono text-xs">username: {createForm.name ? nameFormatToUsername(createForm.name) : '<name_here>'}</div>
+                  <div className="font-mono text-xs">password: {createForm.name ? `${nameFormatToUsername(createForm.name)}_password` : '<name_here>_password'}</div>
+                </div>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="bm-name">Full Name</Label>
+                <input id="bm-name" className="w-full rounded border px-3 py-2" value={createForm.name} onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })} />
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="bm-gender">Gender</Label>
+                  <Select onValueChange={(val) => setCreateForm({ ...createForm, gender: val })}>
+                    <SelectTrigger id="bm-gender" className="w-full">
+                      <SelectValue placeholder="Select gender" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Male">Male</SelectItem>
+                      <SelectItem value="Female">Female</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="bm-branch">Branch</Label>
+                  <Select onValueChange={(val) => setSelectedCreateBranch(Number(val))}>
+                    <SelectTrigger id="bm-branch" className="w-full">
+                      <SelectValue placeholder="Select branch (only branches without manager)" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-60">
+                      {availableBranchesForCreate.map(b => (
+                        <SelectItem key={b.branch_id} value={String(b.branch_id)}>{b.name} (#{b.branch_id})</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="bm-salary">Monthly Salary</Label>
+                <input id="bm-salary" type="number" className="w-full rounded border px-3 py-2" value={createForm.monthly_salary} onChange={(e) => setCreateForm({ ...createForm, monthly_salary: e.target.value })} />
+              </div>
+            </div>
+            <DialogFooter>
+              <div className="flex justify-end gap-2 w-full">
+                <Button variant="ghost" onClick={() => setCreateOpen(false)}>Cancel</Button>
+                <Button onClick={async () => {
+                  if (!createForm.name || !createForm.gender || !selectedCreateBranch) {
+                    toast.error('Please fill required fields');
+                    return;
+                  }
+                  try {
+                    await addBranchManager({ name: createForm.name, gender: createForm.gender, monthly_salary: Number(createForm.monthly_salary || 0), branch_id: Number(selectedCreateBranch) });
+                    toast.success('Branch manager created');
+                    setCreateOpen(false);
+                    setCreateForm({ name: '', gender: '', monthly_salary: '' });
+                    setSelectedCreateBranch(null);
+                    await fetchStaff();
+                  } catch (err) {
+                    toast.error('Failed to create branch manager');
+                  }
+                }}>Create</Button>
+              </div>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="grid gap-4 grid-cols-6 mb-4">
@@ -159,6 +269,7 @@ const BranchManagerPage: React.FC = () => {
       </div>
     </div>
   );
+
 };
 
 export default BranchManagerPage;
