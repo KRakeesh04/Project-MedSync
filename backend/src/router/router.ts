@@ -31,6 +31,8 @@ import {
 	getAllOutstandingBillsHandler
 } from "../handlers/billing_invoice.handler.ts";
 import { getAppointmentsbyPatientIdHandler } from "../handlers/appointment.handler.ts";
+import { getDoctorsPatientsOverviewHandler } from "../handlers/doctorPatients.handler.ts";
+import { getFullPatientDetailsHandler } from "../handlers/patientFull.handler.ts";
 
 
 export const HttpMethod = {
@@ -80,6 +82,8 @@ var routes: Route[] = [
 
 	//doctors router
 	{ path: "/doctors", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllDoctorsForPagination },
+	// Important: specific static routes must come before parameterized routes like /doctors/:id
+	{ path: "/doctors/patients-overview", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getDoctorsPatientsOverviewHandler },
 	{ path: "/doctors/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getDoctorDetailsByID },
 	{ path: "/doctors/add", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: addNewDoctor },
 	{ path: "/doctors/specialities", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllDoctorSpecialities },
@@ -100,6 +104,7 @@ var routes: Route[] = [
 
 	// patients router
 	{ path: "/patients", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getPatients },
+	{ path: "/patient/full/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getFullPatientDetailsHandler },
 	{ path: "/patient/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: updateCurrentPatientDetails },
 	{ path: "/patient/discharge/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: dischargePatientByID },
 	{ path: "/patient/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getPatientDetailsByID },

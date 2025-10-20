@@ -260,3 +260,28 @@ export const getAllDoctorPatientsHistory = async () => {
     throw "Unknown error occurred";
   }
 };
+
+export const getDoctorsPatientsOverview = async () => {
+  try {
+    const response = await axiosInstance.get<{
+      doctor_count: number;
+      doctors: Array<{
+        doctor_id: number;
+        name: string;
+        speciality?: string;
+        patientsCount: number;
+        lastVisit?: string
+      }>
+    }>(`/doctors/patients-overview`);
+    return response.data;
+  } catch (error: unknown) {
+    console.error("Error getting doctors patients overview:", error);
+    if (error instanceof AxiosError) {
+      if (error.response?.data?.error) {
+        throw error.response.data.error;
+      }
+      throw error.message;
+    }
+    throw "Unknown error occurred";
+  }
+};

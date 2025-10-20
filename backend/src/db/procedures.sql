@@ -118,6 +118,9 @@ DROP PROCEDURE IF EXISTS get_all_doctors_count;
 
 DROP PROCEDURE IF EXISTS get_doctor_by_id;
 
+-- Doctors-Patients Overview function
+DROP PROCEDURE IF EXISTS get_doctors_patients_overview;
+
 -- speciality model functions
 DROP PROCEDURE IF EXISTS create_speciality;
 
@@ -791,6 +794,41 @@ BEGIN
     FROM `user` u
     WHERE u.role = 'Doctor'
         AND (doc_branch = -1 OR u.branch_id = doc_branch);
+END$$
+
+-- Procedure to get doctors patients overview (used by backend model)
+CREATE PROCEDURE get_doctors_patients_overview()
+BEGIN
+    SELECT
+        d.doctor_id,
+        d.name,
+        (
+            SELECT GROUP_CONCAT(s.speciality_name SEPARATOR ', ')
+            FROM doctor_speciality ds
+            JOIN speciality s ON ds.speciality_id = s.speciality_id
+            WHERE ds.doctor_id = d.doctor_id
+        ) AS speciality,
+        COUNT(DISTINCT a.patient_id) AS patientsCount,
+        MAX(a.date) AS lastVisit,
+        (
+            SELECT p.name
+            FROM appointment a2
+            JOIN patient p ON a2.patient_id = p.patient_id
+            WHERE a2.doctor_id = d.doctor_id
+            ORDER BY a2.date DESC, a2.time_slot DESC
+            LIMIT 1
+        ) AS lastPatientName,
+        (
+            SELECT a3.patient_id
+            FROM appointment a3
+            WHERE a3.doctor_id = d.doctor_id
+            ORDER BY a3.date DESC, a3.time_slot DESC
+            LIMIT 1
+        ) AS lastPatientId
+    FROM doctor d
+    LEFT JOIN appointment a ON d.doctor_id = a.doctor_id
+    GROUP BY d.doctor_id, d.name
+    ORDER BY patientsCount DESC, d.name ASC;
 END$$
 
 -- Speciality model functions
