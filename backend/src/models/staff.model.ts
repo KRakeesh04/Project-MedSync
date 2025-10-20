@@ -84,3 +84,12 @@ export const getStaffCount = async (
   }
 };
 
+export const getTotalStaffsCount = async (): Promise<Number> => {
+  try {
+    const [rows]: any = await sql.query("CALL get_total_staffs_count()");
+    return rows[0][0].staff_count;
+  } catch (error) {
+    console.error("Error fetching total count of staffs:", error);
+    throw error;
+  } 
+};

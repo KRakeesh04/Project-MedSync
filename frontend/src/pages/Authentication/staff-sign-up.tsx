@@ -16,6 +16,7 @@ import { getAllBranches } from "@/services/branchServices"
 import { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import toast from "@/lib/toast"
+import { isValidEmail } from "@/services/utils"
 
 export const Roles = [
   {
@@ -151,6 +152,9 @@ const StaffSignUp: React.FC = () => {
       selectedBranch === ""
     ) {
       toast.warning("Please fill all the required details");
+      setLoading(false);
+    } else if (isValidEmail(email) === false && email !== "") {
+      toast.warning("Invalid email format");
       setLoading(false);
     } else if (password !== confirmPassword) {
       toast.error("Passwords do not match")

@@ -125,6 +125,16 @@ export const getDoctorById = async (doctor_id: number): Promise<Doctor> => {
   }
 };
 
+export const getAllDoctorsNames = async (): Promise<{ doctor_id: number; name: string }[]> => {
+  try {
+    const [rows] = await sql.query("SELECT doctor_id, name FROM doctor ORDER BY name");
+    return (rows as any) as { doctor_id: number; name: string }[];
+  } catch (error) {
+    console.error("Error fetching doctor names:", error);
+    throw error;
+  }
+};
+
 export const updateDoctorById = async (
   doctor_id: number,
   fullname: string,

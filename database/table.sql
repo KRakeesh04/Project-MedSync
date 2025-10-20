@@ -1,3 +1,4 @@
+-- Active: 1755111596628@@127.0.0.1@3306@Project-MedSync
 -- USE `Project-MedSync`;
 
 -- child → parent drop order
@@ -162,11 +163,12 @@ CREATE TABLE `insurance` (
 );
 
 CREATE TABLE `treatment_catelogue` (
-  `service_code` int,
+  `service_code` int AUTO_INCREMENT,
   `name` varchar(50),
   `fee` numeric(8,2),
   `description` varchar(255),
   `speciality_id` int,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`service_code`),
   FOREIGN KEY (`speciality_id`)
       REFERENCES `speciality`(`speciality_id`)
@@ -220,21 +222,19 @@ CREATE TABLE `billing_invoice` (
     REFERENCES `appointment`(`appointment_id`)
 );
 
-CREATE TABLE `billing_payment` (
-  `payment_id` int,
-  `invoice_id` int,
-  `branch_id` int,
-  `paid_amount` numeric(8,2),
-  `time_stamp` timestamp,
-  `cashier_id` int,
-  PRIMARY KEY (`payment_id`),
-  FOREIGN KEY (`branch_id`)
-      REFERENCES `branch`(`branch_id`),
-  FOREIGN KEY (`invoice_id`)
-      REFERENCES `billing_invoice`(`appointment_id`),
-  FOREIGN KEY (`cashier_id`)
-      REFERENCES `staff`(`staff_id`)
-);
+CREATE TABLE billing_payment (
+  payment_id INT AUTO_INCREMENT,
+  invoice_id INT,
+  branch_id INT,
+  paid_amount NUMERIC(8,2),
+  time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  cashier_id INT,
+  PRIMARY KEY (payment_id),
+  FOREIGN KEY (branch_id) REFERENCES branch(branch_id),
+  FOREIGN KEY (invoice_id) REFERENCES billing_invoice(appointment_id),
+  FOREIGN KEY (cashier_id) REFERENCES staff(staff_id)
+) AUTO_INCREMENT = 1;
+
 
 CREATE TABLE `prescription` (
   `appointment_id` int,

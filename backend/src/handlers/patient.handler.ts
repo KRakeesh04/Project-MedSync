@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
-import { createPatient, dischargePatient, getAllPatients, getPatientByID, getPatientsCount, UpdatePatientByID, type Patient } from "../models/patient.model.ts";
+import { createPatient, dischargePatient, getAllPatients, getPatientByID, getPatientsCount, getPatientsCountPerBranch, getTotalPatientsCount, UpdatePatientByID, type Patient } from "../models/patient.model.ts";
+import e from "express";
 
 
 // export const createNewPatient = async (req: Request, res: Response) => {
@@ -74,8 +75,10 @@ export const getPatients = async (req: Request, res: Response) => {
       res.status(404).json({ error: "Patients not found" });
       return;
     }
+
+    const isExPatientBool = Boolean(parseInt(String(isExPatient)));
     const patient_count: Number = await getPatientsCount(
-      Boolean(isExPatient),
+      isExPatientBool,
       String(branch),
       String(bloodGroup),
       String(gender)
@@ -93,4 +96,39 @@ export const getPatients = async (req: Request, res: Response) => {
     console.log("Error in getPatients handler: ", error)
     res.status(500).json({ error: "Internal Server Error" });
   };
+};
+
+export const getPatientDetailsByID = async (req: Request, res: Response) => {
+  let { id } = req.params;
+  try {
+    const patient = await getPatientByID(Number(id));
+    if (!patient) {
+      res.status(404).json({ error: "Patient not found" });
+      return;
+    }
+    res.status(200).json({ patient });
+  } catch (error) {
+    console.error("Error in getPatientDetailsByID handler:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const fetchTotalPatientsCount = async (req: Request, res: Response) => {
+  try {
+    const total_count: Number = await getTotalPatientsCount();
+    res.status(200).json({ total_count });
+  } catch (error) {
+    console.error("Error in getTotalPatientsCount handler:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const getPatientsCountPerBranchHandler = async (req: Request, res: Response) => {
+  try {
+    const counts = await getPatientsCountPerBranch();
+    res.status(200).json({ counts });
+  } catch (error) {
+    console.error("Error in getPatientsCountPerBranchHandler:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 };
