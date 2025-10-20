@@ -45,6 +45,8 @@ import BranchManagerPage from './pages/managers/manager';
 import MakePayment from './pages/billing/make_payment';
 import AllInvoices from './pages/billing/invoice_details';
 import OutstandingInvoices from './pages/billing/outstanding_balances';
+import InsuranceTypesPage from './pages/insurance/insurancetypes';
+import InsuranceHistory from './pages/insurance/insuranceHistory';
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -368,6 +370,26 @@ function App() {
                     <>
                       <PageTitle title="Outstanding Balances | MedSync" />
                       <OutstandingInvoices />
+                    </>
+                  }
+                />
+
+                <Route
+                  path="/insurance-types"
+                  element={
+                    <>
+                      <PageTitle title="Insurance Types | MedSync" />
+                      <InsuranceTypesPage />
+                    </>
+                  }
+                />
+
+                <Route
+                  path="/insurance-history"
+                  element={
+                    <>
+                      <PageTitle title="Insurance Claim History | MedSync" />
+                      <InsuranceHistory />
                     </>
                   }
                 />
