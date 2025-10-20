@@ -224,6 +224,12 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
       },
       {
         type: "child",
+        title: "Patient Details",
+        url: "/patients/full",
+        icon: IdCardLanyard,
+      },
+      {
+        type: "child",
         title: "Treatments details",
         url: "/patients/treatment",
         icon: FileClock,
@@ -286,6 +292,14 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
     icon: Stethoscope,
     hideIf: (role) => typeof role !== "string",
     children: [
+      {
+        type: "child",
+        title: "Doctors Overview",
+        url: "/doctors-patients-history",
+        icon: FileUser,
+        // hideIf: (role) => typeof role !== "string" ||
+        //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+      },
       {
         type: "child",
         title: "Add Doctor",

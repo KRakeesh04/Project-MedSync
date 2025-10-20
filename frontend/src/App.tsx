@@ -26,6 +26,7 @@ import Home from './pages/Home';
 import MedicalHistory from './pages/patients/medicalhistory/medicalhistory';
 import Treatments from './pages/patients/treatment/treatment';
 import Medications from './pages/patients/medication/medication';
+import PatientFullDetails from './pages/patients/patientFullDetails';
 
 import { useNavigate } from "react-router-dom";
 import {
@@ -248,7 +249,7 @@ function App() {
                   path="/doctors-patients-history"
                   element={
                     <>
-                      <PageTitle title="Patients' history | MedSync" />
+                      <PageTitle title="Doctors-Patients Overview | MedSync" />
                       <DoctorsPatientsHistory />
                     </>
                   }
@@ -323,6 +324,15 @@ function App() {
                   }
                 />
 
+                <Route
+                  path="/patients/full"
+                  element={
+                    <>
+                      <PageTitle title="Patient Details | MedSync" />
+                      <PatientFullDetails />
+                    </>
+                  }
+                />
 
                 <Route
                   path="/patients/medication"
