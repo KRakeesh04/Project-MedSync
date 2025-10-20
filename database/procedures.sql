@@ -72,6 +72,8 @@ DROP PROCEDURE IF EXISTS get_branch_manager_by_branch_id;
 
 DROP PROCEDURE IF EXISTS get_all_branch_manager;
 
+DROP PROCEDURE IF EXISTS get_all_branch_managers;
+
 -- Branch model functions
 DROP PROCEDURE IF EXISTS create_branch;
 
@@ -86,6 +88,23 @@ DROP PROCEDURE IF EXISTS get_all_branch;
 DROP PROCEDURE IF EXISTS get_branch_for_pagination;
 
 DROP PROCEDURE IF EXISTS get_all_branch_count;
+
+-- Insurance model functions
+DROP PROCEDURE IF EXISTS create_insurance_type;
+
+DROP PROCEDURE IF EXISTS update_insurance_type;
+
+DROP PROCEDURE IF EXISTS get_insurance_type_by_id;
+
+DROP PROCEDURE IF EXISTS get_all_insurance_types;
+
+DROP PROCEDURE IF EXISTS get_insurance_type_count;
+
+DROP PROCEDURE IF EXISTS get_insurance_types_for_pagination;
+
+-- Insurance history model functions
+
+DROP PROCEDURE IF EXISTS get_all_insurance_histories;
 
 -- User_Contact model functions
 DROP PROCEDURE IF EXISTS create_user_contact;
@@ -199,6 +218,23 @@ DROP PROCEDURE IF EXISTS get_billing_payments_by_invoice_id;
 
 DROP PROCEDURE IF EXISTS get_all_billing_payments;
 
+DROP PROCEDURE IF EXISTS get_monthly_revenue;
+
+DROP PROCEDURE IF EXISTS patients_count_per_branch;
+
+DROP PROCEDURE IF EXISTS get_doctors_appointments;
+
+DROP PROCEDURE IF EXISTS get_appointments_count;
+
+DROP PROCEDURE IF EXISTS get_appointments_by_doctor_id;
+
+DROP PROCEDURE IF EXISTS get_appointments_by_doctor_id_count;
+
+-- dashboard functions
+DROP PROCEDURE IF EXISTS get_total_patients_count;
+
+DROP PROCEDURE IF EXISTS get_total_staffs_count;
+
 DELIMITER $$
 
 -- User model functions
@@ -221,7 +257,7 @@ END$$
 CREATE PROCEDURE update_user(
     IN p_id INT,
     IN p_username VARCHAR(20),
-    IN p_password_hash VARCHAR(50),
+    IN p_password_hash VARCHAR(255),
     IN p_role ENUM('Super_Admin','Branch_Manager','Doctor','Admin_Staff','Nurse','Receptionist','Billing_Staff','Insurance_Agent','Patient'),
     IN p_branch_id INT,
     IN p_is_approved TINYINT(1)
@@ -572,6 +608,21 @@ BEGIN
     WHERE u.branch_id = p_branch_id;
 END$$
 
+CREATE PROCEDURE get_all_branch_managers()
+BEGIN
+    SELECT
+        b.manager_id,
+        b.name,
+        b.monthly_salary,
+        b.gender,
+        u.branch_id,
+        br.name AS branch_name
+    FROM `branch_manager` b
+    LEFT JOIN `user` u ON u.user_id = b.manager_id
+    LEFT JOIN `branch` br ON br.branch_id = u.branch_id
+    ORDER BY b.manager_id;
+END$$
+
 CREATE PROCEDURE get_all_branch_manager(IN staff_count INT, IN count_start INT)
 BEGIN
     SELECT b.manager_id, b.name, b.monthly_salary, b.gender
@@ -642,6 +693,73 @@ END$$
 CREATE PROCEDURE delete_branch(IN p_id INT)
 BEGIN
     DELETE FROM `branch` WHERE branch_id = p_id;
+END$$
+
+-- insurance type model functions
+CREATE PROCEDURE create_insurance_type(
+    IN p_insurance_type VARCHAR(50),
+    IN p_insurance_period INT,
+    IN p_claim_percentage DECIMAL(5,2)
+)
+BEGIN
+    INSERT INTO `insurance` (insurance_type, insurance_period, claim_percentage)
+    VALUES (p_insurance_type, p_insurance_period, p_claim_percentage);
+END$$
+
+CREATE PROCEDURE update_insurance_type(
+    IN p_insurance_type_id INT,
+    IN p_insurance_type VARCHAR(50),
+    IN p_insurance_period INT,
+    IN p_claim_percentage DECIMAL(5,2)
+)
+BEGIN
+    UPDATE `insurance`
+    SET insurance_type = p_insurance_type,
+        insurance_period = p_insurance_period,
+        claim_percentage = p_claim_percentage
+    WHERE insurance_id = p_insurance_type_id;
+END$$
+
+CREATE PROCEDURE get_insurance_type_by_id(
+    IN p_insurance_type_id INT,
+    OUT p_insurance_type VARCHAR(50),
+    OUT p_insurance_period INT,
+    OUT p_claim_percentage DECIMAL(5,2)
+)
+BEGIN
+    SELECT insurance_type, insurance_period, claim_percentage
+    FROM `insurance`
+    WHERE insurance_id = p_insurance_type_id;
+END$$
+
+CREATE PROCEDURE get_all_insurance_types()
+BEGIN
+    SELECT insurance_id,insurance_type, insurance_period, claim_percentage,created_at
+    FROM `insurance`
+    ORDER BY insurance_id;
+END$$
+
+CREATE PROCEDURE get_insurance_type_count()
+BEGIN
+    SELECT COUNT(insurance_id) AS insurance_count
+    FROM `insurance`;
+END$$
+
+CREATE PROCEDURE get_insurance_types_for_pagination(
+    IN insurance_count INT,
+     IN count_start INT)
+BEGIN
+    SELECT insurance_id,insurance_type, insurance_period, claim_percentage,created_at
+    FROM `insurance`
+    ORDER BY insurance_id
+    LIMIT insurance_count OFFSET count_start;
+END$$
+
+-- insurance history modelfunction
+
+CREATE PROCEDURE get_all_insurance_histories()
+BEGIN
+    SELECT * FROM `insurance_claim`;
 END$$
 
 -- user contact model functions
@@ -1207,5 +1325,137 @@ CREATE PROCEDURE get_all_billing_payments()
 BEGIN
     SELECT * FROM `billing_payment`;
 END$$
+
+-- get total patients count
+CREATE PROCEDURE get_total_patients_count()
+BEGIN
+    SELECT COUNT(*) AS total_count FROM patient;
+END$$
+
+-- get total staff count
+CREATE PROCEDURE get_total_staffs_count()
+BEGIN
+    SELECT COUNT(*) AS staffs_count FROM staff;
+END$$
+
+-- proc for getting appointments based on month
+DROP PROCEDURE IF EXISTS get_monthly_appointment_counts;
+
+CREATE PROCEDURE get_monthly_appointment_counts(
+  IN in_start DATE,                 -- e.g. '2025-01-01'
+  IN in_end   DATE,                 -- e.g. '2025-12-31'
+  IN in_status VARCHAR(50)          -- NULL to ignore, or 'Completed'
+)
+BEGIN
+  -- Normalize to month starts
+  SET in_start = DATE_FORMAT(in_start, '%Y-%m-01');
+  SET in_end   = DATE_FORMAT(in_end,   '%Y-%m-01');
+
+  WITH RECURSIVE months AS (
+    SELECT in_start AS month_start
+    UNION ALL
+    SELECT DATE_ADD(month_start, INTERVAL 1 MONTH)
+    FROM months
+    WHERE month_start < in_end
+  ),
+  agg AS (
+    SELECT
+      DATE_FORMAT(`date`, '%Y-%m-01') AS month_start,
+      COUNT(*) AS cnt
+    FROM appointment
+    WHERE `date` >= in_start
+      AND `date` < DATE_ADD(in_end, INTERVAL 1 MONTH)  -- inclusive end month
+      AND (in_status IS NULL OR status = in_status)
+    GROUP BY month_start
+  )
+  SELECT
+    DATE_FORMAT(m.month_start, '%Y-%m') AS month,
+    COALESCE(a.cnt, 0) AS count
+    FROM months m
+    LEFT JOIN agg a USING (month_start)
+    ORDER BY m.month_start;
+    END$$
+
+-- proc for getiing monthy revenue
+CREATE PROCEDURE get_monthly_revenue(
+  IN in_start DATE,                 -- e.g. '2025-01-01'
+  IN in_end   DATE                  -- e.g. '2025-12-31'
+)
+BEGIN
+  -- Normalize to month starts
+  SET in_start = DATE_FORMAT(in_start, '%Y-%m-01');
+  SET in_end   = DATE_FORMAT(in_end,   '%Y-%m-01');
+
+  WITH RECURSIVE months AS (
+  SELECT DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 12 MONTH), '%Y-%m-01') AS month_start
+  UNION ALL
+  SELECT DATE_FORMAT(DATE_ADD(month_start, INTERVAL 1 MONTH), '%Y-%m-01')
+  FROM months
+  WHERE month_start < DATE_FORMAT(CURDATE(), '%Y-%m-01')
+),
+agg AS (
+  SELECT DATE_FORMAT(`time_stamp`, '%Y-%m-01') AS month_start, sum(paid_amount) AS rev
+  FROM billing_payment
+  --   AND `date` >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
+  GROUP BY DATE_FORMAT(`time_stamp`, '%Y-%m-01')
+)
+SELECT
+  DATE_FORMAT(m.month_start, '%Y-%m') AS month,
+  COALESCE(a.rev, 0) AS revenue
+    FROM months m
+    LEFT JOIN agg a USING (month_start)
+    ORDER BY m.month_start;
+
+END$$
+
+-- proC FOR patients count per branch
+CREATE PROCEDURE patients_count_per_branch()
+
+    BEGIN
+    SELECT b.name AS branch, COUNT(u.user_id) AS total_patients
+    FROM user AS u
+    JOIN branch AS b ON u.branch_id = b.branch_id
+    WHERE u.role = 'Patient'
+    GROUP BY b.name;
+
+END$$
+
+-- doctors  appointment
+CREATE PROCEDURE get_doctors_appointments(IN appt_count INT,
+    IN count_start INT)
+
+BEGIN
+	SELECT d.name, a.appointment_id, a.doctor_id, a.date, a.time_slot, a.status
+    from appointment as a natural join doctor as d
+    where a.doctor_id =  d.doctor_id
+    order by a.date desc
+    limit appt_count OFFSET count_start;
+END$$
+
+-- proc for getting doctors appointments count
+CREATE PROCEDURE get_appointments_count()
+
+BEGIN
+	SELECT count(*) AS total_count
+    from appointment ;
+    
+END$$
+
+-- proc for getting doctors appointments by doctor id
+create procedure get_appointments_by_doctor_id( IN p_id INT)
+begin 
+	select appointment_id,patient.name, patient_note, date, time_slot, status, count(*) as total from
+	doctor natural join appointment join patient on appointment.patient_id = patient.patient_id
+	where doctor.doctor_id=p_id and doctor.doctor_id = appointment.doctor_id;
+end $$
+
+-- proc for getting doctors appointments by doctor id count
+create procedure get_appointments_by_doctor_id_count( IN p_id INT)
+begin 
+	   SELECT COUNT(*) AS total_appointments
+  FROM appointment
+  WHERE doctor_id = p_id;
+
+end $$
 
 DELIMITER;

@@ -1,4 +1,4 @@
--- Active: 1760580896901@@127.0.0.1@3306@project-medsync
+-- Active: 1755111596628@@127.0.0.1@3306@Project-MedSync
 -- use `Project-MedSync`;
 -- User model functions
 DROP PROCEDURE IF EXISTS create_user;
@@ -218,24 +218,21 @@ DROP PROCEDURE IF EXISTS get_billing_payments_by_invoice_id;
 
 DROP PROCEDURE IF EXISTS get_all_billing_payments;
 
--- Drop procedure for monthly revenue
 DROP PROCEDURE IF EXISTS get_monthly_revenue;
 
--- Drop procedure for patients count per branch
 DROP PROCEDURE IF EXISTS patients_count_per_branch;
 
--- Drop procedure for doctors appointments (paginated)
 DROP PROCEDURE IF EXISTS get_doctors_appointments;
 
--- Drop procedure for total appointments count (all doctors)
 DROP PROCEDURE IF EXISTS get_appointments_count;
 
--- Drop procedure for appointments by doctor id
 DROP PROCEDURE IF EXISTS get_appointments_by_doctor_id;
-
--- Drop procedure for appointments by doctor id count
 DROP PROCEDURE IF EXISTS get_appointments_by_doctor_id_count;
 
+-- dashboard functions
+DROP PROCEDURE IF EXISTS get_total_patients_count; 
+
+DROP PROCEDURE IF EXISTS get_total_staffs_count;
 
 DELIMITER $$
 
@@ -1332,13 +1329,13 @@ END$$
 -- get total patients count
 CREATE PROCEDURE get_total_patients_count()
 BEGIN
-    SELECT COUNT(*) INTO total_count FROM patient;
+    SELECT COUNT(*) AS total_count FROM patient;
 END$$
 
 -- get total staff count
 CREATE PROCEDURE get_total_staffs_count()
 BEGIN
-    SELECT COUNT(*) INTO staffs_count FROM staff;
+    SELECT COUNT(*) AS staffs_count FROM staff;
 END$$
 
 

@@ -70,9 +70,9 @@ const InsuranceTypesPage: React.FC = () => {
           Claim Percentage
         </Button>
       ),
-      cell: ({ row }) => `${Number(row.original.claim_percentage).toFixed(2)}%`,
-    },
-    {
+      cell: ({ row }) => `${(Number(row.original.claim_percentage) * 100).toFixed(1)} %`,
+        },
+        {
       accessorKey: "created_at",
       header: ({ column }) => (
         <Button
