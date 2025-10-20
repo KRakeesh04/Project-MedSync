@@ -139,7 +139,7 @@ const Treatments: React.FC = () => {
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold">Treatments</h1>
         <div>
-          <Button onClick={() => setIsAddOpen(true)}>+ Add Treatment</Button>
+          <Button className="bg-blue-600 hover:bg-blue-700" onClick={() => setIsAddOpen(true)}>+ Add Treatment</Button>
         </div>
       </div>
 
