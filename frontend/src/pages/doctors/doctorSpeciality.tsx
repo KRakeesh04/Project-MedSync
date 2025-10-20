@@ -9,6 +9,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from '@/components/ui/label';
 
 import { getDoctorsWithSpecialities, getAllDoctorNames, assignSpecialityToDoctor } from '@/services/doctorServices';
 import { getAllSpecialities } from '@/services/specialityServices';
@@ -320,17 +321,21 @@ const DoctorSpeciality: React.FC = () => {
             </DialogHeader>
 
             <div className="mt-4">
-              <label className="block text-sm mb-2">Select Speciality</label>
-              <select
-                className="w-full rounded border px-3 py-2"
-                value={selectedAssignSpeciality ?? ''}
-                onChange={(e) => setSelectedAssignSpeciality(Number(e.target.value) || null)}
+              <Label className="mb-2">Select Speciality</Label>
+              <Select
+                value={selectedAssignSpeciality ? String(selectedAssignSpeciality) : ''}
+                onValueChange={(val) => setSelectedAssignSpeciality(val ? Number(val) : null)}
               >
-                <option value="">-- select --</option>
-                {availableSpecialities.map((s) => (
-                  <option key={s.speciality_id} value={s.speciality_id}>{s.speciality_name}</option>
-                ))}
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="-- select --" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">-- select --</SelectItem>
+                  {availableSpecialities.map((s) => (
+                    <SelectItem key={s.speciality_id} value={String(s.speciality_id)}>{s.speciality_name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <DialogFooter className="mt-4">
@@ -351,23 +356,37 @@ const DoctorSpeciality: React.FC = () => {
 
             <div className="mt-4 space-y-3">
               <div>
-                <label className="block text-sm mb-1">Select Doctor</label>
-                <select className="w-full rounded border px-3 py-2" value={selectedAssignDoctorId ?? ''} onChange={(e) => setSelectedAssignDoctorId(Number(e.target.value) || null)}>
-                  <option value="">-- select doctor --</option>
-                  {availableDoctorNames.map(d => (
-                    <option key={d.doctor_id} value={d.doctor_id}>{d.name}</option>
-                  ))}
-                </select>
+                <Label className="block text-sm mb-1">Select Doctor</Label>
+                <Select
+                  value={selectedAssignDoctorId ? String(selectedAssignDoctorId) : ''}
+                  onValueChange={(val) => setSelectedAssignDoctorId(val ? Number(val) : null)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select doctor" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableDoctorNames.map(d => (
+                      <SelectItem key={d.doctor_id} value={String(d.doctor_id)}>{d.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>
-                <label className="block text-sm mb-1">Select Speciality</label>
-                <select className="w-full rounded border px-3 py-2" value={selectedAssignSpeciality ?? ''} onChange={(e) => setSelectedAssignSpeciality(Number(e.target.value) || null)}>
-                  <option value="">-- select speciality --</option>
-                  {availableSpecialities.map(s => (
-                    <option key={s.speciality_id} value={s.speciality_id}>{s.speciality_name}</option>
-                  ))}
-                </select>
+                <Label className="block text-sm mb-1">Select Speciality</Label>
+                <Select
+                  value={selectedAssignSpeciality ? String(selectedAssignSpeciality) : ''}
+                  onValueChange={(val) => setSelectedAssignSpeciality(val ? Number(val) : null)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select speciality" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableSpecialities.map(s => (
+                      <SelectItem key={s.speciality_id} value={String(s.speciality_id)}>{s.speciality_name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
