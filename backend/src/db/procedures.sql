@@ -201,6 +201,25 @@ DROP PROCEDURE IF EXISTS get_billing_payments_by_invoice_id;
 
 DROP PROCEDURE IF EXISTS get_all_billing_payments;
 
+-- Drop procedure for monthly revenue
+DROP PROCEDURE IF EXISTS get_monthly_revenue;
+
+-- Drop procedure for patients count per branch
+DROP PROCEDURE IF EXISTS patients_count_per_branch;
+
+-- Drop procedure for doctors appointments (paginated)
+DROP PROCEDURE IF EXISTS get_doctors_appointments;
+
+-- Drop procedure for total appointments count (all doctors)
+DROP PROCEDURE IF EXISTS get_appointments_count;
+
+-- Drop procedure for appointments by doctor id
+DROP PROCEDURE IF EXISTS get_appointments_by_doctor_id;
+
+-- Drop procedure for appointments by doctor id count
+DROP PROCEDURE IF EXISTS get_appointments_by_doctor_id_count;
+
+
 DELIMITER $$
 
 -- User model functions
@@ -223,7 +242,7 @@ END$$
 CREATE PROCEDURE update_user(
     IN p_id INT,
     IN p_username VARCHAR(20),
-    IN p_password_hash VARCHAR(50),
+    IN p_password_hash VARCHAR(255),
     IN p_role ENUM('Super_Admin','Branch_Manager','Doctor','Admin_Staff','Nurse','Receptionist','Billing_Staff','Insurance_Agent','Patient'),
     IN p_branch_id INT,
     IN p_is_approved TINYINT(1)
@@ -1225,4 +1244,140 @@ BEGIN
     SELECT * FROM `billing_payment`;
 END$$
 
-DELIMITER;
+-- get total patients count
+CREATE PROCEDURE get_total_patients_count()
+BEGIN
+    SELECT COUNT(*) INTO total_count FROM patient;
+END$$
+
+-- get total staff count
+CREATE PROCEDURE get_total_staffs_count()
+BEGIN
+    SELECT COUNT(*) INTO staffs_count FROM staff;
+END$$
+
+
+-- proc for getting appointments based on month
+DROP PROCEDURE IF EXISTS get_monthly_appointment_counts;
+
+
+CREATE PROCEDURE get_monthly_appointment_counts(
+  IN in_start DATE,                 -- e.g. '2025-01-01'
+  IN in_end   DATE,                 -- e.g. '2025-12-31'
+  IN in_status VARCHAR(50)          -- NULL to ignore, or 'Completed'
+)
+BEGIN
+  -- Normalize to month starts
+  SET in_start = DATE_FORMAT(in_start, '%Y-%m-01');
+  SET in_end   = DATE_FORMAT(in_end,   '%Y-%m-01');
+
+  WITH RECURSIVE months AS (
+    SELECT in_start AS month_start
+    UNION ALL
+    SELECT DATE_ADD(month_start, INTERVAL 1 MONTH)
+    FROM months
+    WHERE month_start < in_end
+  ),
+  agg AS (
+    SELECT
+      DATE_FORMAT(`date`, '%Y-%m-01') AS month_start,
+      COUNT(*) AS cnt
+    FROM appointment
+    WHERE `date` >= in_start
+      AND `date` < DATE_ADD(in_end, INTERVAL 1 MONTH)  -- inclusive end month
+      AND (in_status IS NULL OR status = in_status)
+    GROUP BY month_start
+  )
+  SELECT
+    DATE_FORMAT(m.month_start, '%Y-%m') AS month,
+    COALESCE(a.cnt, 0) AS count
+    FROM months m
+    LEFT JOIN agg a USING (month_start)
+    ORDER BY m.month_start;
+    END$$
+
+-- proc for getiing monthy revenue
+CREATE PROCEDURE get_monthly_revenue(
+  IN in_start DATE,                 -- e.g. '2025-01-01'
+  IN in_end   DATE                  -- e.g. '2025-12-31'
+)
+BEGIN
+  -- Normalize to month starts
+  SET in_start = DATE_FORMAT(in_start, '%Y-%m-01');
+  SET in_end   = DATE_FORMAT(in_end,   '%Y-%m-01');
+
+  WITH RECURSIVE months AS (
+  SELECT DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 12 MONTH), '%Y-%m-01') AS month_start
+  UNION ALL
+  SELECT DATE_FORMAT(DATE_ADD(month_start, INTERVAL 1 MONTH), '%Y-%m-01')
+  FROM months
+  WHERE month_start < DATE_FORMAT(CURDATE(), '%Y-%m-01')
+),
+agg AS (
+  SELECT DATE_FORMAT(`time_stamp`, '%Y-%m-01') AS month_start, sum(paid_amount) AS rev
+  FROM billing_payment
+  --   AND `date` >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
+  GROUP BY DATE_FORMAT(`time_stamp`, '%Y-%m-01')
+)
+SELECT
+  DATE_FORMAT(m.month_start, '%Y-%m') AS month,
+  COALESCE(a.rev, 0) AS revenue
+    FROM months m
+    LEFT JOIN agg a USING (month_start)
+    ORDER BY m.month_start;
+
+END$$
+
+-- proC FOR patients count per branch
+CREATE PROCEDURE patients_count_per_branch()
+
+    BEGIN
+    SELECT b.name AS branch, COUNT(u.user_id) AS total_patients
+    FROM user AS u
+    JOIN branch AS b ON u.branch_id = b.branch_id
+    WHERE u.role = 'Patient'
+    GROUP BY b.name;
+
+END$$
+
+
+-- doctors  appointment
+CREATE PROCEDURE get_doctors_appointments(IN appt_count INT,
+    IN count_start INT)
+
+BEGIN
+	SELECT d.name, a.appointment_id, a.doctor_id, a.date, a.time_slot, a.status
+    from appointment as a natural join doctor as d
+    where a.doctor_id =  d.doctor_id
+    order by a.date desc
+    limit appt_count OFFSET count_start;
+END$$
+
+-- proc for getting doctors appointments count
+CREATE PROCEDURE get_appointments_count()
+
+BEGIN
+	SELECT count(*) AS total_count
+    from appointment ;
+    
+END$$
+
+-- proc for getting doctors appointments by doctor id
+create procedure get_appointments_by_doctor_id( IN p_id INT)
+begin 
+	select appointment_id,patient.name, patient_note, date, time_slot, status, count(*) as total from
+	doctor natural join appointment join patient on appointment.patient_id = patient.patient_id
+	where doctor.doctor_id=p_id and doctor.doctor_id = appointment.doctor_id;
+end $$
+
+-- proc for getting doctors appointments by doctor id count
+create procedure get_appointments_by_doctor_id_count( IN p_id INT)
+begin 
+	   SELECT COUNT(*) AS total_appointments
+  FROM appointment
+  WHERE doctor_id = p_id;
+
+end $$
+
+
+DELIMITER ;

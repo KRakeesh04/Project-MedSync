@@ -129,3 +129,23 @@ export const getPatientsCount = async (
     throw error;
   }
 };
+
+export const getTotalPatientsCount = async (): Promise<Number> => {
+  try {
+    const [rows]: any = await sql.query("CALL get_total_patients_count()");
+    return rows[0][0].patient_count;
+  } catch (error) {
+    console.error("Error fetching total count of patients:", error);
+    throw error;
+  }
+};
+
+export const getPatientsCountPerBranch = async (): Promise<{ branch_name: string; total_count: number }[]> => {
+  try {
+    const [rows] = await sql.query("CALL patients_count_per_branch()");
+    return (rows as any)[0] as { branch_name: string; total_count: number }[];
+  } catch (error) {
+    console.error("Error fetching patients count per branch:", error);
+    throw error;
+  }
+};

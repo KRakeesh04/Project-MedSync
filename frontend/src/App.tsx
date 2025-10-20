@@ -28,6 +28,7 @@ import Treatments from './pages/patients/treatment/treatment';
 import Medications from './pages/patients/medication/medication';
 import PatientFullDetails from './pages/patients/patientFullDetails';
 
+
 import { useNavigate } from "react-router-dom";
 import {
   LOCAL_STORAGE__ROLE,
