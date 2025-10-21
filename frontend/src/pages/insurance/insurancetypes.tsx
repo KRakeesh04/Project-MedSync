@@ -7,7 +7,7 @@ import { createTimer } from "@/services/utils";
 import { Eye } from "lucide-react";
 import { getInsuranceTypesDataForPagination, type InsuranceTypes } from "@/services/insuranceService";
 import ViewInsurance from "@/pages/insurance/insurancetypes-view";
-import { LOCAL_STORAGE__ROLE, LOCAL_STORAGE__USER } from "@/services/authServices";
+import { LOCAL_STORAGE__USER } from "@/services/authServices";
 import { Navigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -28,7 +28,6 @@ const InsuranceTypesPage: React.FC = () => {
   if (!user) {
     return <Navigate to="/sign-in" replace />;
   }
-  const role = localStorage.getItem(LOCAL_STORAGE__ROLE) || "";
 
   const columns: ColumnDef<InsuranceTypes>[] = [
     {
