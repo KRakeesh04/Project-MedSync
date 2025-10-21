@@ -29,8 +29,12 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from 'sonner';
+import { hasAnyRole } from "@/services/roleGuard";
+import { Role } from "@/services/utils";
 
 export default function SpecialityPage() {
+  const canManage = hasAnyRole([Role.BRANCH_MANAGER, Role.SUPER_ADMIN]);
+  const isSuperAdmin = hasAnyRole([Role.SUPER_ADMIN]);
   const [specialities, setSpecialities] = useState<Speciality[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -70,7 +74,7 @@ export default function SpecialityPage() {
   const handleAdd = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!name.trim() || !description.trim()) {
-  toast.warning("Please provide both name and description.");
+      toast.warning("Please provide both name and description.");
       return;
     }
     setSubmitting(true);
@@ -132,54 +136,56 @@ export default function SpecialityPage() {
           <p className="text-sm text-muted-foreground">{total} items</p>
         </div>
 
-        <div className="flex place-content-end gap-3 md:pt-5">
-          <Dialog open={openAdd} onOpenChange={setOpenAdd}>
-            <DialogTrigger asChild>
-              <Button className="bg-blue-600 hover:bg-blue-700">+ Add New Speciality</Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[520px]">
-              <DialogHeader>
-                <DialogTitle>Add New Speciality</DialogTitle>
-              </DialogHeader>
+        {canManage && (
+          <div className="flex place-content-end gap-3 md:pt-5">
+            <Dialog open={openAdd} onOpenChange={setOpenAdd}>
+              <DialogTrigger asChild>
+                <Button className="bg-blue-600 hover:bg-blue-700">+ Add New Speciality</Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[520px]">
+                <DialogHeader>
+                  <DialogTitle>Add New Speciality</DialogTitle>
+                </DialogHeader>
 
-              <form onSubmit={handleAdd} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Speciality name</label>
-                  <Input
-                    placeholder="e.g. Cardiology"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                    autoFocus
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-1">Description</label>
-                  <textarea
-                    placeholder="Short description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    required
-                    className="w-full rounded-md border bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                    rows={4}
-                  />
-                </div>
-
-                <DialogFooter>
-                  <div className="flex justify-end gap-2 w-full">
-                    <Button type="button" variant="ghost" onClick={() => setOpenAdd(false)}>
-                      Cancel
-                    </Button>
-                    <Button type="submit" disabled={submitting}>
-                      {submitting ? "Adding..." : "Add"}
-                    </Button>
+                <form onSubmit={handleAdd} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Speciality name</label>
+                    <Input
+                      placeholder="e.g. Cardiology"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      required
+                      autoFocus
+                    />
                   </div>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Description</label>
+                    <textarea
+                      placeholder="Short description"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      required
+                      className="w-full rounded-md border bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                      rows={4}
+                    />
+                  </div>
+
+                  <DialogFooter>
+                    <div className="flex justify-end gap-2 w-full">
+                      <Button type="button" variant="ghost" onClick={() => setOpenAdd(false)}>
+                        Cancel
+                      </Button>
+                      <Button type="submit" disabled={submitting}>
+                        {submitting ? "Adding..." : "Add"}
+                      </Button>
+                    </div>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
+        )}
       </div>
 
       {/* Card grid */}
@@ -192,18 +198,22 @@ export default function SpecialityPage() {
             <div>
               <div className="flex justify-between items-start">
                 <h3 className="text-base font-semibold">{s.speciality_name}</h3>
-                <div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="size-8">⋯</Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent side="bottom">
-                      <DropdownMenuItem onClick={() => setViewing(s)}>View</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setEditing(s)}>Edit</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setConfirmDelete(s)} className="text-destructive">Delete</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
+                {canManage && (
+                  <div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="size-8">⋯</Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent side="bottom">
+                        <DropdownMenuItem onClick={() => setViewing(s)}>View</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setEditing(s)}>Edit</DropdownMenuItem>
+                        {isSuperAdmin && (
+                          <DropdownMenuItem onClick={() => setConfirmDelete(s)} className="text-destructive">Delete</DropdownMenuItem>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                )}
               </div>
 
               <p className="mt-2 text-sm text-muted-foreground line-clamp-4">{s.description}</p>
@@ -224,99 +234,107 @@ export default function SpecialityPage() {
       {specialities.length === 0 && (
         <div className="p-6 text-center rounded-md border border-dashed">
           <p className="mb-3">No specialities found.</p>
-          <Button onClick={() => setOpenAdd(true)}>Add the first speciality</Button>
+          {canManage && (
+            <Button onClick={() => setOpenAdd(true)}>Add the first speciality</Button>
+          )}
         </div>
       )}
 
       {/* View dialog */}
-      <Dialog open={!!viewing} onOpenChange={() => setViewing(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{viewing?.speciality_name}</DialogTitle>
-          </DialogHeader>
-          <div className="py-2">
-            <p className="text-sm text-muted-foreground">{viewing?.description}</p>
-          </div>
-          <DialogFooter>
-            <Button onClick={() => setViewing(null)}>Close</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {canManage && (
+        <Dialog open={!!viewing} onOpenChange={() => setViewing(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{viewing?.speciality_name}</DialogTitle>
+            </DialogHeader>
+            <div className="py-2">
+              <p className="text-sm text-muted-foreground">{viewing?.description}</p>
+            </div>
+            <DialogFooter>
+              <Button onClick={() => setViewing(null)}>Close</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* Edit dialog */}
-      <Dialog open={!!editing} onOpenChange={() => setEditing(null)}>
-        <DialogContent className="sm:max-w-[520px]">
-          <DialogHeader>
-            <DialogTitle>Edit Speciality</DialogTitle>
-          </DialogHeader>
-          <form
-            onSubmit={async (e) => {
-              e.preventDefault();
-              if (!editing) return;
-              setSubmitting(true);
-              try {
-                await updateSpeciality(editing.speciality_id, { speciality_name: editing.speciality_name, description: editing.description });
-                toast.success("Updated successfully");
-                setEditing(null);
-                await fetchSpecialities();
-              } catch (err) {
-                const msg = err instanceof Error ? err.message : String(err);
-                toast.error(`Update failed: ${msg}`);
-              } finally {
-                setSubmitting(false);
-              }
-            }}
-            className="space-y-4"
-          >
-            <div>
-              <label className="block text-sm font-medium mb-1">Speciality name</label>
-              <Input value={editing?.speciality_name || ""} onChange={(e) => setEditing(editing ? { ...editing, speciality_name: e.target.value } : null)} />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">Description</label>
-              <textarea className="w-full rounded-md border bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring" rows={4} value={editing?.description || ""} onChange={(e) => setEditing(editing ? { ...editing, description: e.target.value } : null)} />
-            </div>
-
-            <DialogFooter>
-              <div className="flex justify-end gap-2 w-full">
-                <Button type="button" variant="ghost" onClick={() => setEditing(null)}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={submitting}>{submitting ? "Saving..." : "Save"}</Button>
+      {canManage && (
+        <Dialog open={!!editing} onOpenChange={() => setEditing(null)}>
+          <DialogContent className="sm:max-w-[520px]">
+            <DialogHeader>
+              <DialogTitle>Edit Speciality</DialogTitle>
+            </DialogHeader>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (!editing) return;
+                setSubmitting(true);
+                try {
+                  await updateSpeciality(editing.speciality_id, { speciality_name: editing.speciality_name, description: editing.description });
+                  toast.success("Updated successfully");
+                  setEditing(null);
+                  await fetchSpecialities();
+                } catch (err) {
+                  const msg = err instanceof Error ? err.message : String(err);
+                  toast.error(`Update failed: ${msg}`);
+                } finally {
+                  setSubmitting(false);
+                }
+              }}
+              className="space-y-4"
+            >
+              <div>
+                <label className="block text-sm font-medium mb-1">Speciality name</label>
+                <Input value={editing?.speciality_name || ""} onChange={(e) => setEditing(editing ? { ...editing, speciality_name: e.target.value } : null)} />
               </div>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Description</label>
+                <textarea className="w-full rounded-md border bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring" rows={4} value={editing?.description || ""} onChange={(e) => setEditing(editing ? { ...editing, description: e.target.value } : null)} />
+              </div>
+
+              <DialogFooter>
+                <div className="flex justify-end gap-2 w-full">
+                  <Button type="button" variant="ghost" onClick={() => setEditing(null)}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={submitting}>{submitting ? "Saving..." : "Save"}</Button>
+                </div>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* Delete confirm alert */}
-      <AlertDialog open={!!confirmDelete} onOpenChange={() => setConfirmDelete(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete speciality</AlertDialogTitle>
-            <AlertDialogDescription>Are you sure you want to delete "{confirmDelete?.speciality_name}"? This action cannot be undone.</AlertDialogDescription>
-          </AlertDialogHeader>
-          <div className="flex justify-end gap-2 mt-4">
-            <AlertDialogCancel onClick={() => setConfirmDelete(null)}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={async () => {
-              if (!confirmDelete) return;
-              setDeletingId(confirmDelete.speciality_id);
-              try {
-                await deleteSpeciality(confirmDelete.speciality_id);
-                toast.success("Deleted successfully");
-                setConfirmDelete(null);
-                await fetchSpecialities();
-              } catch (err) {
-                const msg = err instanceof Error ? err.message : String(err);
-                toast.error(`Delete failed: ${msg}`);
-              } finally {
-                setDeletingId(null);
-              }
-            }} className={`bg-destructive text-white ${deletingId ? 'opacity-60 pointer-events-none' : ''}`}>Delete</AlertDialogAction>
-          </div>
-        </AlertDialogContent>
-      </AlertDialog>
+      {isSuperAdmin && (
+        <AlertDialog open={!!confirmDelete} onOpenChange={() => setConfirmDelete(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete speciality</AlertDialogTitle>
+              <AlertDialogDescription>Are you sure you want to delete "{confirmDelete?.speciality_name}"? This action cannot be undone.</AlertDialogDescription>
+            </AlertDialogHeader>
+            <div className="flex justify-end gap-2 mt-4">
+              <AlertDialogCancel onClick={() => setConfirmDelete(null)}>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={async () => {
+                if (!confirmDelete) return;
+                setDeletingId(confirmDelete.speciality_id);
+                try {
+                  await deleteSpeciality(confirmDelete.speciality_id);
+                  toast.success("Deleted successfully");
+                  setConfirmDelete(null);
+                  await fetchSpecialities();
+                } catch (err) {
+                  const msg = err instanceof Error ? err.message : String(err);
+                  toast.error(`Delete failed: ${msg}`);
+                } finally {
+                  setDeletingId(null);
+                }
+              }} className={`bg-destructive text-white ${deletingId ? 'opacity-60 pointer-events-none' : ''}`}>Delete</AlertDialogAction>
+            </div>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </div>
   );
 }

@@ -13,6 +13,8 @@ import { Label } from '@/components/ui/label';
 
 import { getDoctorsWithSpecialities, getAllDoctorNames, assignSpecialityToDoctor } from '@/services/doctorServices';
 import { getAllSpecialities } from '@/services/specialityServices';
+import { hasAnyRole } from '@/services/roleGuard';
+import { Role } from '@/services/utils';
 
 type DoctorSpecialtyHistory = {
   name: string;
@@ -28,6 +30,7 @@ type Doctor = {
 };
 
 const DoctorSpeciality: React.FC = () => {
+  const canManage = hasAnyRole([Role.BRANCH_MANAGER, Role.SUPER_ADMIN]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [filteredDoctors, setFilteredDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -179,7 +182,9 @@ const DoctorSpeciality: React.FC = () => {
       </div>
       <div className="grid gap-4 grid-cols-6 mb-4">
         <div className="flex justify-between place-items-center mb-4 place-self-end col-span-5">
-          <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={() => setAssignGlobalOpen(true)}>Assign New</Button>
+          {canManage && (
+            <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={() => setAssignGlobalOpen(true)}>Assign New</Button>
+          )}
         </div>
       </div>
 
@@ -248,8 +253,8 @@ const DoctorSpeciality: React.FC = () => {
               {filteredDoctors.map((doctor) => (
                 <article
                   key={doctor.doctor_id}
-                  className="bg-card p-4 rounded-lg shadow-sm border border-border flex flex-col justify-between hover:shadow-md hover:translate-y-[-2px] transition-all cursor-pointer"
-                  onClick={() => setSelectedDoctor(doctor)}
+                  className={`bg-card p-4 rounded-lg shadow-sm border border-border flex flex-col justify-between ${canManage ? 'hover:shadow-md hover:translate-y-[-2px] transition-all cursor-pointer' : ''}`}
+                  onClick={canManage ? () => setSelectedDoctor(doctor) : undefined}
                 >
                   <div>
                     <h3 className="text-base font-semibold">{doctor.name}</h3>
@@ -267,14 +272,16 @@ const DoctorSpeciality: React.FC = () => {
 
                   <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
                     <div>#{doctor.doctor_id}</div>
-                    <div className="flex items-center gap-2">
-                      <Button size="icon" variant="outline" onClick={(e) => { e.stopPropagation(); setSelectedDoctor(doctor); setAssignOpen(true); }}>
-                        <Pen />
-                      </Button>
-                      <Button size="icon" variant="outline" onClick={(e) => { e.stopPropagation(); setSelectedDoctor(doctor); }}>
-                        <Eye />
-                      </Button>
-                    </div>
+                    {canManage && (
+                      <div className="flex items-center gap-2">
+                        <Button size="icon" variant="outline" onClick={(e) => { e.stopPropagation(); setSelectedDoctor(doctor); setAssignOpen(true); }}>
+                          <Pen />
+                        </Button>
+                        <Button size="icon" variant="outline" onClick={(e) => { e.stopPropagation(); setSelectedDoctor(doctor); }}>
+                          <Eye />
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </article>
               ))}
@@ -284,7 +291,7 @@ const DoctorSpeciality: React.FC = () => {
       }
 
       {/* Doctor Details Popup */}
-      {selectedDoctor && (
+      {canManage && selectedDoctor && (
         <Dialog open={!!selectedDoctor} onOpenChange={() => setSelectedDoctor(null)}>
           <DialogContent>
             <DialogHeader>
@@ -313,7 +320,7 @@ const DoctorSpeciality: React.FC = () => {
       )}
 
       {/* Assign Speciality Dialog */}
-      {selectedDoctor && assignOpen && (
+      {canManage && selectedDoctor && assignOpen && (
         <Dialog open={assignOpen} onOpenChange={() => setAssignOpen(false)}>
           <DialogContent>
             <DialogHeader>
@@ -347,7 +354,7 @@ const DoctorSpeciality: React.FC = () => {
       )}
 
       {/* Global Assign Dialog */}
-      {assignGlobalOpen && (
+      {canManage && assignGlobalOpen && (
         <Dialog open={assignGlobalOpen} onOpenChange={() => setAssignGlobalOpen(false)}>
           <DialogContent>
             <DialogHeader>

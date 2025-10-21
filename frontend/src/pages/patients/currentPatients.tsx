@@ -11,9 +11,17 @@ import { getPatients, type Patient } from "@/services/patientServices";
 import { Label } from "@/components/ui/label";
 import { Eye } from "lucide-react";
 import { createTimer, formatDate } from "@/services/utils";
+import { hasAnyRole } from "@/services/roleGuard";
+import { Role } from "@/services/utils";
 
 
 const CurrentPatients: React.FC = () => {
+  const canEdit = hasAnyRole([
+    Role.RECEPTIONIST,
+    Role.ADMIN_STAFF,
+    Role.BRANCH_MANAGER,
+    Role.SUPER_ADMIN,
+  ]);
   const [patients, setPatients] = useState<Patient[]>([]);
   const [patientCount, setPatientCount] = useState<number>(0);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
@@ -136,16 +144,22 @@ const CurrentPatients: React.FC = () => {
     {
       header: "Action",
       cell: ({ row }) => (
-        <Button
-          size="icon"
-          variant="outline"
-          onClick={() => {
-            setSelectedPatient(row.original);
-            setAction("edit");
-          }}
-        >
-          <Eye />
-        </Button>
+        canEdit ? (
+          <Button
+            size="icon"
+            variant="outline"
+            onClick={() => {
+              if (!canEdit) {
+                toast.error("You don't have permission to edit patients.");
+                return;
+              }
+              setSelectedPatient(row.original);
+              setAction("edit");
+            }}
+          >
+            <Eye />
+          </Button>
+        ) : null
       ),
     },
   ];
@@ -293,7 +307,7 @@ const CurrentPatients: React.FC = () => {
       />
 
       <ViewPatient
-        isOpen={action === "edit" && selectedPatient !== null}
+        isOpen={canEdit && action === "edit" && selectedPatient !== null}
         selectedPatient={selectedPatient}
         onFinished={fetchPatients}
         onClose={() => {
