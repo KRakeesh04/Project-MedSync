@@ -3,6 +3,7 @@ import PageTitle from "@/components/PageTitle";
 import PatientDashboard from "./patientDashboard";
 import AdminDashboard from "./adminDashboard/adminDashboard";
 import { LOCAL_STORAGE__USER } from "@/services/authServices";
+import DoctorDashboard from "./doctorDashboard";
 
 const DashboardRedirect = () => {
   const user = localStorage.getItem(LOCAL_STORAGE__USER);
@@ -19,7 +20,8 @@ const DashboardRedirect = () => {
     <>
       <PageTitle title="Dashboard | MedSync" />
       {user_role === "Patient" && <PatientDashboard />}
-      {user_role !== "Patient" && <AdminDashboard />}
+      {user_role === "Doctor" && <DoctorDashboard />}
+      {user_role !== "Patient" && user_role !== "Doctor" && <AdminDashboard />}
     </>
   );
 };

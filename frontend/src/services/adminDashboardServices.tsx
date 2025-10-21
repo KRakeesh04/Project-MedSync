@@ -31,6 +31,8 @@ export interface DoctorDashboardDetails {
   branch_name: string;
   fee_per_patient: number;
   basic_monthly_salary: number;
+  speciality_name: string;
+  
 }
 
 type ApiResponse = {
@@ -42,6 +44,7 @@ type ApiResponse = {
     branch_name: string;
     fee_per_patient: string | number;
     basic_monthly_salary: string | number;
+    speciality_name: string;
   };
 };
 
@@ -65,6 +68,7 @@ export const doctorDashboardDetails = async (): Promise<DoctorDashboardDetails> 
     basic_monthly_salary: typeof record.basic_monthly_salary === "string"
       ? Number(record.basic_monthly_salary)
       : record.basic_monthly_salary,
+    
   };
 };
 

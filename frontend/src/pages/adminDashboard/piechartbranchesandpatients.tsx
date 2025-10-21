@@ -32,7 +32,11 @@ type BranchCount = {
     fill?: string;
 };
 
-export function BranchPatientsPieChart() {
+type Props = {
+    defaultBranchName?: string | null;
+}
+
+export function BranchPatientsPieChart({ defaultBranchName }: Props) {
     const id = "branch-patients-pie";
     const [branchData, setBranchData] = React.useState<BranchCount[]>([]);
     const [activeBranch, setActiveBranch] = React.useState<string | null>(null);
@@ -40,7 +44,7 @@ export function BranchPatientsPieChart() {
     React.useEffect(() => {
         (async () => {
             try {
-                const counts = await getPatientsCountPerBranch(); 
+                const counts = await getPatientsCountPerBranch();
                 const colors = [
                     "#003A6B", // Ateneo Blue
                     "#1B5886", // Blue Sapphire
@@ -50,7 +54,7 @@ export function BranchPatientsPieChart() {
                     "#89CFF1", // Baby Blue
                     "#A3D2F4", // Light Sky Blue
                     "#BEE1F4", // Pale Blue
-                     
+
                 ]
 
 
@@ -61,7 +65,8 @@ export function BranchPatientsPieChart() {
 
 
                 setBranchData(filled);
-                setActiveBranch(filled[0]?.branch_name ?? null);
+                // Use provided defaultBranchName (from current user) if available, otherwise first branch
+                setActiveBranch(defaultBranchName ?? filled[0]?.branch_name ?? null);
             } catch (error) {
                 console.error("Error fetching patient counts per branch:", error);
             }
@@ -72,7 +77,7 @@ export function BranchPatientsPieChart() {
         () => branchData.findIndex((item) => item.branch_name === activeBranch),
         [activeBranch, branchData]
     );
-    const activeIndex = activeIndexRaw >= 0 ? activeIndexRaw : 0; 
+    const activeIndex = activeIndexRaw >= 0 ? activeIndexRaw : 0;
     const chartConfig: ChartConfig = React.useMemo(
         () =>
             branchData.reduce(
@@ -132,8 +137,8 @@ export function BranchPatientsPieChart() {
                         <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
                         <Pie
                             data={branchData}
-                            dataKey="patient_count"  
-                            nameKey="branch_name"  
+                            dataKey="patient_count"
+                            nameKey="branch_name"
                             innerRadius={60}
                             strokeWidth={5}
                             activeIndex={activeIndex}
