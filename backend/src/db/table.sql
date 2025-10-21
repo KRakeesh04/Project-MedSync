@@ -313,7 +313,7 @@ CREATE OR REPLACE VIEW branch_daily_appointment_summary AS
 SELECT 
     b.branch_id,
     b.name AS branch_name,
-    a.date AS appointment_date,
+    DATE_FORMAT(a.date, '%Y-%m-%d') AS appointment_date,
     a.status,
     COUNT(a.appointment_id) AS total_appointments
 FROM appointment a
