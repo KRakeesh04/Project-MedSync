@@ -517,7 +517,8 @@ export function AppSidebar() {
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 side="top"
-                className="w-full w-(--sidebar-width)"
+                align="start"
+                className="w-72 md:w-62 max-w-none min-w-0"
               >
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
