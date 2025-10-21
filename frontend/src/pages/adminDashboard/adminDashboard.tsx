@@ -167,7 +167,7 @@ const AdminDashboard: React.FC = () => {
         <Card className="bg-neutral-900 border border-neutral-800 rounded-2xl shadow-sm hover:shadow-md hover:border-green-500/30 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-gray-100 text-base font-medium flex items-center gap-2">
-              Total Staffs
+              Total Staff
             </CardTitle>
             <div className="p-2 rounded-full bg-neutral-800">
               <UserCheck className="h-5 w-5 text-green-400" />
