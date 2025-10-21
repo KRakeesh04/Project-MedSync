@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { getAllDoctorsForAppointments, getAvailableSlots, type Doctor, type AvailableSlot } from '@/services/appointmentServices';
 import { toast } from 'sonner';
 import { CheckCircle, Calendar, Clock, User, MapPin } from 'lucide-react';
+import { hasAnyRole } from '@/services/roleGuard';
+import { Role } from '@/services/utils';
 
 export default function DoctorTimeSlots() {
   const navigate = useNavigate();
@@ -33,7 +35,7 @@ export default function DoctorTimeSlots() {
 
   const fetchAvailableSlots = async () => {
     if (!selectedDoctor) return;
-    
+
     setLoading(true);
     try {
       const data = await getAvailableSlots(Number(selectedDoctor), selectedDate);
@@ -58,20 +60,20 @@ export default function DoctorTimeSlots() {
 
   const handleBookAppointment = (slot: AvailableSlot) => {
     console.log('Booking slot:', slot);
-    
+
     // Ensure all data is properly formatted for the URL
     const queryParams = new URLSearchParams({
       doctor_id: slot.doctor_id.toString(),
       date: slot.date, // Use the date exactly as it comes from the API
       time_slot: slot.time_slot
     });
-    
+
     console.log('Navigating with params:', {
       doctor_id: slot.doctor_id.toString(),
       date: slot.date,
       time_slot: slot.time_slot
     });
-    
+
     navigate(`/appointments/add?${queryParams.toString()}`);
   };
 
@@ -97,9 +99,11 @@ export default function DoctorTimeSlots() {
             Browse and book available appointment slots
           </p>
         </div>
-        <Button variant="outline" onClick={() => navigate('/appointments')}>
-          View All Appointments
-        </Button>
+        {!hasAnyRole([Role.PATIENT]) && (
+          <Button variant="outline" onClick={() => navigate('/appointments')}>
+            View All Appointments
+          </Button>
+        )}
       </div>
 
       <Card>
@@ -185,7 +189,7 @@ export default function DoctorTimeSlots() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {availableSlots.map((slot, index) => (
                   <Card key={index} className="hover:shadow-lg transition-all duration-200 border-2 hover:border-primary">
@@ -203,7 +207,7 @@ export default function DoctorTimeSlots() {
                             Available
                           </Badge>
                         </div>
-                        
+
                         <div className="space-y-2">
                           <div className="flex items-center gap-2 text-sm">
                             <Clock className="w-4 h-4 text-primary" />
@@ -214,14 +218,16 @@ export default function DoctorTimeSlots() {
                             <span>{formatDisplayDate(slot.date)}</span>
                           </div>
                         </div>
-                        
-                        <Button 
-                          onClick={() => handleBookAppointment(slot)}
-                          className="w-full"
-                          size="lg"
-                        >
-                          Book This Slot
-                        </Button>
+
+                        {!hasAnyRole([Role.PATIENT]) && (
+                          <Button
+                            onClick={() => handleBookAppointment(slot)}
+                            className="w-full"
+                            size="lg"
+                          >
+                            Book This Slot
+                          </Button>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
