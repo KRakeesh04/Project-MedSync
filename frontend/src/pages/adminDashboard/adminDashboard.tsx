@@ -22,10 +22,10 @@ import { getDoctorsAppointments } from "@/services/appoinmentServices";
 import { getAllBranches, type Branch } from "@/services/branchServices";
 import { BranchPatientsPieChart } from "./piechartbranchesandpatients";
 import DoctorsAppointment from "./doctorsAppointmenttable";
-import DoctorsAppointmentsByDoctorId from "./doctorsAppointmentByDcotor_id";
 import { Navigate } from "react-router-dom";
 import { LOCAL_STORAGE__USER, LOCAL_STORAGE__USER_ID } from "@/services/authServices";
 import { Role } from "@/services/utils";
+import DoctorsAppointmentsByDoctorId from "./doctorsAppointmentByDcotor_id";
 
 const AdminDashboard: React.FC = () => {
   const [totalPatients, setTotalPatients] = useState<number>(0);

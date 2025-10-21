@@ -133,7 +133,16 @@ export const getPatientsCount = async (
 export const getTotalPatientsCount = async (): Promise<Number> => {
   try {
     const [rows]: any = await sql.query("CALL get_total_patients_count()");
-    return rows[0][0].patient_count;
+    if (Array.isArray(rows)) {
+      const firstRow = Array.isArray(rows[0]) ? rows[0][0] : rows[0];
+      if (firstRow && typeof firstRow.total_count !== "undefined") {
+        return firstRow.total_count;
+      }
+    }
+    if (rows && typeof rows.total_count !== "undefined") {
+      return rows.total_count;
+    }
+    return 0 as Number;
   } catch (error) {
     console.error("Error fetching total count of patients:", error);
     throw error;

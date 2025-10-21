@@ -9,6 +9,7 @@ export interface Doctor {
   branch_name: string;
   fee_per_patient: number;
   basic_monthly_salary: number;
+  speciality_name: string;
 }
 
 export const createDoctor = async (
