@@ -51,6 +51,7 @@ import InsuranceTypesPage from './pages/insurance/insurancetypes';
 import InsuranceHistory from './pages/insurance/insuranceHistory';
 import Reports from './pages/reports/Reports';
 
+
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
   const { pathname } = useLocation();

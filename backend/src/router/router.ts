@@ -160,10 +160,14 @@ var routes: Route[] = [
 	//appointment router
 	{ path: "/appointments", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllAppointments },
 	{ path: "/appointments", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: createAppointment },
+	{ path: "/appointments/create", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: createAppointmentFromData },
 	{ path: "/appointments/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: updateAppointment },
 	{ path: "/appointments/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.DELETE, handler: deleteAppointment },
+	{ path: "/appointments/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAppointmentById },
+	{ path: "/appointments/:id/status", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PATCH, handler: updateAppointmentStatus },
+	{ path: "/available-slots", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAvailableSlots },
 	{ path: "/appointment/doctors", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllDoctorsForAppointments },
-  { path: "/appointments/monthly-counts", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAppointmentsCountByMonthHandler },
+	{ path: "/appointments/monthly-counts", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAppointmentsCountByMonthHandler },
 	{ path: "/patient/appointments/:patientId", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAppointmentsbyPatientIdHandler },
 	{ path: "/doctors/appointments/:doctorId", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAppointmentsByDoctorIdHandler },
 	{ path: "/doctors/appointments/:doctorId/count", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAppointmentsByDoctorIdCountHandler },
@@ -193,7 +197,6 @@ var routes: Route[] = [
 	{ path: "/reports/outstanding-balances.csv", AccessibleBy: availableForRoles([Role.BILLING_STAFF, Role.ADMIN_STAFF, Role.BRANCH_MANAGER, Role.SUPER_ADMIN]), method: HttpMethod.GET, handler: getPatientsWithOutstandingBalancesCsv },
 	{ path: "/reports/treatments-per-category.csv", AccessibleBy: availableForRoles([Role.ADMIN_STAFF, Role.BRANCH_MANAGER, Role.SUPER_ADMIN]), method: HttpMethod.GET, handler: getTreatmentsPerCategoryCsv },
 	{ path: "/reports/insurance-vs-out-of-pocket.csv", AccessibleBy: availableForRoles([Role.BILLING_STAFF, Role.ADMIN_STAFF, Role.BRANCH_MANAGER, Role.SUPER_ADMIN]), method: HttpMethod.GET, handler: getInsuranceVsOutOfPocketCsv },
-
 
 ];
 
