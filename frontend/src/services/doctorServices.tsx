@@ -59,7 +59,7 @@ export const getAllDoctors = async (count: number, offset: number, branchId: str
     const response = await axiosInstance.get<{
       doctor_count: number;
       doctors: Array<Doctor>;
-    }>(`/doctors?count=${count}&offset=${offset}&branch=${branchId}`);
+    }>(`/doctors`, { params: { count, offset, branch: branchId } });
     return response.data;
   } catch (error: unknown) {
     console.error("Error getting all doctors data:", error);

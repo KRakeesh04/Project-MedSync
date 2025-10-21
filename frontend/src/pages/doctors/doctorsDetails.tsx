@@ -160,11 +160,16 @@ const DoctorsDetails: React.FC = () => {
       setPageCount(Math.ceil(response[0].value.doctor_count / itemsPerPage));
       setErrorCode(null);
     } catch (error: any) {
-      if (error.response?.status === 404) {
+      // Prefer backend-provided error message when available
+      const backendMsg = typeof error === "string"
+        ? error
+        : error?.response?.data?.error || error?.message;
+
+      if (typeof error !== "string" && error?.response?.status === 404) {
         setErrorCode(404);
-      } else {
-        toast.error("Failed to fetch doctors");
       }
+
+      toast.error(backendMsg || "Failed to fetch doctors");
     } finally {
       toast.dismiss(loadingId);
     }
