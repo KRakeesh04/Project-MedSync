@@ -54,12 +54,12 @@ export interface DoctorPatientsHistory {
   updated_at: string;
 }
 
-export const getAllDoctors = async (branchId: string) => {
+export const getAllDoctors = async (count: number, offset: number, branchId: string) => {
   try {
     const response = await axiosInstance.get<{
       doctor_count: number;
       doctors: Array<Doctor>;
-    }>(`/doctors?branch=${branchId}`);
+    }>(`/doctors?count=${count}&offset=${offset}&branch=${branchId}`);
     return response.data;
   } catch (error: unknown) {
     console.error("Error getting all doctors data:", error);

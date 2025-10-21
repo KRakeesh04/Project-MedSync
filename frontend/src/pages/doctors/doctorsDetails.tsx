@@ -4,7 +4,6 @@ import { getCoreRowModel, getPaginationRowModel, getSortedRowModel, useReactTabl
 import { Button } from "@/components/ui/button";
 import toast from "@/lib/toast";
 import { createTimer, formatSalary, Role } from "@/services/utils";
-import { Eye } from "lucide-react";
 import { Label } from "../../components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 import { getAllBranches } from "../../services/branchServices";
@@ -18,8 +17,7 @@ import { Link } from "react-router-dom";
 const DoctorsDetails: React.FC = () => {
   const [Doctors, setDoctors] = useState<Array<Doctor>>([]);
   const [doctorCount, setDoctorCount] = useState<number>(0);
-  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
-  const [action, setAction] = useState<"edit" | null>(null);
+  // View/edit dialog is not used currently; remove related state to avoid unused warnings
   const [branches, setBranches] = useState<{ value: string; label: string }[]>([]);
   const [errorCode, setErrorCode] = useState<number | null>(null);
   const user = localStorage.getItem(LOCAL_STORAGE__USER)
@@ -109,23 +107,7 @@ const DoctorsDetails: React.FC = () => {
       ),
       cell: ({ row }) => formatSalary(Number(row.original.basic_monthly_salary)),
     },
-    {
-      header: "Actions",
-      cell: ({ row }) => {
-        return (
-          <Button
-            size="icon"
-            variant="outline"
-            onClick={() => {
-              setSelectedDoctor(row.original);
-              setAction("edit");
-            }}
-          >
-            <Eye />
-          </Button>
-        );
-      },
-    },
+    // Actions column removed (no view dialog wired up yet)
   ]
 
   const [pagination, setPagination] = useState({
@@ -160,8 +142,8 @@ const DoctorsDetails: React.FC = () => {
     try {
       const response = await Promise.allSettled([
         getAllDoctors(
-          // itemsPerPage,
-          // (page - 1) * itemsPerPage,
+          itemsPerPage,
+          (page - 1) * itemsPerPage,
           userRole === Role.SUPER_ADMIN
             ? (selectedBranch === "All" ? "-1" : selectedBranch)
             : userBranchId
