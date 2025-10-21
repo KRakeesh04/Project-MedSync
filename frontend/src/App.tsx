@@ -50,6 +50,8 @@ import OutstandingInvoices from './pages/billing/outstanding_balances';
 import InsuranceTypesPage from './pages/insurance/insurancetypes';
 import InsuranceHistory from './pages/insurance/insuranceHistory';
 import Reports from './pages/reports/Reports';
+import ProfilePage from './pages/profile/ProfilePage';
+import SettingsPage from './pages/settings/SettingsPage';
 
 
 function App() {
@@ -151,6 +153,26 @@ function App() {
 
               </Route>
               <Route element={<DefaultLayout />}>
+
+                <Route
+                  path="/profile"
+                  element={
+                    <>
+                      <PageTitle title="Profile | MedSync" />
+                      <ProfilePage />
+                    </>
+                  }
+                />
+
+                <Route
+                  path="/settings"
+                  element={
+                    <>
+                      <PageTitle title="Settings | MedSync" />
+                      <SettingsPage />
+                    </>
+                  }
+                />
 
                 <Route
                   path="/dashboard"

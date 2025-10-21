@@ -522,9 +522,12 @@ export function AppSidebar() {
               >
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                {/* <DropdownMenuItem>Team</DropdownMenuItem> */}
+                <DropdownMenuItem asChild>
+                  <NavLink to="/profile">Profile</NavLink>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <NavLink to="/settings">Settings</NavLink>
+                </DropdownMenuItem>
                 <DropdownMenuItem
                   className="text-destructive hover:text-destructive"
                   onClick={logout}>
