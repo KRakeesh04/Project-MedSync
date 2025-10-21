@@ -464,7 +464,7 @@ export function AppSidebar() {
           item.type !== "parent" || item.hideIf?.(role) ? null : (
             <SidebarGroup key={item.title}>
               <SidebarMenu>
-                <Collapsible className="group/collapsible" key={`${item.title}-collapsible`}>
+                <Collapsible className="group/collapsible" key={`${item.title}-collapsible`} defaultOpen>
                   <SidebarMenuItem>
                     <CollapsibleTrigger asChild>
                       <SidebarMenuButton>
