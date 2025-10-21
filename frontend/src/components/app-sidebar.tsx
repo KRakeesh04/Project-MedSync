@@ -137,7 +137,7 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
   {
     type: "child",
     title: "Reports",
-    url: "",
+    url: "/reports",
     icon: ClipboardPenLine,
     // hideIf: (role) => typeof role !== "string" ||
     //   ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),

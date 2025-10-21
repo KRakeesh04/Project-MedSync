@@ -49,6 +49,7 @@ import AllInvoices from './pages/billing/invoice_details';
 import OutstandingInvoices from './pages/billing/outstanding_balances';
 import InsuranceTypesPage from './pages/insurance/insurancetypes';
 import InsuranceHistory from './pages/insurance/insuranceHistory';
+import Reports from './pages/reports/Reports';
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -226,6 +227,16 @@ function App() {
                     <>
                       <PageTitle title="Branch | MedSync" />
                       <Branches />
+                    </>
+                  }
+                />
+
+                <Route
+                  path="/reports"
+                  element={
+                    <>
+                      <PageTitle title="Reports | MedSync" />
+                      <Reports />
                     </>
                   }
                 />
