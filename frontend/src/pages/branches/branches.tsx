@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/dialog";
 import { getBranchesForPagination, createBranch, type Branch } from "@/services/branchServices";
 import toast from "@/lib/toast";
+import { LOCAL_STORAGE__ROLE } from "@/services/authServices";
+import { Role } from "@/services/utils";
 
 const Branches: React.FC = () => {
   const [branches, setBranches] = useState<Array<Branch>>([]);
@@ -27,6 +29,10 @@ const Branches: React.FC = () => {
   const [location, setLocation] = useState("");
   const [landline, setLandline] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  // role-based UI visibility
+  const role = (typeof window !== 'undefined' && localStorage.getItem(LOCAL_STORAGE__ROLE)) || "";
+  const isSuperAdmin = role === Role.SUPER_ADMIN;
 
   const fetchBranches = useCallback(async () => {
     setLoading(true);
@@ -107,62 +113,64 @@ const Branches: React.FC = () => {
           <p className="text-sm text-muted-foreground">{branches.length} items</p>
         </div>
 
-        <div className="flex items-center gap-3 md:pt-5 place-content-end">
-          <Dialog open={openAdd} onOpenChange={setOpenAdd}>
-            <DialogTrigger asChild>
-              <Button className="bg-blue-600 hover:bg-blue-700">+ Add New Branch</Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[520px]">
-              <DialogHeader>
-                <DialogTitle>Add New Branch</DialogTitle>
-              </DialogHeader>
+        {isSuperAdmin ? (
+          <div className="flex items-center gap-3 md:pt-5 place-content-end">
+            <Dialog open={openAdd} onOpenChange={setOpenAdd}>
+              <DialogTrigger asChild>
+                <Button className="bg-blue-600 hover:bg-blue-700">+ Add New Branch</Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[520px]">
+                <DialogHeader>
+                  <DialogTitle>Add New Branch</DialogTitle>
+                </DialogHeader>
 
-              <form onSubmit={handleAdd} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Branch name</label>
-                  <input
-                    className="w-full rounded-md border bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                    placeholder="e.g. Main Clinic"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    autoFocus
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-1">Location</label>
-                  <input
-                    className="w-full rounded-md border bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                    placeholder="City, Street"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-1">Landline</label>
-                  <input
-                    className="w-full rounded-md border bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                    placeholder="Optional"
-                    value={landline}
-                    onChange={(e) => setLandline(e.target.value)}
-                  />
-                </div>
-
-                <DialogFooter>
-                  <div className="flex justify-end gap-2 w-full">
-                    <Button type="button" variant="ghost" onClick={() => setOpenAdd(false)}>
-                      Cancel
-                    </Button>
-                    <Button type="submit" disabled={submitting}>
-                      {submitting ? "Adding..." : "Add"}
-                    </Button>
+                <form onSubmit={handleAdd} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Branch name</label>
+                    <input
+                      className="w-full rounded-md border bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                      placeholder="e.g. Main Clinic"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      autoFocus
+                    />
                   </div>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Location</label>
+                    <input
+                      className="w-full rounded-md border bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                      placeholder="City, Street"
+                      value={location}
+                      onChange={(e) => setLocation(e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Landline</label>
+                    <input
+                      className="w-full rounded-md border bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                      placeholder="Optional"
+                      value={landline}
+                      onChange={(e) => setLandline(e.target.value)}
+                    />
+                  </div>
+
+                  <DialogFooter>
+                    <div className="flex justify-end gap-2 w-full">
+                      <Button type="button" variant="ghost" onClick={() => setOpenAdd(false)}>
+                        Cancel
+                      </Button>
+                      <Button type="submit" disabled={submitting}>
+                        {submitting ? "Adding..." : "Add"}
+                      </Button>
+                    </div>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
+        ) : null}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -186,9 +194,11 @@ const Branches: React.FC = () => {
                 <Button size="icon" variant="outline" onClick={() => { setSelectedBranch(b); setAction("view"); }}>
                   <Eye />
                 </Button>
-                <Button size="icon" variant="destructive" onClick={() => { setSelectedBranch(b); setAction("view"); }}>
-                  <Trash />
-                </Button>
+                {isSuperAdmin ? (
+                  <Button size="icon" variant="destructive" onClick={() => { setSelectedBranch(b); setAction("view"); }}>
+                    <Trash />
+                  </Button>
+                ) : null}
               </div>
             </div>
           </article>
