@@ -2,6 +2,8 @@
 
 A comprehensive medical clinic appointment and treatment management system built with modern web technologies.
 
+Website link - ```http://medsync.kalanalakshan.me/```
+
 ## 🏥 Project Overview
 
 MedSync is a full-stack web application designed to streamline clinic operations, manage patient appointments, and handle treatment records efficiently. The system provides a seamless experience for both healthcare providers and patients.
