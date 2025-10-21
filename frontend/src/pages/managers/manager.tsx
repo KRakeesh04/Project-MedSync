@@ -131,7 +131,11 @@ const BranchManagerPage: React.FC = () => {
       <div className="flex items-center justify-end">
         <Dialog open={createOpen} onOpenChange={setCreateOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-blue-600 hover:bg-blue-700">New Branch Manager</Button>
+            {isSuperAdmin ? (
+              <DialogTrigger asChild>
+                <Button className="bg-blue-600 hover:bg-blue-700">New Branch Manager</Button>
+              </DialogTrigger>
+            ) : null}
           </DialogTrigger>
           <DialogContent className="sm:max-w-[520px]">
             <DialogHeader>
