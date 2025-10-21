@@ -66,7 +66,12 @@ export const updateAppointment = async (id: number, appointmentData: any): Promi
   }
 };
 
-export const getAllAppointments = async (itemsPerPage: number, p0: number, searchText: string, p1: string | undefined): Promise<Appointment[]> => {
+export const getAllAppointments = async (
+  itemsPerPage?: number,
+  p0?: number,
+  searchText?: string,
+  p1?: string
+): Promise<Appointment[]> => {
   try {
     const response = await axiosInstance.get<Appointment[]>(`/appointments`);
     return response.data;

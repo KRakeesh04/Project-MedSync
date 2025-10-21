@@ -250,11 +250,13 @@ const DoctorsDetails: React.FC = () => {
           </Select>
         </div>
         <div className="flex justify-between items-center mb-4 place-self-end col-span-5">
-          <Link to="/doctors/add">
-            <Button className="bg-blue-600 hover:bg-blue-700">
-              + Add New Doctor
-            </Button>
-          </Link>
+          {userRole === Role.SUPER_ADMIN || userRole === Role.BRANCH_MANAGER ? (
+            <Link to="/doctors/add">
+              <Button className="bg-blue-600 hover:bg-blue-700">
+                + Add New Doctor
+              </Button>
+            </Link>
+          ) : null}
         </div>
       </div>
       <DataTable table={table} errorCode={errorCode} />

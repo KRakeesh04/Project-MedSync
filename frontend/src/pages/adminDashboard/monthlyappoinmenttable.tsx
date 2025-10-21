@@ -35,7 +35,7 @@ export function MonthlyAppointmentsChart({ year = new Date().getFullYear() }: { 
         const rows = await fetchMonthlyAppointmentsForYear(year);
         const mapped: ChartRow[] = rows.map((r) => ({
           date: `${r.month}-01`,
-          appointments: r.count,
+          appointments: typeof r.count === 'string' ? Number(r.count) : r.count,
         }));
         setData(mapped);
       } finally {
@@ -85,6 +85,10 @@ export function MonthlyAppointmentsChart({ year = new Date().getFullYear() }: { 
                   labelFormatter={(value) =>
                     new Date(value).toLocaleDateString("en-US", { year: "numeric", month: "long" })
                   }
+                  formatter={(val) => [
+                    typeof val === 'number' ? val.toLocaleString() : String(val),
+                    'Appointments',
+                  ]}
                 />
               }
             />

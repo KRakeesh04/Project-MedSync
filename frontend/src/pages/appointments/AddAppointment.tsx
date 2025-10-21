@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { getAllDoctorsForAppointments, createAppointment, type Doctor } from '@/services/appointmentServices';
+import { can } from '@/services/roleGuard';
 import { toast } from 'sonner';
 import { ArrowLeft, User, Phone, Calendar, Clock, Stethoscope } from 'lucide-react';
 
@@ -16,6 +17,7 @@ export default function AddAppointment() {
   const [loading, setLoading] = useState(false);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [isFromAvailableSlots, setIsFromAvailableSlots] = useState(false);
+  const [authorized, setAuthorized] = useState<boolean>(false);
   
   const [formData, setFormData] = useState({
     patient_name: '',
@@ -57,6 +59,14 @@ export default function AddAppointment() {
   };
 
   useEffect(() => {
+    // Page-level authorization: only allow roles that can add appointments
+    if (!can.addAppointment()) {
+      toast.error('You do not have permission to create appointments');
+      navigate('/appointments', { replace: true });
+      return;
+    }
+    setAuthorized(true);
+
     const initializeData = async () => {
       try {
         // First fetch doctors
@@ -167,6 +177,8 @@ export default function AddAppointment() {
     const doctor = doctors.find(d => d.doctor_id.toString() === formData.doctor_id);
     return doctor ? doctor.name : '';
   };
+
+  if (!authorized) return null;
 
   return (
     <div className="space-y-6">

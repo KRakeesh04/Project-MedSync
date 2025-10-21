@@ -11,6 +11,7 @@ import { getAllAppointments, deleteAppointment, type Appointment } from '@/servi
 import { toast } from 'sonner';
 import { Search, Trash2, Plus, Calendar, Clock, User, Stethoscope, Edit, ChevronLeft, ChevronRight } from 'lucide-react';
 import EditAppointment from './EditAppointment';
+import { can } from "@/services/roleGuard";
 
 export default function AllAppointments() {
   const navigate = useNavigate();
@@ -117,10 +118,12 @@ export default function AllAppointments() {
           <Button variant="outline" onClick={() => navigate('/appointments/slots')}>
             View Available Slots
           </Button>
-          <Button onClick={() => navigate('/appointments/add')}>
-            <Plus className="w-4 h-4 mr-2" />
-            Add Appointment
-          </Button>
+          {can.addAppointment() ? (
+            <Button onClick={() => navigate('/appointments/add')}>
+              <Plus className="w-4 h-4 mr-2" />
+              Add Appointment
+            </Button>
+          ) : null}
         </div>
       </div>
 
@@ -228,37 +231,41 @@ export default function AllAppointments() {
                       </TableCell>
                       <TableCell>
                         <div className="flex justify-end gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleEdit(appointment)}
-                          >
+                          {can.editAppointment() ? (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEdit(appointment)}
+                            >
                             <Edit className="w-4 h-4" />
-                          </Button>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button variant="destructive" size="sm">
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Delete Appointment</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Are you sure you want to delete appointment #{appointment.appointment_id}? This action cannot be undone.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => handleDelete(appointment.appointment_id)}
-                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                >
-                                  Delete
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
+                            </Button>
+                          ) : null}
+                          {can.deleteAppointment() ? (
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="destructive" size="sm">
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Delete Appointment</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Are you sure you want to delete appointment #{appointment.appointment_id}? This action cannot be undone.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleDelete(appointment.appointment_id)}
+                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                  >
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          ) : null}
                         </div>
                       </TableCell>
                     </TableRow>
