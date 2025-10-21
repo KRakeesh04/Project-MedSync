@@ -294,7 +294,7 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
     type: "parent",
     title: "Appointments",
     icon: ClipboardClock,
-    hideIf: (role) => typeof role !== "string" || [ROLE_PATIENT, ROLE_INSURANCE_AGENT].includes(role),
+    hideIf: (role) => typeof role !== "string" || [ROLE_INSURANCE_AGENT].includes(role),
     children: [
       {
         type: "child",
