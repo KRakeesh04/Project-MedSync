@@ -9,7 +9,6 @@ import {
   HandCoins,
   type LucideIcon,
   FileClock,
-  FileStack,
   IdCardLanyard,
   BookOpen,
   FileUser,
@@ -17,13 +16,10 @@ import {
   UserSearch,
   ClipboardPlus,
   ClipboardList,
-  CalendarSync,
-  CalendarX2,
   CreditCard,
   ReceiptText,
   ClockPlus,
   BanknoteX,
-  ClipboardPenLine,
   ChevronRight,
   LogOut,
   PanelRightOpen,
@@ -32,15 +28,10 @@ import {
   UserRoundCheck,
   MapPinHouse,
   Logs,
-  UserPen
+  UserPen,
+  BarChart3,
+  ShieldCheck
 } from "lucide-react"
-// billing and paments - Receipt
-// patient - Users
-// doctor - Stethoscope
-// insurance - HandCoins
-// appointments - ClipboardClock
-// home - Hospital
-// user - user
 
 import {
   Sidebar,
@@ -51,7 +42,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSkeleton,
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
@@ -89,7 +79,7 @@ const ROLE_RECEPTIONIST = Role.RECEPTIONIST;
 const ROLE_BILLING_STAFF = Role.BILLING_STAFF;
 const ROLE_INSURANCE_AGENT = Role.INSURANCE_AGENT;
 const ROLE_PATIENT = Role.PATIENT;
-const ROLE_USER = "User";
+// const ROLE_USER = "User";
 
 
 export interface LocalStorage_User {
@@ -123,49 +113,53 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
     title: "Dashboard",
     url: "/dashboard",
     icon: Hospital,
-    // hideIf: (role) => typeof role !== "string" ||
-    //   ![ROLE_RECEPTIONIST, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+    hideIf: (role) => typeof role !== "string"
   },
   {
     type: "child",
     title: "Branch",
     url: "/branches",
     icon: MapPinHouse,
-    // hideIf: (role) => typeof role !== "string" ||
-    //   ![ROLE_RECEPTIONIST, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+    hideIf: (role) => typeof role !== "string"
   },
   {
     type: "child",
     title: "Reports",
     url: "/reports",
-    icon: ClipboardPenLine,
-    // hideIf: (role) => typeof role !== "string" ||
-    //   ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+    icon: BarChart3,
+    hideIf: (role) => typeof role !== "string" ||
+      ![ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
   },
   {
     type: "child",
     title: "Logs",
     url: "/logs",
     icon: Logs,
-    // hideIf: (role) => typeof role !== "string" ||
-    //   ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+    hideIf: (role) => typeof role !== "string" ||
+      ![ROLE_SUPER_ADMIN].includes(role),
   },
   {
     type: "parent",
     title: "Users",
     icon: UsersRound,
+    hideIf: (role) => typeof role !== "string" ||
+      ![ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
     children: [
       {
         type: "child",
         title: "Active Users",
         url: "/users/active",
         icon: UserRoundCheck,
+        hideIf: (role) => typeof role !== "string" ||
+          ![ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
       },
       {
         type: "child",
         title: "Deleted Users",
         url: "/users/inactive",
         icon: UserRoundX,
+        hideIf: (role) => typeof role !== "string" ||
+          ![ROLE_SUPER_ADMIN].includes(role),
       },
     ],
   },
@@ -173,22 +167,24 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
     type: "parent",
     title: "Employees",
     icon: Users,
+    hideIf: (role) => typeof role !== "string" ||
+      ![ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
     children: [
       {
         type: "child",
         title: "All Managers",
         url: "/branch-managers",
         icon: UserSearch,
-        // hideIf: (role) => typeof role !== "string" ||
-        //   ![ROLE_ADMIN_STAFF, ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+        hideIf: (role) => typeof role !== "string" ||
+          ![ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
       },
       {
         type: "child",
         title: "All Staff",
         url: "/staff",
         icon: UserSearch,
-        // hideIf: (role) => typeof role !== "string" ||
-        //   ![ROLE_ADMIN_STAFF, ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+        hideIf: (role) => typeof role !== "string" ||
+          ![ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
       },
     ],
   },
@@ -196,96 +192,58 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
     type: "parent",
     title: "Patients",
     icon: HeartPulse,
-    // hideIf: (role) => typeof role !== "string" || role != ROLE_PATIENT,
+    hideIf: (role) => typeof role !== "string" || role === ROLE_PATIENT,
     children: [
       {
         type: "child",
         title: "In-Patients",
         url: "/current-patients",
         icon: HeartPulse,
-        // hideIf: (role) => typeof role !== "string" ||
-        //   [ROLE_PATIENT, ROLE_INSURANCE_AGENT].includes(role),
+        hideIf: (role) => typeof role !== "string" ||
+          [ROLE_PATIENT].includes(role),
       },
       {
         type: "child",
         title: "Ex-Patients",
         url: "/ex-patients",
         icon: HeartPulse,
-        // hideIf: (role) => typeof role !== "string" ||
-        //   [ROLE_PATIENT, ROLE_INSURANCE_AGENT].includes(role),
+        hideIf: (role) => typeof role !== "string" ||
+          [ROLE_PATIENT].includes(role),
       },
       {
         type: "child",
         title: "Medical History",
         url: "/patients/medical-history",
         icon: BookOpen,
-        // hideIf: (role) => typeof role !== "string" ||
-        //   [ROLE_PATIENT, ROLE_INSURANCE_AGENT, ROLE_RECEPTIONIST, ROLE_BILLING_STAFF].includes(role),
+        hideIf: (role) => typeof role !== "string" ||
+          [ROLE_PATIENT, ROLE_INSURANCE_AGENT, ROLE_BILLING_STAFF].includes(role),
       },
       {
         type: "child",
         title: "Patient Details",
         url: "/patients/full",
         icon: IdCardLanyard,
+        hideIf: (role) => typeof role !== "string" ||
+          [ROLE_PATIENT, ROLE_INSURANCE_AGENT].includes(role),
       },
       {
         type: "child",
         title: "Treatments details",
         url: "/patients/treatment",
         icon: FileClock,
-        // hideIf: (role) => typeof role !== "string" ||
-        //   [ROLE_PATIENT, ROLE_INSURANCE_AGENT, ROLE_RECEPTIONIST, ROLE_BILLING_STAFF].includes(role),
+        hideIf: (role) => typeof role !== "string" ||
+          [ROLE_PATIENT, ROLE_INSURANCE_AGENT, ROLE_BILLING_STAFF].includes(role),
       },
       {
         type: "child",
         title: "Medication details",
         url: "/patients/medication",
         icon: FileClock,
-        // hideIf: (role) => typeof role !== "string" ||
-        //   [ROLE_PATIENT, ROLE_INSURANCE_AGENT, ROLE_RECEPTIONIST, ROLE_BILLING_STAFF].includes(role),
+        hideIf: (role) => typeof role !== "string" ||
+          [ROLE_PATIENT, ROLE_INSURANCE_AGENT, ROLE_BILLING_STAFF].includes(role),
       },
     ],
   },
-  // {
-  //   type: "parent",
-  //   title: "Patients",
-  //   icon: HeartPulse,
-  //   hideIf: (role) => typeof role !== "string" || role != ROLE_PATIENT,
-  //   children: [
-  //     {
-  //       type: "child",
-  //       title: "Medical History",
-  //       url: "",
-  //       icon: BookOpen,
-  //       hideIf: (role) => typeof role !== "string" ||
-  //         ![ROLE_PATIENT, ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
-  //     },
-  //     {
-  //       type: "child",
-  //       title: "Outstanding bills",
-  //       url: "",
-  //       icon: FileStack,
-  //       hideIf: (role) => typeof role !== "string" ||
-  //         ![ROLE_PATIENT, ROLE_BILLING_STAFF, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
-  //     },
-  //     {
-  //       type: "child",
-  //       title: "Insurances info",
-  //       url: "",
-  //       icon: IdCardLanyard,
-  //       hideIf: (role) => typeof role !== "string" ||
-  //         ![ROLE_PATIENT, ROLE_INSURANCE_AGENT, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
-  //     },
-  //     {
-  //       type: "child",
-  //       title: "Payment history",
-  //       url: "",
-  //       icon: FileClock,
-  //       hideIf: (role) => typeof role !== "string" ||
-  //         ![ROLE_PATIENT, ROLE_BILLING_STAFF, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
-  //     }
-  //   ],
-  // },
   {
     type: "parent",
     title: "Doctors",
@@ -297,39 +255,38 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
         title: "Doctors Overview",
         url: "/doctors-patients-history",
         icon: FileUser,
-        // hideIf: (role) => typeof role !== "string" ||
-        //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+        hideIf: (role) => typeof role !== "string" ||
+          ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
       },
       {
         type: "child",
         title: "Add Doctor",
         url: "/doctors/add",
         icon: UserPen,
-        // hideIf: (role) => typeof role !== "string" ||
-        //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+        hideIf: (role) => typeof role !== "string" ||
+          ![ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
       },
       {
         type: "child",
         title: "All Doctors",
         url: "/doctors",
         icon: UsersRound,
-        // hideIf: (role) => typeof role !== "string" ||
-        //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+        hideIf: (role) => typeof role !== "string" ||
+          ![ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
       },
       {
         type: "child",
         title: "Doctors' Specialities",
         url: "/doctors/specialities",
         icon: FileUser,
-        // hideIf: (role) => typeof role !== "string",
+        hideIf: (role) => typeof role !== "string",
       },
       {
         type: "child",
         title: "All Specialities",
         url: "/speciality",
         icon: BookUser,
-        // hideIf: (role) => typeof role !== "string" ||
-        //   [ROLE_PATIENT, ROLE_INSURANCE_AGENT].includes(role),
+        hideIf: (role) => typeof role !== "string",
       },
     ],
   },
@@ -337,79 +294,63 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
     type: "parent",
     title: "Appointments",
     icon: ClipboardClock,
-    // hideIf:(role) => typeof role !== "string" || ![ROLE_DOCTOR].includes(role),
+    hideIf: (role) => typeof role !== "string" || [ROLE_PATIENT, ROLE_INSURANCE_AGENT].includes(role),
     children: [
       {
         type: "child",
         title: "All Appointments",
         url: "/appointments",
         icon: ClipboardList,
-        // hideIf: (role) => typeof role !== "string" ||
-        //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+        hideIf: (role) => typeof role !== "string" ||
+          [ROLE_INSURANCE_AGENT, ROLE_PATIENT].includes(role),
       },
       {
         type: "child",
-        title: "Doctors' avilable time",
+        title: "Doctors' available time",
         url: "/appointments/slots",
         icon: ClockPlus,
-        // hideIf: (role) => typeof role !== "string" ||
-        //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+        hideIf: (role) => typeof role !== "string" ||
+          [ROLE_INSURANCE_AGENT, ROLE_BILLING_STAFF].includes(role),
       },
       {
         type: "child",
         title: "Add Appointment",
         url: "/appointments/add",
         icon: ClipboardPlus,
-        // hideIf: (role) => typeof role !== "string" ||
-        //   ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+        hideIf: (role) => typeof role !== "string" ||
+          ![ROLE_RECEPTIONIST, ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
       },
-      // {
-      //   type: "child",
-      //   title: "Schedule/Reschedule",
-      //   url: "",
-      //   icon: CalendarSync,
-      //   hideIf: (role) => typeof role !== "string" ||
-      //     ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
-      // },
-      // {
-      //   type: "child",
-      //   title: "Cancelled",
-      //   url: "",
-      //   icon: CalendarX2,
-      //   hideIf: (role) => typeof role !== "string" ||
-      //     ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
-      // },
     ],
   },
   {
     type: "parent",
     title: "Billing & Payment",
     icon: Receipt,
-    // hideIf:(role) => typeof role !== "string" || ![ROLE_DOCTOR].includes(role),
+    hideIf: (role) => typeof role !== "string" || [ROLE_PATIENT, ROLE_RECEPTIONIST, ROLE_NURSE, ROLE_DOCTOR].includes(role),
     children: [
       {
         type: "child",
         title: "Invoice details",
         url: "/invoice_details",
         icon: ReceiptText,
-        // hideIf: (role) => typeof role !== "string" ||
-        //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+        hideIf: (role) => typeof role !== "string" ||
+          [ROLE_PATIENT, ROLE_RECEPTIONIST, ROLE_NURSE, ROLE_DOCTOR].includes(role),
       },
       {
         type: "child",
         title: "Outstanding balances",
         url: "/outstanding-balances",
         icon: BanknoteX,
-        // hideIf: (role) => typeof role !== "string" ||
-        //   ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+        hideIf: (role) => typeof role !== "string" ||
+          [ROLE_PATIENT, ROLE_RECEPTIONIST, ROLE_NURSE, ROLE_DOCTOR].includes(role),
       },
       {
         type: "child",
         title: "Make payment",
         url: "/make-payment",
         icon: CreditCard,
-        // hideIf: (role) => typeof role !== "string" ||
-        //   ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+        hideIf: (role) => typeof role !== "string" ||
+          [ROLE_PATIENT, ROLE_RECEPTIONIST, ROLE_NURSE, ROLE_DOCTOR].includes(role),
       },
     ],
   },
@@ -417,41 +358,41 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
     type: "parent",
     title: "Insurance info",
     icon: HandCoins,
-    // hideIf: (role) => typeof role !== "string" ||
-    //   ![ROLE_BILLING_STAFF, ROLE_INSURANCE_AGENT, ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+    hideIf: (role) => typeof role !== "string" ||
+      ![ROLE_BILLING_STAFF, ROLE_INSURANCE_AGENT, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
     children: [
       {
         type: "child",
         title: "Claimed History",
         url: "/insurance-history",
-        icon: HandCoins,
-        // hideIf: (role) => typeof role !== "string" ||
-        //   ![ROLE_BILLING_STAFF, ROLE_INSURANCE_AGENT, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+        icon: ReceiptText,
+        hideIf: (role) => typeof role !== "string" ||
+          ![ROLE_BILLING_STAFF, ROLE_INSURANCE_AGENT, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
       },
-      {
-        type: "child",
-        title: "Requests",
-        url: "",
-        icon: HandCoins,
-        // hideIf: (role) => typeof role !== "string" ||
-        //   ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
-      },
+      // {
+      //   type: "child",
+      //   title: "Requests",
+      //   url: "",
+      //   icon: HandCoins,
+      //   // hideIf: (role) => typeof role !== "string" ||
+      //   //   ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+      // },
       {
         type: "child",
         title: "Insurance Types",
         url: "/insurance-types",
-        icon: HandCoins,
-        // hideIf: (role) => typeof role !== "string" ||
-        //   ![ROLE_BILLING_STAFF, ROLE_INSURANCE_AGENT, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+        icon: ShieldCheck,
+        hideIf: (role) => typeof role !== "string" ||
+          ![ROLE_BILLING_STAFF, ROLE_INSURANCE_AGENT, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
       },
-      {
-        type: "child",
-        title: "Available Patient",
-        url: "",
-        icon: HandCoins,
-        // hideIf: (role) => typeof role !== "string" ||
-        //   ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
-      },
+      // {
+      //   type: "child",
+      //   title: "Available Patient",
+      //   url: "",
+      //   icon: HandCoins,
+      //   // hideIf: (role) => typeof role !== "string" ||
+      //   //   ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+      // },
     ],
   },
 ]
@@ -521,9 +462,9 @@ export function AppSidebar() {
         </SidebarGroup>
         {items.map((item) =>
           item.type !== "parent" || item.hideIf?.(role) ? null : (
-            <SidebarGroup>
+            <SidebarGroup key={item.title}>
               <SidebarMenu>
-                <Collapsible className="group/collapsible">
+                <Collapsible className="group/collapsible" key={`${item.title}-collapsible`}>
                   <SidebarMenuItem>
                     <CollapsibleTrigger asChild>
                       <SidebarMenuButton>
@@ -535,7 +476,7 @@ export function AppSidebar() {
                     <CollapsibleContent>
                       <SidebarMenuSub>
                         {item.children.map((child) =>
-                          item.hideIf?.(role) ? null : (
+                          child.hideIf?.(role) ? null : (
                             <SidebarMenuSubItem key={child.title}>
                               <SidebarMenuSubButton asChild>
                                 <NavLink to={child.url}>
@@ -576,7 +517,6 @@ export function AppSidebar() {
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 side="top"
-                // className="w-[--radix-popper-anchor-width]"
                 className="w-full w-(--sidebar-width)"
               >
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
