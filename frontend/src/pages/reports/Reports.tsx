@@ -9,7 +9,6 @@ import {
   downloadTreatmentsPerCategoryCsv,
 } from "@/services/reportsServices";
 
-// no direct backend url usage; services handle requests
 
 export default function Reports() {
 
@@ -56,7 +55,7 @@ export default function Reports() {
           <CardTitle>Treatments per Category</CardTitle>
         </CardHeader>
         <CardContent>
-          <Button onClick={() => downloadTreatmentsPerCategoryCsv()}>
+          <Button className="cursor-pointer" onClick={() => downloadTreatmentsPerCategoryCsv()}>
             <DownloadCloud className="mr-2 h-4 w-4" /> Download CSV
           </Button>
         </CardContent>
