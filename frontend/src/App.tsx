@@ -66,9 +66,17 @@ function App() {
 
   useEffect(() => {
     const path = window.location.pathname;
-    const isAuthPath =
-      path == "/staff/sign-in" || path == "/staff/sign-up" || path == "/sign-in" || path === "/sign-up";
-    if (!token && !isAuthPath) {
+    // Publicly accessible routes (no auth required)
+    const PUBLIC_PATHS = new Set<string>([
+      "/",
+      "/sign-in",
+      "/sign-up",
+      "/staff/sign-in",
+      "/staff/sign-up",
+    ]);
+    const isPublicPath = PUBLIC_PATHS.has(path);
+
+    if (!token && !isPublicPath) {
       navigate("/sign-in");
       return;
     }
@@ -81,8 +89,11 @@ function App() {
       localStorage.removeItem(LOCAL_STORAGE__ROLE);
       localStorage.removeItem(LOCAL_STORAGE__USER_ID);
 
-      if (!isAuthPath) {
+      if (!isPublicPath) {
         navigate("/sign-in");
+      } else {
+        // Stay on public pages and stop showing loading on invalid/expired tokens
+        setLoading(false);
       }
     });
   }, []);
