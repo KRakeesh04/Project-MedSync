@@ -36,11 +36,12 @@ import { getAllBranchManagers, createBranchManager, updateBranchManager, addNewB
 
 
 import { getMonthlyRevenueHandler } from "../handlers/billingpayment.handlers.ts";
-import {  getAppointmentsByDoctorIdCountHandler, getAppointmentsByDoctorIdHandler, getAppointmentsbyPatientIdHandler, getAppointmentsCountByMonthHandler, getDoctorsAppointmentsForPagination } from "../handlers/appointment.handler.ts";
+import { getAppointmentsByDoctorIdCountHandler, getAppointmentsByDoctorIdHandler, getAppointmentsbyPatientIdHandler, getAppointmentsCountByMonthHandler, getDoctorsAppointmentsForPagination } from "../handlers/appointment.handler.ts";
 import { getAllAppointments, getAppointmentById, createAppointment, createAppointmentFromData, updateAppointment, updateAppointmentStatus, deleteAppointment, getAvailableSlots, getAllDoctorsForAppointments } from "../handlers/appointment.handler.ts";
 
 import { createNewInsuranceType, getAllInsuranceTypeNames, getInsuranceTypes, updateInsuranceTypeByID } from "../handlers/insurance.handler.ts";
 import { getInsuranceHistoryHandler } from "../handlers/insurancehistory.handler.ts";
+import { getBranchDailyAppointmentSummaryCsv, getDoctorRevenueReportCsv, getInsuranceVsOutOfPocketCsv, getPatientsWithOutstandingBalancesCsv, getTreatmentsPerCategoryCsv } from "../handlers/reports.handler.ts";
 
 export const HttpMethod = {
 	GET: "GET",
@@ -173,10 +174,10 @@ var routes: Route[] = [
 	{ path: "/branch-managers/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: updateBranchManager },
 	{ path: "/branches/without-manager", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getBranchesWithoutManagerHandler },
 	{ path: "/branch-managers/add", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: addNewBranchManager },
-	
+
 	//billing and payment router
 	{ path: "/billing/monthly-revenue", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getMonthlyRevenueHandler },
-	
+
 	//insurance router
 	{ path: "/all-insurance-types", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllInsuranceTypeNames },
 	{ path: "/insurance-types", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getInsuranceTypes },
@@ -184,7 +185,14 @@ var routes: Route[] = [
 	{ path: "/insurance-types/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: updateInsuranceTypeByID },
 
 	//insurance history router
-	{path: "/insurance-histories", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler:getInsuranceHistoryHandler },
+	{ path: "/insurance-histories", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getInsuranceHistoryHandler },
+
+	// reports CSV downloads
+	{ path: "/reports/branch-daily-appointments.csv", AccessibleBy: availableForRoles([Role.ADMIN_STAFF, Role.BRANCH_MANAGER, Role.SUPER_ADMIN]), method: HttpMethod.GET, handler: getBranchDailyAppointmentSummaryCsv },
+	{ path: "/reports/doctor-revenue.csv", AccessibleBy: availableForRoles([Role.BILLING_STAFF, Role.ADMIN_STAFF, Role.BRANCH_MANAGER, Role.SUPER_ADMIN]), method: HttpMethod.GET, handler: getDoctorRevenueReportCsv },
+	{ path: "/reports/outstanding-balances.csv", AccessibleBy: availableForRoles([Role.BILLING_STAFF, Role.ADMIN_STAFF, Role.BRANCH_MANAGER, Role.SUPER_ADMIN]), method: HttpMethod.GET, handler: getPatientsWithOutstandingBalancesCsv },
+	{ path: "/reports/treatments-per-category.csv", AccessibleBy: availableForRoles([Role.ADMIN_STAFF, Role.BRANCH_MANAGER, Role.SUPER_ADMIN]), method: HttpMethod.GET, handler: getTreatmentsPerCategoryCsv },
+	{ path: "/reports/insurance-vs-out-of-pocket.csv", AccessibleBy: availableForRoles([Role.BILLING_STAFF, Role.ADMIN_STAFF, Role.BRANCH_MANAGER, Role.SUPER_ADMIN]), method: HttpMethod.GET, handler: getInsuranceVsOutOfPocketCsv },
 
 
 ];

@@ -222,17 +222,17 @@ CREATE TABLE `billing_invoice` (
     REFERENCES `appointment`(`appointment_id`)
 );
 
-CREATE TABLE billing_payment (
-  payment_id INT AUTO_INCREMENT,
-  invoice_id INT,
-  branch_id INT,
-  paid_amount NUMERIC(8,2),
-  time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  cashier_id INT,
-  PRIMARY KEY (payment_id),
-  FOREIGN KEY (branch_id) REFERENCES branch(branch_id),
-  FOREIGN KEY (invoice_id) REFERENCES billing_invoice(appointment_id),
-  FOREIGN KEY (cashier_id) REFERENCES staff(staff_id)
+CREATE TABLE `billing_payment` (
+  `payment_id` INT AUTO_INCREMENT,
+  `invoice_id` INT,
+  `branch_id` INT,
+  `paid_amount` NUMERIC(8,2),
+  `time_stamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `cashier_id` INT,
+  PRIMARY KEY (`payment_id`),
+  FOREIGN KEY (`branch_id`) REFERENCES `branch`(`branch_id`),
+  FOREIGN KEY (`invoice_id`) REFERENCES `billing_invoice`(`appointment_id`),
+  FOREIGN KEY (`cashier_id`) REFERENCES `staff`(`staff_id`)
 ) AUTO_INCREMENT = 1;
 
 
@@ -328,3 +328,75 @@ CREATE INDEX idx_treatment_service_code ON treatment(service_code);
 -- Insurance claim
 CREATE INDEX idx_insurance_claim_patient ON insurance_claim(patient_id);
 CREATE INDEX idx_insurance_claim_insurance ON insurance_claim(insurance_id);
+
+
+-- Branch-wise appointment summary per day
+CREATE OR REPLACE VIEW branch_daily_appointment_summary AS
+SELECT 
+    b.branch_id,
+    b.name AS branch_name,
+    DATE_FORMAT(a.date, '%Y-%m-%d') AS appointment_date,
+    a.status,
+    COUNT(a.appointment_id) AS total_appointments
+FROM appointment a
+JOIN doctor d ON a.doctor_id = d.doctor_id
+JOIN user u ON d.doctor_id = u.user_id
+JOIN branch b ON u.branch_id = b.branch_id
+GROUP BY b.branch_id, b.name, a.date, a.status
+ORDER BY b.branch_id, a.date;
+
+
+-- Doctor-wise revenue report
+CREATE OR REPLACE VIEW doctor_revenue_report AS
+SELECT 
+    d.doctor_id,
+    d.name AS doctor_name,
+    SUM(bi.net_amount) AS total_revenue
+FROM appointment a
+JOIN doctor d ON a.doctor_id = d.doctor_id
+JOIN billing_invoice bi ON bi.appointment_id = a.appointment_id
+GROUP BY d.doctor_id, d.name
+ORDER BY total_revenue DESC;
+
+
+-- Patients with outstanding balances
+CREATE OR REPLACE VIEW patients_with_outstanding_balance AS
+SELECT 
+    p.patient_id,
+    p.name AS patient_name,
+    bi.net_amount,
+    bi.remaining_payment_amount
+FROM billing_invoice bi
+JOIN appointment a ON bi.appointment_id = a.appointment_id
+JOIN patient p ON a.patient_id = p.patient_id
+WHERE bi.remaining_payment_amount > 0
+ORDER BY bi.remaining_payment_amount DESC;
+
+
+-- Number of treatments per category (for given date range)
+CREATE OR REPLACE VIEW treatments_per_category AS
+SELECT 
+    s.speciality_name,
+    tc.name AS treatment_name,
+    COUNT(t.appointment_id) AS total_treatments
+FROM treatment t
+JOIN treatment_catelogue tc ON t.service_code = tc.service_code
+JOIN speciality s ON tc.speciality_id = s.speciality_id
+JOIN appointment a ON t.appointment_id = a.appointment_id
+GROUP BY s.speciality_name, tc.name
+ORDER BY s.speciality_name, tc.name;
+
+
+-- Insurance coverage vs out-of-pocket payments
+CREATE OR REPLACE VIEW insurance_vs_out_of_pocket_report AS
+SELECT 
+    b.name AS branch_name,
+    SUM(CASE WHEN bi.claim_id IS NOT NULL THEN bi.net_amount ELSE 0 END) AS insurance_covered_amount,
+    SUM(CASE WHEN bi.claim_id IS NULL THEN bi.net_amount ELSE 0 END) AS out_of_pocket_amount
+FROM billing_invoice bi
+JOIN appointment a ON bi.appointment_id = a.appointment_id
+JOIN doctor d ON a.doctor_id = d.doctor_id
+JOIN user u ON d.doctor_id = u.user_id
+JOIN branch b ON u.branch_id = b.branch_id
+GROUP BY b.branch_id, b.name
+ORDER BY b.name;
