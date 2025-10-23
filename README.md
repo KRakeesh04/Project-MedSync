@@ -3,6 +3,7 @@
 A comprehensive medical clinic appointment and treatment management system built with modern web technologies.
 
 Website link - ```http://medsync.kalanalakshan.me/```
+Hosted and dockerized repository link - ``` https://github.com/Kalana-Lakshan/Testing-Project ```
 
 ## 🏥 Project Overview
 
